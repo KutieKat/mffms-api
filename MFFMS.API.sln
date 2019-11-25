@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MFFMS.API", "MFFMS.API.csproj", "{736FF47C-3DA7-4C59-B949-DE9A5E38F237}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{736FF47C-3DA7-4C59-B949-DE9A5E38F237}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{736FF47C-3DA7-4C59-B949-DE9A5E38F237}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{736FF47C-3DA7-4C59-B949-DE9A5E38F237}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{736FF47C-3DA7-4C59-B949-DE9A5E38F237}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {88E86A09-6B6E-49E7-9A2B-EB20763ABCFD}
+	EndGlobalSection
+EndGlobal
