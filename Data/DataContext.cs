@@ -11,9 +11,8 @@ namespace MFFMS.API.Data
         public DbSet<KhachHang> DanhSachKhachHang { get; set; }
         public DbSet<NhanVien> DanhSachNhanVien { get; set; }
         public DbSet<SanBong> DanhSachSanBong { get; set; }
-        /*public DbSet<GiaGioThue> DanhSachGiaGioThue { get; set; }
         public DbSet<PhieuDatSan> DanhSachPhieuDatSan { get; set; }
-        public DbSet<ChiTietGioThue> DanhSachChiTietGioThue { get; set; }*/
+        public DbSet<ChiTietPhieuDatSan> DanhSachChiTietPhieuDatSan { get; set; }
         public DbSet<DichVu> DanhSachDichVu { get; set; }
         public DbSet<HoaDonDichVu> DanhSachHoaDonDichVu { get; set; }
         public DbSet<ChiTietHDDV> DanhSachChiTietHDDV { get; set; }
@@ -31,9 +30,8 @@ namespace MFFMS.API.Data
             modelBuilder.Entity<KhachHang>().HasKey(x => x.MaKhachHang);
             modelBuilder.Entity<NhanVien>().HasKey(x => x.MaNhanVien);
             modelBuilder.Entity<SanBong>().HasKey(x => x.MaSanBong);
-            /* modelBuilder.Entity<GiaGioThue>().HasKey(x => x.MaGio);
-             modelBuilder.Entity<PhieuDatSan>().HasKey(x => x.MaPhieuDatSan);
-             modelBuilder.Entity<ChiTietGioThue>().HasKey(x => new { x.MaPhieuDatSan, x.MaGio });*/
+            modelBuilder.Entity<PhieuDatSan>().HasKey(x => x.MaPhieuDatSan);
+            modelBuilder.Entity<ChiTietPhieuDatSan>().HasKey(x => x.MaChiTietPDS);
             modelBuilder.Entity<DichVu>().HasKey(x => x.MaDichVu);
             modelBuilder.Entity<HoaDonDichVu>().HasKey(x => x.SoHDDV);
             modelBuilder.Entity<ChiTietHDDV>().HasKey(x => new { x.SoHDDV, x.MaDichVu });
@@ -65,12 +63,13 @@ namespace MFFMS.API.Data
             modelBuilder.Entity<TaiSanThietBi>().HasIndex(x => x.TenTSTB).IsUnique();
             modelBuilder.Entity<TaiSanThietBi>().Property(x => x.TenTSTB).IsRequired();
 
+            modelBuilder.Entity<ChiTietPhieuDatSan>().HasIndex(x => x.ThoiGianBatDau).IsUnique();
+            modelBuilder.Entity<ChiTietPhieuDatSan>().Property(x => x.ThoiGianBatDau).IsRequired();
+            modelBuilder.Entity<ChiTietPhieuDatSan>().HasIndex(x => x.ThoiGianKetThuc).IsUnique();
+            modelBuilder.Entity<ChiTietPhieuDatSan>().Property(x => x.ThoiGianKetThuc).IsRequired();
+
             //Relationships
-            /* modelBuilder.Entity<PhieuDatSan>()
-                 .HasOne(x=>x.KhachHang)
-                 .WithMany(x=>x.PhieuDatSan)
-                 .IsRequired()
-                 .OnDelete(DeleteBehavior.Cascade);*/
+            
 
             modelBuilder.Entity<HoaDonDichVu>()
                 .HasOne(x => x.KhachHang)
@@ -111,6 +110,24 @@ namespace MFFMS.API.Data
             modelBuilder.Entity<ChiTietDonNhapHang>()
                 .HasOne(x => x.TaiSanThietBi)
                 .WithMany(x => x.ChiTietDonNhapHang)
+                .IsRequired();
+
+            modelBuilder.Entity<PhieuDatSan>()
+                .HasOne(x => x.KhachHang)
+                .WithMany(x => x.PhieuDatSan)
+                .IsRequired();
+            modelBuilder.Entity<PhieuDatSan>()
+                .HasOne(x => x.NhanVien)
+                .WithMany(x => x.PhieuDatSan)
+                .IsRequired();
+
+            modelBuilder.Entity<ChiTietPhieuDatSan>()
+                .HasOne(x => x.PhieuDatSan)
+                .WithMany(x => x.ChiTietPhieuDatSan)
+                .IsRequired();
+            modelBuilder.Entity<ChiTietPhieuDatSan>()
+                .HasOne(x => x.SanBong)
+                .WithMany(x => x.ChiTietPhieuDatSan)
                 .IsRequired();
         }
     }

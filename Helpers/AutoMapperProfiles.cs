@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using MFFMS.API.Dtos.KhachHangDto;
+using MFFMS.API.Dtos.NhanVienDto;
 using MFFMS.API.Dtos.TaiKhoanDto;
 using MFFMS.API.Models;
 using System;
@@ -13,6 +15,8 @@ namespace MFFMS.API.Helpers
         public AutoMapperProfiles()
         {
             CreateMapForTaiKhoan();
+            CreateMapForKhachHang();
+            CreateMapForNhanVien();
         }
 
         private void CreateMapForTaiKhoan()
@@ -24,6 +28,26 @@ namespace MFFMS.API.Helpers
             CreateMap<TaiKhoan, TaiKhoanForLoginDto>();
             CreateMap<TaiKhoanForCreateDto, TaiKhoan>();
             CreateMap<TaiKhoanForUpdateDto, TaiKhoan>();
+        }
+
+        private void CreateMapForKhachHang()
+        {
+            CreateMap<KhachHang, KhachHangForListDto>();
+            CreateMap<KhachHang, KhachHangForViewDto>();
+            CreateMap<KhachHang, KhachHangForCreateDto>();
+            CreateMap<KhachHang, KhachHangForUpdateDto>();
+            CreateMap<KhachHangForCreateDto, KhachHang>();
+            CreateMap<KhachHangForUpdateDto, KhachHang>();
+        }
+
+        private void CreateMapForNhanVien()
+        {
+            CreateMap<NhanVien, NhanVienForListDto>();
+            CreateMap<NhanVien, NhanVienForViewDto>();
+            CreateMap<NhanVien, NhanVienForCreateDto>();
+            CreateMap<NhanVien, NhanVienForUpdateDto>();
+            CreateMap<NhanVienForCreateDto, NhanVien>();
+            CreateMap<NhanVienForUpdateDto, NhanVien>();
         }
     }
 }

@@ -14,6 +14,6 @@ namespace MFFMS.API.Models
         public string DienTich { get; set; } // Sân 5, sân 7 / sân 11
         public string GhiChu { get; set; }
 
-        //public ICollection<PhieuDatSan> PhieuDatSan { get; set; }
+        public ICollection<ChiTietPhieuDatSan> ChiTietPhieuDatSan { get; set; }
     }
 }
