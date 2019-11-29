@@ -25,6 +25,9 @@ using Microsoft.AspNetCore.Identity;
 using MFFMS.API.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using MFFMS.API.Data.KhachHangRepository;
+using MFFMS.API.Data.NhanVienRepository;
+using MFFMS.API.Data.SanBongRepository;
 
 namespace MFFMS.API
 {
@@ -49,6 +52,9 @@ namespace MFFMS.API
             services.AddCors();
             services.AddAutoMapper();
             services.AddScoped<ITaiKhoanRepository, TaiKhoanRepository>();
+            services.AddScoped<IKhachHangRepository, KhachHangRepository>();
+            services.AddScoped<INhanVienRepository, NhanVienRepository>();
+            services.AddScoped<ISanBongRepository, SanBongRepository>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

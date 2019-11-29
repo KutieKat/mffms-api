@@ -1,22 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MFFMS.API.Models
+namespace MFFMS.API.Dtos.KhachHangDto
 {
-    public class KhachHang : BaseModel
+    public class KhachHangForListDto : BaseDto
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string MaKhachHang { get; set; }
         public string TenKhachHang { get; set; }
         public string GioiTinh { get; set; }
         public string SoDienThoai { get; set; }
         public string DiaChi { get; set; }
         public string GhiChu { get; set; }
-
-        public ICollection<PhieuDatSan> PhieuDatSan { get; set; }
-        public ICollection<HoaDonDichVu> HoaDonDichVu { get; set; }
     }
 }

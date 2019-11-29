@@ -1,25 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MFFMS.API.Models
+namespace MFFMS.API.Dtos.NhanVienDto
 {
-    public class NhanVien : BaseModel
+    public class NhanVienForCreateDto : BaseDto
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public string MaNhanVien { get; set; }
+        [Required]
         public string TenNhanVien { get; set; }
+        [Required]
         public string GioiTinh { get; set; }
+        [Required]
         public DateTime NgaySinh { get; set; }
+        [Required]
         public string ChucVu { get; set; }
+        [Required]
         public string SoDienThoai { get; set; }
+        [Required]
         public string SoCMND { get; set; }
+        [Required]
         public decimal Luong { get; set; }
         public string GhiChu { get; set; }
 
-        public ICollection<PhieuDatSan> PhieuDatSan { get; set; }
-        public ICollection<DonNhapHang> DonNhapHang { get; set; }
     }
 }
