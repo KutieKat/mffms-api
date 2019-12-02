@@ -182,7 +182,38 @@ namespace MFFMS.API.Data.KhachHangRepository
             return result;
         }
 
-        public object GetStatusStatistics(KhachHangParams userParams)
+        public async Task<Object> GetGeneralStatistics(KhachHangStatisticsParams userParams)
+        {
+            var result = _context.DanhSachKhachHang.AsQueryable();
+            var totalCustomers = 0;
+            var maleCustomers = 0;
+            var femaleCustomers = 0;
+
+            if (userParams != null && userParams.StartingTime.GetHashCode() != 0 && userParams.EndingTime.GetHashCode() != 0)
+            {
+                totalCustomers = result.Count();
+                maleCustomers = result.Where(x => x.GioiTinh == "Nam" && x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Count();
+                femaleCustomers = result.Where(x => x.GioiTinh == "Nữ" && x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Count();
+            }
+            else
+            {
+                totalCustomers = result.Count();
+                maleCustomers = result.Where(x => x.GioiTinh == "Nam").Count();
+                femaleCustomers = result.Where(x => x.GioiTinh == "Nữ").Count();
+            }
+
+            return new
+            {
+                Customers = new
+                {
+                    Total = totalCustomers,
+                    Males = maleCustomers,
+                    Females = femaleCustomers
+                }
+            };
+        }
+
+        public Object GetStatusStatistics(KhachHangParams userParams)
         {
             var result = _context.DanhSachKhachHang.AsQueryable();
             var sortField = userParams.SortField;
