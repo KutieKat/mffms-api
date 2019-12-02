@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using MFFMS.API.Dtos.DichVuDto;
+using MFFMS.API.Dtos.HoaDonDichVuDto;
 using MFFMS.API.Dtos.KhachHangDto;
 using MFFMS.API.Dtos.NhanVienDto;
 using MFFMS.API.Dtos.SanBongDto;
@@ -19,6 +21,8 @@ namespace MFFMS.API.Helpers
             CreateMapForKhachHang();
             CreateMapForNhanVien();
             CreateMapForSanBong();
+            CreateMapForDichVu();
+            CreateMapForHoaDonDichVu();
         }
 
         private void CreateMapForTaiKhoan()
@@ -61,6 +65,26 @@ namespace MFFMS.API.Helpers
             CreateMap<SanBong, SanBongForUpdateDto>();
             CreateMap<SanBongForCreateDto, SanBong>();
             CreateMap<SanBongForUpdateDto, SanBong>();
+        }
+
+        private void CreateMapForDichVu()
+        {
+            CreateMap<DichVu, DichVuForCreateDto>();
+            CreateMap<DichVu, DichVuForUpdateDto>();
+            CreateMap<DichVu, DichVuForViewDto>();
+            CreateMap<DichVu, DichVuForListDto>();
+            CreateMap<DichVuForCreateDto, DichVu>();
+            CreateMap<DichVuForUpdateDto, DichVu>();
+        }
+
+        private void CreateMapForHoaDonDichVu()
+        {
+            CreateMap<HoaDonDichVu, HoaDonDichVuForCreateDto>();
+            CreateMap<HoaDonDichVu, HoaDonDichVuForUpdateDto>();
+            CreateMap<HoaDonDichVu, HoaDonDichVuForViewDto>();
+            CreateMap<HoaDonDichVu, HoaDonDichVuForListDto>();
+            CreateMap<HoaDonDichVuForCreateDto, HoaDonDichVu>();
+            CreateMap<HoaDonDichVuForUpdateDto, HoaDonDichVu>();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace MFFMS.API.Data.KhachHangRepository
 {
     public class KhachHangRepository : IKhachHangRepository
     {
-        private DataContext _context;
+        private readonly DataContext _context;
         private int _totalItems;
         private int _totalPages;
 
