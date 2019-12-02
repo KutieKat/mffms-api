@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using MFFMS.API.Data.SanBongRepository;
+using MFFMS.API.Data.NhaCungCapRepository;
 using MFFMS.API.Dtos.ResponseDto;
-using MFFMS.API.Dtos.SanBongDto;
+using MFFMS.API.Dtos.NhaCungCapDto;
 using MFFMS.API.Helpers;
 using MFFMS.API.Helpers.Params;
 using Microsoft.AspNetCore.Http;
@@ -15,26 +15,26 @@ namespace MFFMS.API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class SanBongController : ControllerBase
+    public class NhaCungCapController : ControllerBase
     {
-        private readonly ISanBongRepository _repo;
+        private readonly INhaCungCapRepository _repo;
         private readonly IMapper _mapper;
         private readonly string _entityName;
 
-        public SanBongController(ISanBongRepository repo, IMapper mapper)
+        public NhaCungCapController(INhaCungCapRepository repo, IMapper mapper)
         {
             _repo = repo;
             _mapper = mapper;
-            _entityName = "sân bóng";
+            _entityName = "nhà cung cấp";
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] SanBongParams userParams)
+        public async Task<IActionResult> GetAll([FromQuery] NhaCungCapParams userParams)
         {
-            try
+            try 
             {
                 var result = await _repo.GetAll(userParams);
-                var resultToReturn = _mapper.Map<IEnumerable<SanBongForListDto>>(result);
+                var resultToReturn = _mapper.Map<IEnumerable<NhaCungCapForListDto>>(result);
 
                 Response.AddPagination(result.CurrentPage, result.PageSize, result.TotalCount, result.TotalPages);
 
@@ -51,6 +51,7 @@ namespace MFFMS.API.Controllers
                         StatusStatistics = _repo.GetStatusStatistics(userParams)
                     }
                 });
+
             }
             catch (Exception e)
             {
@@ -65,14 +66,13 @@ namespace MFFMS.API.Controllers
             }
         }
 
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             try
             {
                 var result = await _repo.GetById(id);
-                var resultToReturn = _mapper.Map<SanBongForViewDto>(result);
+                var resultToReturn = _mapper.Map<NhaCungCapForViewDto>(result);
 
                 return StatusCode(200, new SuccessResponseDto
                 {
@@ -97,15 +97,15 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(SanBongForCreateDto sanBong)
+        public async Task<IActionResult> Create(NhaCungCapForCreateDto nhaCungCap)
         {
             try
             {
-                var validationResult = _repo.ValidateBeforeCreate(sanBong);
+                var validationResult = _repo.ValidateBeforeCreate(nhaCungCap);
 
                 if (validationResult.IsValid)
                 {
-                    var result = await _repo.Create(sanBong);
+                    var result = await _repo.Create(nhaCungCap);
 
                     return StatusCode(201, new SuccessResponseDto
                     {
@@ -142,15 +142,15 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateById(int id, SanBongForUpdateDto sanBong)
+        public async Task<IActionResult> UpdateById(int id, NhaCungCapForUpdateDto nhaCungCap)
         {
             try
             {
-                var validationResult = _repo.ValidateBeforeUpdate(id, sanBong);
+                var validationResult = _repo.ValidateBeforeUpdate(id, nhaCungCap);
 
                 if (validationResult.IsValid)
                 {
-                    var result = await _repo.UpdateById(id, sanBong);
+                    var result = await _repo.UpdateById(id, nhaCungCap);
 
                     return StatusCode(200, new SuccessResponseDto
                     {
@@ -185,7 +185,7 @@ namespace MFFMS.API.Controllers
                 });
             }
         }
-
+        
         [HttpPut("{id}")]
         public async Task<IActionResult> TemporarilyDeleteById(int id)
         {
@@ -214,7 +214,7 @@ namespace MFFMS.API.Controllers
                 });
             }
         }
-        
+
         [HttpPut("{id}")]
         public async Task<IActionResult> RestoreById(int id)
         {

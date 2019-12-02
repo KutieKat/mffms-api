@@ -28,6 +28,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using MFFMS.API.Data.KhachHangRepository;
 using MFFMS.API.Data.NhanVienRepository;
 using MFFMS.API.Data.SanBongRepository;
+using MFFMS.API.Data.NhaCungCapRepository;
 
 namespace MFFMS.API
 {
@@ -55,6 +56,7 @@ namespace MFFMS.API
             services.AddScoped<IKhachHangRepository, KhachHangRepository>();
             services.AddScoped<INhanVienRepository, NhanVienRepository>();
             services.AddScoped<ISanBongRepository, SanBongRepository>();
+            services.AddScoped<INhaCungCapRepository, NhaCungCapRepository>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
