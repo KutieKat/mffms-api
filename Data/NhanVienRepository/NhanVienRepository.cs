@@ -574,5 +574,34 @@ namespace MFFMS.API.Data.NhanVienRepository
 
             return tempId;
         }
+
+        public async Task<Object> GetGeneralStatistics (NhanVienStatisticsParams userParams)
+        {
+            var result = _context.DanhSachNhanVien.AsQueryable();
+            double totalSalary = 0;
+            var totalQuantity = 0;
+
+            if (userParams != null && userParams.StartingTime.GetHashCode() != 0 && userParams.EndingTime.GetHashCode() != 0)
+            {
+                totalQuantity = result.Count();
+                totalSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Sum(x=>x.Luong);
+            }
+            else
+            {
+               
+                totalQuantity = result.Count();
+                totalSalary = result.Sum(x=>x.Luong);
+            }
+
+            return new
+            {
+                generalEmployee = new
+                {
+                    TotalQuantity = totalQuantity,
+                    TotalSalary = totalSalary
+                }
+            };
+        }
+
     }
 }

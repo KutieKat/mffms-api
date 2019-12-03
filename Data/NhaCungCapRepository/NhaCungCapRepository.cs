@@ -1,50 +1,61 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MFFMS.API.Dtos.KhachHangDto;
+using MFFMS.API.Dtos;
+using MFFMS.API.Dtos.NhaCungCapDto;
 using MFFMS.API.Helpers;
 using MFFMS.API.Helpers.Params;
 using MFFMS.API.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace MFFMS.API.Data.KhachHangRepository
+namespace MFFMS.API.Data.NhaCungCapRepository
 {
-    public class KhachHangRepository : IKhachHangRepository
+    public class NhaCungCapRepository : INhaCungCapRepository
     {
-        private readonly DataContext _context;
+        private DataContext _context;
         private int _totalItems;
         private int _totalPages;
 
-        public KhachHangRepository(DataContext context)
+        public NhaCungCapRepository(DataContext context)
         {
             _context = context;
             _totalItems = 0;
             _totalPages = 0;
         }
 
-        public async Task<KhachHang> Create(KhachHangForCreateDto khachHang)
+        public async Task<NhaCungCap> Create(NhaCungCapForCreateDto nhaCungCap)
         {
-            var newKhachHang = new KhachHang
+            var danhSachNhaCungCap = await _context.DanhSachNhaCungCap.OrderByDescending(x => x.MaNhaCungCap).FirstOrDefaultAsync();
+            var maNhaCungCap = 1;
+            if (danhSachNhaCungCap == null)
             {
-                MaKhachHang = GenerateId(),
-                TenKhachHang = khachHang.TenKhachHang,
-                GioiTinh = khachHang.GioiTinh,
-                SoDienThoai = khachHang.SoDienThoai,
-                DiaChi = khachHang.DiaChi,
-                GhiChu = khachHang.GhiChu,
-                ThoiGianTao = DateTime.Now,
+                maNhaCungCap = 1;
+            }
+            else
+            {
+                maNhaCungCap = danhSachNhaCungCap.MaNhaCungCap + 1;
+            }
+
+            var newNhaCungCap = new NhaCungCap
+            {
+                MaNhaCungCap = maNhaCungCap,
+                TenNhaCungCap = nhaCungCap.TenNhaCungCap,
+                SoDienThoai = nhaCungCap.SoDienThoai,
+                DiaChi = nhaCungCap.DiaChi,
+                GhiChu = nhaCungCap.GhiChu,
                 ThoiGianCapNhat = DateTime.Now,
+                ThoiGianTao = DateTime.Now,
                 TrangThai = 1
             };
-            await _context.DanhSachKhachHang.AddAsync(newKhachHang);
+            await _context.DanhSachNhaCungCap.AddAsync(newNhaCungCap);
             await _context.SaveChangesAsync();
-            return newKhachHang;
+            return newNhaCungCap;
         }
 
-        public async Task<PagedList<KhachHang>> GetAll(KhachHangParams userParams)
+        public async Task<PagedList<NhaCungCap>> GetAll(NhaCungCapParams userParams)
         {
-            var result = _context.DanhSachKhachHang.AsQueryable();
+            var result = _context.DanhSachNhaCungCap.AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
@@ -56,7 +67,7 @@ namespace MFFMS.API.Data.KhachHangRepository
 
             if (!string.IsNullOrEmpty(keyword))
             {
-                result = result.Where(x => x.TenKhachHang.ToLower().Contains(keyword.ToLower()) || x.SoDienThoai.ToLower().Contains(keyword.ToLower()) || x.DiaChi.ToLower().Contains(keyword.ToLower()) || x.MaKhachHang == keyword);
+                result = result.Where(x => x.TenNhaCungCap.ToLower().Contains(keyword.ToLower()) || x.MaNhaCungCap.ToString() == keyword);
             }
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
@@ -78,38 +89,28 @@ namespace MFFMS.API.Data.KhachHangRepository
             {
                 switch (sortField)
                 {
-                    case "MaKhachHang":
+                    case "MaNhaCungCap":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.MaKhachHang);
+                            result = result.OrderBy(x => x.MaNhaCungCap);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.MaKhachHang);
+                            result = result.OrderByDescending(x => x.MaNhaCungCap);
                         }
                         break;
 
-                    case "TenKhachHang":
+                    case "TenNhaCungCap":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.TenKhachHang);
+                            result = result.OrderBy(x => x.TenNhaCungCap);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.TenKhachHang);
+                            result = result.OrderByDescending(x => x.TenNhaCungCap);
                         }
                         break;
 
-                    case "GioiTinh":
-                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
-                        {
-                            result = result.OrderBy(x => x.GioiTinh);
-                        }
-                        else
-                        {
-                            result = result.OrderByDescending(x => x.GioiTinh);
-                        }
-                        break;
                     case "SoDienThoai":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
@@ -118,16 +119,6 @@ namespace MFFMS.API.Data.KhachHangRepository
                         else
                         {
                             result = result.OrderByDescending(x => x.SoDienThoai);
-                        }
-                        break;
-                    case "DiaChi":
-                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
-                        {
-                            result = result.OrderBy(x => x.DiaChi);
-                        }
-                        else
-                        {
-                            result = result.OrderByDescending(x => x.DiaChi);
                         }
                         break;
 
@@ -172,50 +163,18 @@ namespace MFFMS.API.Data.KhachHangRepository
             _totalItems = result.Count();
             _totalPages = (int)Math.Ceiling((double)_totalItems / (double)userParams.PageSize);
 
-            return await PagedList<KhachHang>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
+            return await PagedList<NhaCungCap>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<KhachHang> GetById(string id)
+        public async Task<NhaCungCap> GetById(int id)
         {
-            var result = await _context.DanhSachKhachHang.FirstOrDefaultAsync(x => x.MaKhachHang == id);
-
+            var result = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
             return result;
         }
 
-        public async Task<Object> GetGeneralStatistics(KhachHangStatisticsParams userParams)
+        public object GetStatusStatistics(NhaCungCapParams userParams)
         {
-            var result = _context.DanhSachKhachHang.AsQueryable();
-            var totalCustomers = 0;
-            var maleCustomers = 0;
-            var femaleCustomers = 0;
-
-            if (userParams != null && userParams.StartingTime.GetHashCode() != 0 && userParams.EndingTime.GetHashCode() != 0)
-            {
-                totalCustomers = result.Count();
-                maleCustomers = result.Where(x => x.GioiTinh == "Nam" && x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Count();
-                femaleCustomers = result.Where(x => x.GioiTinh == "Nữ" && x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Count();
-            }
-            else
-            {
-                totalCustomers = result.Count();
-                maleCustomers = result.Where(x => x.GioiTinh == "Nam").Count();
-                femaleCustomers = result.Where(x => x.GioiTinh == "Nữ").Count();
-            }
-
-            return new
-            {
-                Customers = new
-                {
-                    Total = totalCustomers,
-                    Males = maleCustomers,
-                    Females = femaleCustomers
-                }
-            };
-        }
-
-        public Object GetStatusStatistics(KhachHangParams userParams)
-        {
-            var result = _context.DanhSachKhachHang.AsQueryable();
+            var result = _context.DanhSachNhaCungCap.AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
@@ -227,7 +186,7 @@ namespace MFFMS.API.Data.KhachHangRepository
 
             if (!string.IsNullOrEmpty(keyword))
             {
-                result = result.Where(x => x.TenKhachHang.ToLower().Contains(keyword.ToLower()) || x.SoDienThoai.ToLower().Contains(keyword.ToLower()) || x.DiaChi.ToLower().Contains(keyword.ToLower()) || x.MaKhachHang == keyword);
+                result = result.Where(x => x.TenNhaCungCap.ToLower().Contains(keyword.ToLower()) || x.MaNhaCungCap.ToString() == keyword);
             }
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
@@ -244,56 +203,25 @@ namespace MFFMS.API.Data.KhachHangRepository
             {
                 switch (sortField)
                 {
-                    case "MaKhachHang":
+                    case "MaNhaCungCap":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.MaKhachHang);
+                            result = result.OrderBy(x => x.MaNhaCungCap);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.MaKhachHang);
+                            result = result.OrderByDescending(x => x.MaNhaCungCap);
                         }
                         break;
 
-                    case "TenKhoa":
+                    case "TenNhaCungCap":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.TenKhachHang);
+                            result = result.OrderBy(x => x.TenNhaCungCap);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.TenKhachHang);
-                        }
-                        break;
-
-                    case "GioiTinh":
-                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
-                        {
-                            result = result.OrderBy(x => x.GioiTinh);
-                        }
-                        else
-                        {
-                            result = result.OrderByDescending(x => x.GioiTinh);
-                        }
-                        break;
-                    case "SoDienThoai":
-                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
-                        {
-                            result = result.OrderBy(x => x.SoDienThoai);
-                        }
-                        else
-                        {
-                            result = result.OrderByDescending(x => x.SoDienThoai);
-                        }
-                        break;
-                    case "DiaChi":
-                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
-                        {
-                            result = result.OrderBy(x => x.DiaChi);
-                        }
-                        else
-                        {
-                            result = result.OrderByDescending(x => x.DiaChi);
+                            result = result.OrderByDescending(x => x.TenNhaCungCap);
                         }
                         break;
 
@@ -335,7 +263,6 @@ namespace MFFMS.API.Data.KhachHangRepository
                         break;
                 }
             }
-
             var all = result.Count();
             var active = result.Count(x => x.TrangThai == 1);
             var inactive = result.Count(x => x.TrangThai == -1);
@@ -346,91 +273,121 @@ namespace MFFMS.API.Data.KhachHangRepository
                 Active = active,
                 Inactive = inactive
             };
-        }
 
+        }
         public int GetTotalItems()
         {
             return _totalItems;
         }
-
         public int GetTotalPages()
         {
             return _totalPages;
         }
 
-        public async Task<KhachHang> PermanentlyDeleteById(string id)
+        public async Task<NhaCungCap> PermanentlyDeleteById(int id)
         {
-            var khachHangToDelete = await _context.DanhSachKhachHang.FirstOrDefaultAsync(x => x.MaKhachHang == id);
+            var nhaCungCapToDelete = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
 
-            _context.DanhSachKhachHang.Remove(khachHangToDelete);
+            _context.DanhSachNhaCungCap.Remove(nhaCungCapToDelete);
             await _context.SaveChangesAsync();
 
-            return khachHangToDelete;
+            return nhaCungCapToDelete;
         }
 
-        public async Task<KhachHang> RestoreById(string id)
+        public async Task<NhaCungCap> RestoreById(int id)
         {
-            var khachHangToRestoreById = await _context.DanhSachKhachHang.FirstOrDefaultAsync(x => x.MaKhachHang == id);
+            var nhaCungCapToRestoreById = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
 
-            khachHangToRestoreById.TrangThai = 1;
-            khachHangToRestoreById.ThoiGianCapNhat = DateTime.Now;
+            nhaCungCapToRestoreById.TrangThai = 1;
+            nhaCungCapToRestoreById.ThoiGianCapNhat = DateTime.Now;
 
-            _context.DanhSachKhachHang.Update(khachHangToRestoreById);
+            _context.DanhSachNhaCungCap.Update(nhaCungCapToRestoreById);
             await _context.SaveChangesAsync();
 
-            return khachHangToRestoreById;
+            return nhaCungCapToRestoreById;
         }
 
-        public async Task<KhachHang> TemporarilyDeleteById(string id)
+        public async Task<NhaCungCap> TemporarilyDeleteById(int id)
         {
-            var khachHangToTemporarilyDeleteById = await _context.DanhSachKhachHang.FirstOrDefaultAsync(x => x.MaKhachHang == id);
+            var nhaCungCapTemporarilyDeleteById = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
 
-            khachHangToTemporarilyDeleteById.TrangThai = -1;
-            khachHangToTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
+            nhaCungCapTemporarilyDeleteById.TrangThai = -1;
+            nhaCungCapTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
 
-            _context.DanhSachKhachHang.Update(khachHangToTemporarilyDeleteById);
+            _context.DanhSachNhaCungCap.Update(nhaCungCapTemporarilyDeleteById);
             await _context.SaveChangesAsync();
 
-            return khachHangToTemporarilyDeleteById;
+            return nhaCungCapTemporarilyDeleteById;
         }
 
-        public async Task<KhachHang> UpdateById(string id, KhachHangForUpdateDto khachHang)
+        public async Task<NhaCungCap> UpdateById(int id, NhaCungCapForUpdateDto nhaCungCap)
         {
-            var oldRecord = await _context.DanhSachKhachHang.AsNoTracking().FirstOrDefaultAsync(x => x.MaKhachHang == id);
-            var khachHangToUpdate = new KhachHang
+            var oldRecord = await _context.DanhSachNhaCungCap.AsNoTracking().FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
+            var nhaCungCapToUpdate = new NhaCungCap
             {
-                MaKhachHang = id,
-                TenKhachHang = khachHang.TenKhachHang,
-                GioiTinh = khachHang.GioiTinh,
-                SoDienThoai = khachHang.SoDienThoai,
-                DiaChi = khachHang.DiaChi,
-                GhiChu = khachHang.GhiChu,
-                ThoiGianCapNhat = DateTime.Now,
+                MaNhaCungCap = id,
+                TenNhaCungCap = nhaCungCap.TenNhaCungCap,
+                SoDienThoai = nhaCungCap.SoDienThoai,
+                DiaChi = nhaCungCap.DiaChi,
+                GhiChu = nhaCungCap.GhiChu,
                 ThoiGianTao = oldRecord.ThoiGianTao,
-                TrangThai = khachHang.TrangThai
+                ThoiGianCapNhat = DateTime.Now,
+                TrangThai = nhaCungCap.TrangThai
             };
-            _context.DanhSachKhachHang.Update(khachHangToUpdate);
-            await _context.SaveChangesAsync();
 
-            return khachHangToUpdate;
+            _context.DanhSachNhaCungCap.Update(nhaCungCapToUpdate);
+            await _context.SaveChangesAsync();
+            return nhaCungCapToUpdate;
         }
 
-        private string GenerateId()
+        public ValidationResultDto ValidateBeforeCreate(NhaCungCapForCreateDto nhaCungCap)
         {
-            int count = _context.DanhSachKhachHang.Count() + 1;
-            string tempId = count.ToString();
-            string currentYear = DateTime.Now.ToString("yy");
+            var totalTenNhaCungCap = _context.DanhSachNhaCungCap.Count(x => x.TenNhaCungCap.ToLower() == nhaCungCap.TenNhaCungCap.ToLower());
+            IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
 
-            while (tempId.Length < 4)
+            if (totalTenNhaCungCap >= 1)
             {
-                tempId = "0" + tempId;
+                Errors.Add("tenNhaCungCap", new string[] { "tenNhaCungCap is duplicated!" });
+
+                return new ValidationResultDto
+                {
+                    IsValid = false,
+                    Errors = Errors
+                };
+            }
+            else
+            {
+                return new ValidationResultDto
+                {
+                    IsValid = true
+                };
+            }
+        }
+
+        public ValidationResultDto ValidateBeforeUpdate(int id, NhaCungCapForUpdateDto nhaCungCap)
+        {
+            var totalTenNhaCungCap = _context.DanhSachNhaCungCap.Count(x => x.MaNhaCungCap != id && x.TenNhaCungCap.ToLower() == nhaCungCap.TenNhaCungCap.ToLower());
+            IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
+
+            if (totalTenNhaCungCap > 0)
+            {
+                Errors.Add("tenNhaCungCap", new string[] { "tenNhaCungCap is duplicated!" });
+
+                return new ValidationResultDto
+                {
+                    IsValid = false,
+                    Errors = Errors
+                };
+            }
+            else
+            {
+                return new ValidationResultDto
+                {
+                    IsValid = true
+                };
             }
 
-            tempId = "KH" + currentYear + tempId;
-
-            return tempId;
         }
-
 
     }
 }

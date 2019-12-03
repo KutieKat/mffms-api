@@ -11,7 +11,7 @@ namespace MFFMS.API.Models
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int MaSanBong { get; set; }
         public string TenSanBong { get; set; }
-        public string DienTich { get; set; } // Sân 5, sân 7 / sân 11
+        public string DienTich { get; set; } // Sân 5, sân 7, sân 11
         public string GhiChu { get; set; }
 
         public ICollection<ChiTietPhieuDatSan> ChiTietPhieuDatSan { get; set; }

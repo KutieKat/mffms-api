@@ -21,5 +21,6 @@ namespace MFFMS.API.Data.KhachHangRepository
         int GetTotalPages();
         int GetTotalItems();
         Object GetStatusStatistics(KhachHangParams userParams);
+        Task<Object> GetGeneralStatistics(KhachHangStatisticsParams userParams);
     }
 }

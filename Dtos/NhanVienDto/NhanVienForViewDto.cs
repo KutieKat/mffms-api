@@ -14,7 +14,7 @@ namespace MFFMS.API.Dtos.NhanVienDto
         public string ChucVu { get; set; }
         public string SoDienThoai { get; set; }
         public string SoCMND { get; set; }
-        public decimal Luong { get; set; }
+        public double Luong { get; set; }
         public string GhiChu { get; set; }
     }
 }

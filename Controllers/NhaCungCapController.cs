@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using MFFMS.API.Data.NhanVienRepository;
-using MFFMS.API.Dtos.NhanVienDto;
+using MFFMS.API.Data.NhaCungCapRepository;
 using MFFMS.API.Dtos.ResponseDto;
+using MFFMS.API.Dtos.NhaCungCapDto;
 using MFFMS.API.Helpers;
 using MFFMS.API.Helpers.Params;
 using Microsoft.AspNetCore.Http;
@@ -15,26 +15,26 @@ namespace MFFMS.API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class NhanVienController : ControllerBase
+    public class NhaCungCapController : ControllerBase
     {
-        private readonly INhanVienRepository _repo;
+        private readonly INhaCungCapRepository _repo;
         private readonly IMapper _mapper;
         private readonly string _entityName;
 
-        public NhanVienController(INhanVienRepository repo, IMapper mapper)
+        public NhaCungCapController(INhaCungCapRepository repo, IMapper mapper)
         {
             _repo = repo;
             _mapper = mapper;
-            _entityName = "nhân viên";
+            _entityName = "nhà cung cấp";
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] NhanVienParams userParams)
+        public async Task<IActionResult> GetAll([FromQuery] NhaCungCapParams userParams)
         {
-            try
+            try 
             {
                 var result = await _repo.GetAll(userParams);
-                var resultToReturn = _mapper.Map<IEnumerable<NhanVienForListDto>>(result);
+                var resultToReturn = _mapper.Map<IEnumerable<NhaCungCapForListDto>>(result);
 
                 Response.AddPagination(result.CurrentPage, result.PageSize, result.TotalCount, result.TotalPages);
 
@@ -51,6 +51,7 @@ namespace MFFMS.API.Controllers
                         StatusStatistics = _repo.GetStatusStatistics(userParams)
                     }
                 });
+
             }
             catch (Exception e)
             {
@@ -65,14 +66,13 @@ namespace MFFMS.API.Controllers
             }
         }
 
-
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<IActionResult> GetById(int id)
         {
             try
             {
                 var result = await _repo.GetById(id);
-                var resultToReturn = _mapper.Map<NhanVienForViewDto>(result);
+                var resultToReturn = _mapper.Map<NhaCungCapForViewDto>(result);
 
                 return StatusCode(200, new SuccessResponseDto
                 {
@@ -97,15 +97,15 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(NhanVienForCreateDto nhanVien)
+        public async Task<IActionResult> Create(NhaCungCapForCreateDto nhaCungCap)
         {
             try
             {
-                var validationResult = _repo.ValidateBeforeCreate(nhanVien);
+                var validationResult = _repo.ValidateBeforeCreate(nhaCungCap);
 
                 if (validationResult.IsValid)
                 {
-                    var result = await _repo.Create(nhanVien);
+                    var result = await _repo.Create(nhaCungCap);
 
                     return StatusCode(201, new SuccessResponseDto
                     {
@@ -142,15 +142,15 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateById(string id, NhanVienForUpdateDto nhanVien)
+        public async Task<IActionResult> UpdateById(int id, NhaCungCapForUpdateDto nhaCungCap)
         {
             try
             {
-                var validationResult = _repo.ValidateBeforeUpdate(id, nhanVien);
+                var validationResult = _repo.ValidateBeforeUpdate(id, nhaCungCap);
 
                 if (validationResult.IsValid)
                 {
-                    var result = await _repo.UpdateById(id, nhanVien);
+                    var result = await _repo.UpdateById(id, nhaCungCap);
 
                     return StatusCode(200, new SuccessResponseDto
                     {
@@ -185,9 +185,9 @@ namespace MFFMS.API.Controllers
                 });
             }
         }
-
+        
         [HttpPut("{id}")]
-        public async Task<IActionResult> TemporarilyDeleteById(string id)
+        public async Task<IActionResult> TemporarilyDeleteById(int id)
         {
             try
             {
@@ -214,8 +214,9 @@ namespace MFFMS.API.Controllers
                 });
             }
         }
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> RestoreById(string id)
+        public async Task<IActionResult> RestoreById(int id)
         {
             try
             {
@@ -244,7 +245,7 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> PermanentlyDeleteById(string id)
+        public async Task<IActionResult> PermanentlyDeleteById(int id)
         {
             try
             {
@@ -264,36 +265,6 @@ namespace MFFMS.API.Controllers
                 return StatusCode(500, new FailedResponseDto
                 {
                     Message = "Xóa " + _entityName + " thất bại!",
-                    Result = new FailedResponseResultDto
-                    {
-                        Errors = e
-                    }
-                });
-            }
-        }
-
-
-        [HttpGet]
-        public async Task<IActionResult> GetGeneralStatistics([FromQuery] NhanVienStatisticsParams userParams)
-        {
-            try
-            {
-                var result = await _repo.GetGeneralStatistics(userParams);
-
-                return StatusCode(200, new SuccessResponseDto
-                {
-                    Message = "Lấy dữ liệu thống kê tổng quan về " + _entityName + " thành công!",
-                    Result = new SuccessResponseResultWithSingleDataDto
-                    {
-                        Data = result
-                    }
-                });
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, new FailedResponseDto
-                {
-                    Message = "Lấy dữ liệu thống kê tổng quan về " + _entityName + " thất bại!",
                     Result = new FailedResponseResultDto
                     {
                         Errors = e

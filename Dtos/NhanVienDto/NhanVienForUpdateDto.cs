@@ -21,7 +21,7 @@ namespace MFFMS.API.Dtos.NhanVienDto
         [Required]
         public string SoCMND { get; set; }
         [Required]
-        public decimal Luong { get; set; }
+        public double Luong { get; set; }
         public string GhiChu { get; set; }
     }
 }
