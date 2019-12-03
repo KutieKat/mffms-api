@@ -271,5 +271,35 @@ namespace MFFMS.API.Controllers
                 });
             }
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetGeneralStatistics([FromQuery] NhanVienStatisticsParams userParams)
+        {
+            try
+            {
+                var result = await _repo.GetGeneralStatistics(userParams);
+
+                return StatusCode(200, new SuccessResponseDto
+                {
+                    Message = "Lấy dữ liệu thống kê tổng quan về " + _entityName + " thành công!",
+                    Result = new SuccessResponseResultWithSingleDataDto
+                    {
+                        Data = result
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new FailedResponseDto
+                {
+                    Message = "Lấy dữ liệu thống kê tổng quan về " + _entityName + " thất bại!",
+                    Result = new FailedResponseResultDto
+                    {
+                        Errors = e
+                    }
+                });
+            }
+        }
     }
 }
