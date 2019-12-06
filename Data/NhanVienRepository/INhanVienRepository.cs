@@ -26,5 +26,6 @@ namespace MFFMS.API.Data.NhanVienRepository
         ValidationResultDto ValidateBeforeUpdate(string id, NhanVienForUpdateDto nhanVien);
 
         Task<Object> GetGeneralStatistics(NhanVienStatisticsParams userParams);
+       // Task<object> GetDetailsStatistics(NhanVienStatisticsParams userParams);
     }
 }

@@ -20,6 +20,7 @@ namespace MFFMS.API.Data
         public DbSet<TaiSanThietBi> DanhSachTaiSanThietBi { get; set; }
         public DbSet<DonNhapHang> DanhSachDonNhapHang { get; set; }
         public DbSet<ChiTietDonNhapHang> DanhSachChiTietDonNhapHang { get; set; }
+        public DbSet<CaiDat> DanhSachCaiDat{ get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
@@ -39,6 +40,7 @@ namespace MFFMS.API.Data
             modelBuilder.Entity<TaiSanThietBi>().HasKey(x => x.MaTSTB);
             modelBuilder.Entity<DonNhapHang>().HasKey(x => x.MaDonNhapHang);
             modelBuilder.Entity<ChiTietDonNhapHang>().HasKey(x => new { x.MaDonNhapHang, x.MaTSTB });
+            modelBuilder.Entity<CaiDat>().HasKey(x => x.MaCaiDat);
 
             // Requirements
             modelBuilder.Entity<NhanVien>().HasIndex(x => x.SoDienThoai).IsUnique();
