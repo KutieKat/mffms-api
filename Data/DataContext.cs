@@ -34,7 +34,7 @@ namespace MFFMS.API.Data
             modelBuilder.Entity<ChiTietPhieuDatSan>().HasKey(x => x.MaChiTietPDS);
             modelBuilder.Entity<DichVu>().HasKey(x => x.MaDichVu);
             modelBuilder.Entity<HoaDonDichVu>().HasKey(x => x.SoHDDV);
-            modelBuilder.Entity<ChiTietHDDV>().HasKey(x => new { x.SoHDDV, x.MaDichVu });
+            modelBuilder.Entity<ChiTietHDDV>().HasKey(x => new {x.SoHDDV,x.MaDichVu });
             modelBuilder.Entity<NhaCungCap>().HasKey(x => x.MaNhaCungCap);
             modelBuilder.Entity<TaiSanThietBi>().HasKey(x => x.MaTSTB);
             modelBuilder.Entity<DonNhapHang>().HasKey(x => x.MaDonNhapHang);
@@ -88,6 +88,7 @@ namespace MFFMS.API.Data
                 .HasOne(x => x.HoaDonDichVu)
                 .WithMany(x => x.ChiTietHDDV)
                 .IsRequired();
+
 
             modelBuilder.Entity<TaiSanThietBi>()
                 .HasOne(x => x.NhaCungCap)
