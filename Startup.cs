@@ -29,6 +29,7 @@ using MFFMS.API.Data.KhachHangRepository;
 using MFFMS.API.Data.NhanVienRepository;
 using MFFMS.API.Data.SanBongRepository;
 using MFFMS.API.Data.NhaCungCapRepository;
+using MFFMS.API.Data.CaiDatRepository;
 
 namespace MFFMS.API
 {
@@ -57,6 +58,7 @@ namespace MFFMS.API
             services.AddScoped<INhanVienRepository, NhanVienRepository>();
             services.AddScoped<ISanBongRepository, SanBongRepository>();
             services.AddScoped<INhaCungCapRepository, NhaCungCapRepository>();
+            services.AddScoped<ICaiDatRepository, CaiDatRepository>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
