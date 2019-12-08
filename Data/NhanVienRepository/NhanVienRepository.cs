@@ -13,7 +13,7 @@ namespace MFFMS.API.Data.NhanVienRepository
 {
     public class NhanVienRepository : INhanVienRepository
     {
-        private DataContext _context;
+        private readonly DataContext _context;
         private int _totalItems;
         private int _totalPages;
 
