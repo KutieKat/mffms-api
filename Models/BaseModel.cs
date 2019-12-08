@@ -10,5 +10,6 @@ namespace MFFMS.API.Models
         public DateTime ThoiGianTao { get; set; }
         public DateTime ThoiGianCapNhat { get; set; }
         public int TrangThai { get; set; } = 1;
+        public int DaXoa { get; set; } = 0;
     }
 }

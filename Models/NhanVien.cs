@@ -18,6 +18,7 @@ namespace MFFMS.API.Models
         public string SoCMND { get; set; }
         public double Luong { get; set; }
         public string GhiChu { get; set; }
+        public string DiaChi { get; set; }
 
         public ICollection<PhieuDatSan> PhieuDatSan { get; set; }
         public ICollection<DonNhapHang> DonNhapHang { get; set; }

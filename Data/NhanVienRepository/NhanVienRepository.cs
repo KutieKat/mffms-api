@@ -34,6 +34,7 @@ namespace MFFMS.API.Data.NhanVienRepository
                 TenNhanVien = nhanVien.TenNhanVien,
                 GioiTinh = nhanVien.GioiTinh,
                 NgaySinh = nhanVien.NgaySinh,
+                DiaChi = nhanVien.DiaChi,
                 ChucVu = nhanVien.ChucVu,
                 SoDienThoai = nhanVien.SoDienThoai,
                 SoCMND = nhanVien.SoCMND,
@@ -63,12 +64,15 @@ namespace MFFMS.API.Data.NhanVienRepository
             var ngaySinhBatDau = userParams.NgaySinhBatDau;
             var ngaySinhKetThuc = userParams.NgaySinhKetThuc;
             var chucVu = userParams.ChucVu;
+            var daXoa = userParams.DaXoa;
 
             if (!string.IsNullOrEmpty(keyword))
             {
                 result = result.Where(x => x.TenNhanVien.ToLower().Contains(keyword.ToLower()) ||
+                                           x.DiaChi.ToLower().Contains(keyword.ToLower()) ||
                                            x.MaNhanVien.ToLower().Contains(keyword.ToLower()) ||
                                            x.SoDienThoai.ToLower().Contains(keyword.ToLower()) ||
+                                           x.DiaChi.ToLower().Contains(keyword.ToLower()) ||
                                            x.GioiTinh.ToLower().Contains(keyword.ToLower()));
             }
 
@@ -95,6 +99,11 @@ namespace MFFMS.API.Data.NhanVienRepository
             if (ngaySinhBatDau.GetHashCode() != 0 && ngaySinhKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.NgaySinh >= ngaySinhBatDau && x.NgaySinh <= ngaySinhKetThuc);
+            }
+
+            if(daXoa == 1 || daXoa == 0)
+            {
+                result = result.Where(x => x.DaXoa == daXoa);
             }
 
             if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
@@ -133,6 +142,17 @@ namespace MFFMS.API.Data.NhanVienRepository
                             result = result.OrderByDescending(x => x.GioiTinh);
                         }
                         break;
+                    case "DiaChi":
+                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = result.OrderBy(x => x.DiaChi);
+                        }
+                        else
+                        {
+                            result = result.OrderByDescending(x => x.DiaChi);
+                        }
+                        break;
+
 
                     case "NgaySinh":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
@@ -412,8 +432,8 @@ namespace MFFMS.API.Data.NhanVienRepository
             }
 
             var all = result.Count();
-            var active = result.Count(x => x.TrangThai == 1);
-            var inactive = result.Count(x => x.TrangThai == -1);
+            var active = result.Count(x => x.DaXoa == 0);
+            var inactive = result.Count(x => x.DaXoa == 1);
 
             return new
             {
@@ -447,7 +467,7 @@ namespace MFFMS.API.Data.NhanVienRepository
         {
             var nhanVienToRestoreById = await _context.DanhSachNhanVien.FirstOrDefaultAsync(x => x.MaNhanVien == id);
 
-            nhanVienToRestoreById.TrangThai = 1;
+            nhanVienToRestoreById.DaXoa = 0;
             nhanVienToRestoreById.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachNhanVien.Update(nhanVienToRestoreById);
@@ -460,7 +480,7 @@ namespace MFFMS.API.Data.NhanVienRepository
         {
             var nhanVienToTemporarilyDeleteById = await _context.DanhSachNhanVien.FirstOrDefaultAsync(x => x.MaNhanVien == id);
 
-            nhanVienToTemporarilyDeleteById.TrangThai = -1;
+            nhanVienToTemporarilyDeleteById.DaXoa = 1;
             nhanVienToTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachNhanVien.Update(nhanVienToTemporarilyDeleteById);
@@ -478,6 +498,7 @@ namespace MFFMS.API.Data.NhanVienRepository
                 TenNhanVien = nhanVien.TenNhanVien,
                 GioiTinh = nhanVien.GioiTinh,
                 NgaySinh = nhanVien.NgaySinh,
+                DiaChi = nhanVien.DiaChi,
                 ChucVu = nhanVien.ChucVu,
                 SoDienThoai = nhanVien.SoDienThoai,
                 SoCMND = nhanVien.SoCMND,

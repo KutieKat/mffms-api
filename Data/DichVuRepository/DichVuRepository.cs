@@ -65,6 +65,7 @@ namespace MFFMS.API.Data.DichVuRepository
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
+            var daXoa = userParams.DaXoa;
 
             if (!string.IsNullOrEmpty(keyword))
             {
@@ -84,6 +85,11 @@ namespace MFFMS.API.Data.DichVuRepository
             if (trangThai == -1 || trangThai == 1)
             {
                 result = result.Where(x => x.TrangThai == trangThai);
+            }
+
+            if(daXoa == 0 || daXoa == 1)
+            {
+                result = result.Where(x => x.DaXoa == daXoa);
             }
 
             if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
@@ -132,6 +138,7 @@ namespace MFFMS.API.Data.DichVuRepository
                             result = result.OrderByDescending(x => x.DVT);
                         }
                         break;
+
 
                     case "ThoiGianTao":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
@@ -195,6 +202,7 @@ namespace MFFMS.API.Data.DichVuRepository
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
+            var daXoa = userParams.DaXoa;
 
             if (!string.IsNullOrEmpty(keyword))
             {
@@ -292,14 +300,15 @@ namespace MFFMS.API.Data.DichVuRepository
                         break;
 
                     default:
+
                         result = result.OrderByDescending(x => x.ThoiGianTao);
                         break;
                 }
             }
 
             var all = result.Count();
-            var active = result.Count(x => x.TrangThai == 1);
-            var inactive = result.Count(x => x.TrangThai == -1);
+            var active = result.Count(x => x.DaXoa == 0);
+            var inactive = result.Count(x => x.DaXoa == 1);
 
             return new
             {
@@ -333,7 +342,7 @@ namespace MFFMS.API.Data.DichVuRepository
         {
             var dichVuToRestoreById = await _context.DanhSachDichVu.FirstOrDefaultAsync(x => x.MaDichVu == id);
 
-            dichVuToRestoreById.TrangThai = 1;
+            dichVuToRestoreById.DaXoa = 0;
             dichVuToRestoreById.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachDichVu.Update(dichVuToRestoreById);
@@ -345,7 +354,7 @@ namespace MFFMS.API.Data.DichVuRepository
         {
             var dichVuToTemporarilyDeleteById = await _context.DanhSachDichVu.FirstOrDefaultAsync(x => x.MaDichVu == id);
 
-            dichVuToTemporarilyDeleteById.TrangThai = -1;
+            dichVuToTemporarilyDeleteById.DaXoa = 1;
             dichVuToTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachDichVu.Update(dichVuToTemporarilyDeleteById);

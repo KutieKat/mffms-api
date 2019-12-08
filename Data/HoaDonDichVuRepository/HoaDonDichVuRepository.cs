@@ -69,6 +69,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
+            var daXoa = userParams.DaXoa;
 
             if (!string.IsNullOrEmpty(keyword))
             {
@@ -88,6 +89,11 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             if (trangThai == -1 || trangThai == 1)
             {
                 result = result.Where(x => x.TrangThai == trangThai);
+            }
+
+            if(daXoa == 0 || daXoa == 1)
+            {
+                result = result.Where(x => x.DaXoa == daXoa);
             }
 
             if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
@@ -209,6 +215,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
+            var daXoa = userParams.DaXoa;
 
             if (!string.IsNullOrEmpty(keyword))
             {
@@ -323,8 +330,8 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             }
 
             var all = result.Count();
-            var active = result.Count(x => x.TrangThai == 1);
-            var inactive = result.Count(x => x.TrangThai == -1);
+            var active = result.Count(x => x.DaXoa == 0);
+            var inactive = result.Count(x => x.DaXoa == 1);
 
             return new
             {
@@ -358,7 +365,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
         {
             var hoaDonDichVuToRestoreById = await _context.DanhSachHoaDonDichVu.FirstOrDefaultAsync(x => x.SoHDDV == id);
 
-            hoaDonDichVuToRestoreById.TrangThai = 1;
+            hoaDonDichVuToRestoreById.DaXoa = 0;
             hoaDonDichVuToRestoreById.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachHoaDonDichVu.Update(hoaDonDichVuToRestoreById);
@@ -370,7 +377,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
         {
             var hoaDonDichVuToTemporarilyDeleteById = await _context.DanhSachHoaDonDichVu.FirstOrDefaultAsync(x => x.SoHDDV == id);
 
-            hoaDonDichVuToTemporarilyDeleteById.TrangThai = -1;
+            hoaDonDichVuToTemporarilyDeleteById.DaXoa = 1;
             hoaDonDichVuToTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachHoaDonDichVu.Update(hoaDonDichVuToTemporarilyDeleteById);

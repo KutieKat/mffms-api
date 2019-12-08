@@ -15,6 +15,8 @@ namespace MFFMS.API.Dtos.NhanVienDto
         [Required]
         public DateTime NgaySinh { get; set; }
         [Required]
+        public string DiaChi { get; set; }
+        [Required]
         public string ChucVu { get; set; }
         [Required]
         public string SoDienThoai { get; set; }
