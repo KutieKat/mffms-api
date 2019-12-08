@@ -94,6 +94,7 @@ namespace MFFMS.API.Data
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
+            var daXoa = userParams.DaXoa;
 
             if (!string.IsNullOrEmpty(keyword))
             {
@@ -119,6 +120,12 @@ namespace MFFMS.API.Data
             {
                 result = result.Where(x => x.TrangThai == trangThai);
             }
+            
+            if(daXoa == 1 || daXoa == 0)
+            {
+                result = result.Where(x => x.DaXoa == daXoa);
+            }
+
 
             if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
             {
@@ -320,8 +327,8 @@ namespace MFFMS.API.Data
             }
 
             var all = result.Count();
-            var active = result.Count(x => x.TrangThai == 1);
-            var inactive = result.Count(x => x.TrangThai == -1);
+            var active = result.Count(x => x.DaXoa == 0);
+            var inactive = result.Count(x => x.DaXoa == 1);
 
             return new
             {
@@ -355,7 +362,7 @@ namespace MFFMS.API.Data
         {
             var taiKhoanToRestoreById = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
 
-            taiKhoanToRestoreById.TrangThai = 1;
+            taiKhoanToRestoreById.DaXoa = 0;
             taiKhoanToRestoreById.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachTaiKhoan.Update(taiKhoanToRestoreById);
@@ -393,7 +400,7 @@ namespace MFFMS.API.Data
         {
             var taiKhoanToTemporarilyDeleteById = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
 
-            taiKhoanToTemporarilyDeleteById.TrangThai = -1;
+            taiKhoanToTemporarilyDeleteById.DaXoa = 1;
             taiKhoanToTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachTaiKhoan.Update(taiKhoanToTemporarilyDeleteById);

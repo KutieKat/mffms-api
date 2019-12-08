@@ -13,7 +13,6 @@ namespace MFFMS.API.Dtos.NhaCungCapDto
         public string SoDienThoai { get; set; }
         [Required]
         public string DiaChi { get; set; }
-        [Required]
         public string GhiChu { get; set; }
 
     }

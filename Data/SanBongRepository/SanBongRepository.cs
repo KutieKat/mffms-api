@@ -321,7 +321,7 @@ namespace MFFMS.API.Data.SanBongRepository
         {
             var sanBongToRestoreById = await _context.DanhSachSanBong.FirstOrDefaultAsync(x => x.MaSanBong == id);
 
-            sanBongToRestoreById.TrangThai = 1;
+            sanBongToRestoreById.DaXoa = 0;
             sanBongToRestoreById.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachSanBong.Update(sanBongToRestoreById);
@@ -334,7 +334,7 @@ namespace MFFMS.API.Data.SanBongRepository
         {
             var sanBongToTemporarilyDeleteById = await _context.DanhSachSanBong.FirstOrDefaultAsync(x => x.MaSanBong == id);
 
-            sanBongToTemporarilyDeleteById.TrangThai = -1;
+            sanBongToTemporarilyDeleteById.DaXoa = 1;
             sanBongToTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachSanBong.Update(sanBongToTemporarilyDeleteById);

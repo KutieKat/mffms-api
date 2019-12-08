@@ -13,6 +13,8 @@ namespace MFFMS.API.Dtos.KhachHangDto
         [Required]
         public string GioiTinh { get; set; }
         [Required]
+        public DateTime NgaySinh { get; set; }
+        [Required]
         public string SoDienThoai { get; set; }
         [Required]
         public string DiaChi { get; set; }

@@ -30,6 +30,7 @@ namespace MFFMS.API.Data.KhachHangRepository
                 MaKhachHang = GenerateId(),
                 TenKhachHang = khachHang.TenKhachHang,
                 GioiTinh = khachHang.GioiTinh,
+                NgaySinh = khachHang.NgaySinh,
                 SoDienThoai = khachHang.SoDienThoai,
                 DiaChi = khachHang.DiaChi,
                 GhiChu = khachHang.GhiChu,
@@ -53,6 +54,7 @@ namespace MFFMS.API.Data.KhachHangRepository
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
+            var daXoa = userParams.DaXoa;
 
             if (!string.IsNullOrEmpty(keyword))
             {
@@ -72,6 +74,11 @@ namespace MFFMS.API.Data.KhachHangRepository
             if (trangThai == -1 || trangThai == 1)
             {
                 result = result.Where(x => x.TrangThai == trangThai);
+            }
+
+            if(daXoa ==1||daXoa == 0)
+            {
+                result = result.Where(x => x.DaXoa == daXoa);
             }
 
             if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
@@ -128,6 +135,16 @@ namespace MFFMS.API.Data.KhachHangRepository
                         else
                         {
                             result = result.OrderByDescending(x => x.DiaChi);
+                        }
+                        break;
+                    case "NgaySinh":
+                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = result.OrderBy(x => x.NgaySinh);
+                        }
+                        else
+                        {
+                            result = result.OrderByDescending(x => x.NgaySinh);
                         }
                         break;
 
@@ -337,8 +354,8 @@ namespace MFFMS.API.Data.KhachHangRepository
             }
 
             var all = result.Count();
-            var active = result.Count(x => x.TrangThai == 1);
-            var inactive = result.Count(x => x.TrangThai == -1);
+            var active = result.Count(x => x.DaXoa == 0);
+            var inactive = result.Count(x => x.DaXoa == 1);
 
             return new
             {
@@ -372,7 +389,7 @@ namespace MFFMS.API.Data.KhachHangRepository
         {
             var khachHangToRestoreById = await _context.DanhSachKhachHang.FirstOrDefaultAsync(x => x.MaKhachHang == id);
 
-            khachHangToRestoreById.TrangThai = 1;
+            khachHangToRestoreById.DaXoa = 0;
             khachHangToRestoreById.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachKhachHang.Update(khachHangToRestoreById);
@@ -385,7 +402,7 @@ namespace MFFMS.API.Data.KhachHangRepository
         {
             var khachHangToTemporarilyDeleteById = await _context.DanhSachKhachHang.FirstOrDefaultAsync(x => x.MaKhachHang == id);
 
-            khachHangToTemporarilyDeleteById.TrangThai = -1;
+            khachHangToTemporarilyDeleteById.DaXoa = 1;
             khachHangToTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachKhachHang.Update(khachHangToTemporarilyDeleteById);
@@ -402,6 +419,7 @@ namespace MFFMS.API.Data.KhachHangRepository
                 MaKhachHang = id,
                 TenKhachHang = khachHang.TenKhachHang,
                 GioiTinh = khachHang.GioiTinh,
+                NgaySinh = khachHang.NgaySinh,
                 SoDienThoai = khachHang.SoDienThoai,
                 DiaChi = khachHang.DiaChi,
                 GhiChu = khachHang.GhiChu,

@@ -64,6 +64,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
+            var daXoa = userParams.DaXoa;
 
             if (!string.IsNullOrEmpty(keyword))
             {
@@ -83,6 +84,11 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             if (trangThai == -1 || trangThai == 1)
             {
                 result = result.Where(x => x.TrangThai == trangThai);
+            }
+
+            if(daXoa == 1 || daXoa == 0)
+            {
+                result = result.Where(x => x.DaXoa == daXoa);
             }
 
             if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
@@ -184,6 +190,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
 
+
             if (!string.IsNullOrEmpty(keyword))
             {
                 result = result.Where(x => x.TenNhaCungCap.ToLower().Contains(keyword.ToLower()) || x.MaNhaCungCap.ToString() == keyword);
@@ -264,8 +271,8 @@ namespace MFFMS.API.Data.NhaCungCapRepository
                 }
             }
             var all = result.Count();
-            var active = result.Count(x => x.TrangThai == 1);
-            var inactive = result.Count(x => x.TrangThai == -1);
+            var active = result.Count(x => x.DaXoa == 0);
+            var inactive = result.Count(x => x.DaXoa == 1);
 
             return new
             {
@@ -298,7 +305,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
         {
             var nhaCungCapToRestoreById = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
 
-            nhaCungCapToRestoreById.TrangThai = 1;
+            nhaCungCapToRestoreById.DaXoa = 0;
             nhaCungCapToRestoreById.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachNhaCungCap.Update(nhaCungCapToRestoreById);
@@ -311,7 +318,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
         {
             var nhaCungCapTemporarilyDeleteById = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
 
-            nhaCungCapTemporarilyDeleteById.TrangThai = -1;
+            nhaCungCapTemporarilyDeleteById.DaXoa = 1;
             nhaCungCapTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachNhaCungCap.Update(nhaCungCapTemporarilyDeleteById);
