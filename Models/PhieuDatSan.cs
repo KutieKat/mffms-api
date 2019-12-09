@@ -16,6 +16,8 @@ namespace MFFMS.API.Models
         public NhanVien NhanVien { get; set; }
         public DateTime NgayLap { get; set; }
 
+        public decimal TongTien { get; set; }
+
         public ICollection<ChiTietPhieuDatSan> ChiTietPhieuDatSan { get; set; }
     }
 }

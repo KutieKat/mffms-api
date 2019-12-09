@@ -10,8 +10,10 @@ namespace MFFMS.API.Dtos.SanBongDto
     {
         [Required]
         public string TenSanBong { get; set; }
-        [Required]
-        public string DienTich { get; set; }
         public string GhiChu { get; set; }
+        [Required]
+        public double ChieuDai { get; set; }
+        [Required]
+        public double ChieuRong { get; set; }
     }
 }

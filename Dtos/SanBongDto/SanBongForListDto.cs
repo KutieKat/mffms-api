@@ -9,7 +9,8 @@ namespace MFFMS.API.Dtos.SanBongDto
     {
         public int MaSanBong { get; set; }
         public string TenSanBong { get; set; }
-        public string DienTich { get; set; }
+        public double ChieuRong { get; set; }
+        public double ChieuDai { get; set; }
         public string GhiChu { get; set; }
     }
 }
