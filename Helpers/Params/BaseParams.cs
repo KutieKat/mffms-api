@@ -23,6 +23,5 @@ namespace MFFMS.API.Helpers.Params
         public DateTime ThoiGianCapNhatBatDau { get; set; }
         public DateTime ThoiGianCapNhatKetThuc { get; set; }
         public int TrangThai { get; set; } = 0;
-        public int DaXoa { get; set; } = 0;
     }
 }

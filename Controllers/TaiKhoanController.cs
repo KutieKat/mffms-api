@@ -253,7 +253,7 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register( TaiKhoanForCreateDto taiKhoan)
+        public async Task<IActionResult> Register([FromBody] TaiKhoanForCreateDto taiKhoan)
         {
             try
             {
