@@ -2,93 +2,65 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MFFMS.API.Dtos.TaiKhoanDto;
+using MFFMS.API.Dtos;
+using MFFMS.API.Dtos.SanBongDto;
 using MFFMS.API.Helpers;
 using MFFMS.API.Helpers.Params;
 using MFFMS.API.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace MFFMS.API.Data
+namespace MFFMS.API.Data.SanBongRepository
 {
-    public class TaiKhoanRepository : ITaiKhoanRepository
+    public class SanBongRepository : ISanBongRepository
     {
         private readonly DataContext _context;
         private int _totalItems;
         private int _totalPages;
 
-        public TaiKhoanRepository(DataContext context)
+        public SanBongRepository (DataContext context)
         {
             _context = context;
             _totalItems = 0;
             _totalPages = 0;
         }
-
-        public async Task<TaiKhoan> ChangePassword(int id, TaiKhoanForChangePasswordDto taiKhoan)
+        public async Task<SanBong> Create(SanBongForCreateDto sanBong)
         {
-            var result = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
-
-            if (result == null)
-                return null;
-
-            if (!KiemTraHash(taiKhoan.MatKhauCu, result.Hash, result.Salt))
-                return null;
-
-            if (taiKhoan.MatKhauMoi != taiKhoan.XacNhanMatKhauMoi)
-                return null;
-
-            byte[] hash, salt;
-            TaoHash(taiKhoan.MatKhauMoi, out hash, out salt);
-
-            var taiKhoanToUpdate = new TaiKhoan
+            var danhSachSanBong = await _context.DanhSachSanBong.OrderByDescending(x => x.MaSanBong).FirstOrDefaultAsync();
+            var maSanBong = 1;
+            if(danhSachSanBong == null)
             {
-                MaTaiKhoan = id,
-                Hash = hash,
-                Salt = salt,
-                HoVaTen = result.HoVaTen,
-                NgaySinh = result.NgaySinh,
-                SoDienThoai = result.SoDienThoai,
-                Email = result.Email,
-                DiaChi = result.DiaChi,
-                QueQuan = result.QueQuan,
-                PhanQuyen = result.PhanQuyen,
+                maSanBong = 1;
+            }
+            else
+            {
+                maSanBong = danhSachSanBong.MaSanBong + 1;
+            }
+
+            var newSanBong = new SanBong
+            {
+                MaSanBong = maSanBong,
+                TenSanBong = sanBong.TenSanBong,
+                ChieuDai = sanBong.ChieuDai,
+                ChieuRong = sanBong.ChieuRong,
+                GhiChu = sanBong.GhiChu,
+                ThoiGianTao = DateTime.Now,
                 ThoiGianCapNhat = DateTime.Now,
-                TrangThai = result.TrangThai
+                TrangThai = 1
             };
 
-            _context.DanhSachTaiKhoan.Update(taiKhoanToUpdate);
+            newSanBong.DienTich = sanBong.ChieuDai * sanBong.ChieuRong;
+
+            await _context.DanhSachSanBong.AddAsync(newSanBong);
             await _context.SaveChangesAsync();
-            return taiKhoanToUpdate;
+            return newSanBong;
         }
 
-        public async Task<TaiKhoan> DangNhap(string tenDangNhap, string matKhau)
+        public async Task<PagedList<SanBong>> GetAll(SanBongParams userParams)
         {
-            var taiKhoan = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.TenDangNhap == tenDangNhap);
-
-            if (taiKhoan == null)
-                return null;
-
-            if (!KiemTraHash(matKhau, taiKhoan.Hash, taiKhoan.Salt))
-                return null;
-
-            return taiKhoan;
-        }
-
-        public async Task<TaiKhoan> DeleteById(int id)
-        {
-            var taiKhoanToDelete = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
-
-            _context.DanhSachTaiKhoan.Remove(taiKhoanToDelete);
-            await _context.SaveChangesAsync();
-            return taiKhoanToDelete;
-        }
-
-        public async Task<PagedList<TaiKhoan>> GetAll(TaiKhoanParams userParams)
-        {
-            var result = _context.DanhSachTaiKhoan.AsQueryable();
+            var result = _context.DanhSachSanBong.AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
-            var phanQuyen = userParams.PhanQuyen;
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
@@ -98,12 +70,7 @@ namespace MFFMS.API.Data
 
             if (!string.IsNullOrEmpty(keyword))
             {
-                result = result.Where(x => x.TenDangNhap.ToLower().Contains(keyword.ToLower()) || x.MaTaiKhoan.ToString() == keyword);
-            }
-
-            if (!string.IsNullOrEmpty(phanQuyen))
-            {
-                result = result.Where(x => x.PhanQuyen.ToLower().Contains(phanQuyen.ToLower()));
+                result = result.Where(x => x.TenSanBong.ToLower().Contains(keyword.ToLower()) ||  x.MaSanBong.ToString() == keyword);
             }
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
@@ -120,47 +87,68 @@ namespace MFFMS.API.Data
             {
                 result = result.Where(x => x.TrangThai == trangThai);
             }
-            
-            if(daXoa == 1 || daXoa == 0)
+
+            if(daXoa == 1|| daXoa == 0)
             {
                 result = result.Where(x => x.DaXoa == daXoa);
             }
-
 
             if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
             {
                 switch (sortField)
                 {
-                    case "MaTaiKhoan":
+                    case "MaSanBong":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.MaTaiKhoan);
+                            result = result.OrderBy(x => x.MaSanBong);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.MaTaiKhoan);
+                            result = result.OrderByDescending(x => x.MaSanBong);
                         }
                         break;
 
-                    case "TenDangNhap":
+                    case "TenSanBong":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.TenDangNhap);
+                            result = result.OrderBy(x => x.TenSanBong);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.TenDangNhap);
+                            result = result.OrderByDescending(x => x.TenSanBong);
                         }
                         break;
 
-                    case "PhanQuyen":
+                    case "ChieuDai":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.PhanQuyen);
+                            result = result.OrderBy(x => x.ChieuDai);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.PhanQuyen);
+                            result = result.OrderByDescending(x => x.ChieuDai);
+                        }
+                        break;
+
+                    case "ChieuRong":
+                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = result.OrderBy(x => x.ChieuRong);
+                        }
+                        else
+                        {
+                            result = result.OrderByDescending(x => x.ChieuRong);
+                        }
+                        break;
+
+                    case "DienTich":
+                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = result.OrderBy(x => x.DienTich);
+                        }
+                        else
+                        {
+                            result = result.OrderByDescending(x => x.DienTich);
                         }
                         break;
 
@@ -203,36 +191,34 @@ namespace MFFMS.API.Data
                 }
             }
 
-            return await PagedList<TaiKhoan>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
+            _totalItems = result.Count();
+            _totalPages = (int)Math.Ceiling((double)_totalItems / (double)userParams.PageSize);
+
+            return await PagedList<SanBong>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<TaiKhoan> GetById(int id)
+        public async Task<SanBong> GetById(int id)
         {
-            var result = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
+            var result = await _context.DanhSachSanBong.FirstOrDefaultAsync(x => x.MaSanBong == id);
             return result;
         }
 
-        public object GetStatusStatistics(TaiKhoanParams userParams)
+        public object GetStatusStatistics(SanBongParams userParams)
         {
-            var result = _context.DanhSachTaiKhoan.AsQueryable();
+            var result = _context.DanhSachSanBong.AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
-            var phanQuyen = userParams.PhanQuyen;
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
+            var daXoa = userParams.DaXoa;
 
             if (!string.IsNullOrEmpty(keyword))
             {
-                result = result.Where(x => x.TenDangNhap.ToLower().Contains(keyword.ToLower()) || x.MaTaiKhoan.ToString() == keyword);
-            }
-
-            if (!string.IsNullOrEmpty(phanQuyen))
-            {
-                result = result.Where(x => x.PhanQuyen.ToLower().Contains(phanQuyen.ToLower()));
+                result = result.Where(x => x.TenSanBong.ToLower().Contains(keyword.ToLower()) ||  x.MaSanBong.ToString() == keyword);
             }
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
@@ -245,45 +231,61 @@ namespace MFFMS.API.Data
                 result = result.Where(x => x.ThoiGianCapNhat >= thoiGianCapNhatBatDau && x.ThoiGianCapNhat <= thoiGianCapNhatKetThuc);
             }
 
-            if (trangThai == -1 || trangThai == 1)
-            {
-                result = result.Where(x => x.TrangThai == trangThai);
-            }
-
             if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
             {
                 switch (sortField)
                 {
-                    case "MaTaiKhoan":
+                    case "MaSanBong":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.MaTaiKhoan);
+                            result = result.OrderBy(x => x.MaSanBong);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.MaTaiKhoan);
+                            result = result.OrderByDescending(x => x.MaSanBong);
                         }
                         break;
 
-                    case "TenDangNhap":
+                    case "TenSanBong":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.TenDangNhap);
+                            result = result.OrderBy(x => x.TenSanBong);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.TenDangNhap);
+                            result = result.OrderByDescending(x => x.TenSanBong);
+                        }
+                        break;
+                    case "ChieuDai":
+                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = result.OrderBy(x => x.ChieuDai);
+                        }
+                        else
+                        {
+                            result = result.OrderByDescending(x => x.ChieuDai);
                         }
                         break;
 
-                    case "PhanQuyen":
+                    case "ChieuRong":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.PhanQuyen);
+                            result = result.OrderBy(x => x.ChieuRong);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.PhanQuyen);
+                            result = result.OrderByDescending(x => x.ChieuRong);
+                        }
+                        break;
+
+                    case "DienTich":
+                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = result.OrderBy(x => x.DienTich);
+                        }
+                        else
+                        {
+                            result = result.OrderByDescending(x => x.DienTich);
                         }
                         break;
 
@@ -348,110 +350,111 @@ namespace MFFMS.API.Data
             return _totalPages;
         }
 
-        public async Task<TaiKhoan> PermanentlyDeleteById(int id)
+        public async Task<SanBong> PermanentlyDeleteById(int id)
         {
-            var taiKhoanToDelete = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
+            var sanBongToDelete = await _context.DanhSachSanBong.FirstOrDefaultAsync(x => x.MaSanBong == id);
 
-            _context.DanhSachTaiKhoan.Remove(taiKhoanToDelete);
+            _context.DanhSachSanBong.Remove(sanBongToDelete);
             await _context.SaveChangesAsync();
 
-            return taiKhoanToDelete;
+            return sanBongToDelete;
         }
 
-        public async Task<TaiKhoan> RestoreById(int id)
+        public async Task<SanBong> RestoreById(int id)
         {
-            var taiKhoanToRestoreById = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
+            var sanBongToRestoreById = await _context.DanhSachSanBong.FirstOrDefaultAsync(x => x.MaSanBong == id);
 
-            taiKhoanToRestoreById.DaXoa = 0;
-            taiKhoanToRestoreById.ThoiGianCapNhat = DateTime.Now;
+            sanBongToRestoreById.DaXoa = 0;
+            sanBongToRestoreById.ThoiGianCapNhat = DateTime.Now;
 
-            _context.DanhSachTaiKhoan.Update(taiKhoanToRestoreById);
+            _context.DanhSachSanBong.Update(sanBongToRestoreById);
             await _context.SaveChangesAsync();
 
-            return taiKhoanToRestoreById;
+            return sanBongToRestoreById;
         }
 
-        public async Task<bool> TaiKhoanTonTai(string tenDangNhap)
+        public async Task<SanBong> TemporarilyDeleteById(int id)
         {
-            if (await _context.DanhSachTaiKhoan.AnyAsync(x => x.TenDangNhap == tenDangNhap))
-                return true;
+            var sanBongToTemporarilyDeleteById = await _context.DanhSachSanBong.FirstOrDefaultAsync(x => x.MaSanBong == id);
 
-            return false;
-        }
+            sanBongToTemporarilyDeleteById.DaXoa = 1;
+            sanBongToTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
 
-        public async Task<TaiKhoan> TaoTaiKhoan(TaiKhoan taiKhoan, string matKhau)
-        {
-            byte[] hash, salt;
-            TaoHash(matKhau, out hash, out salt);
-
-            taiKhoan.Hash = hash;
-            taiKhoan.Salt = salt;
-            taiKhoan.ThoiGianTao = DateTime.Now;
-            taiKhoan.ThoiGianCapNhat = DateTime.Now;
-            taiKhoan.TrangThai = 1;
-
-            await _context.DanhSachTaiKhoan.AddAsync(taiKhoan);
+            _context.DanhSachSanBong.Update(sanBongToTemporarilyDeleteById);
             await _context.SaveChangesAsync();
 
-            return taiKhoan;
+            return sanBongToTemporarilyDeleteById;
         }
 
-        public async Task<TaiKhoan> TemporarilyDeleteById(int id)
+        public async Task<SanBong> UpdateById(int id, SanBongForUpdateDto sanBong)
         {
-            var taiKhoanToTemporarilyDeleteById = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
-
-            taiKhoanToTemporarilyDeleteById.DaXoa = 1;
-            taiKhoanToTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
-
-            _context.DanhSachTaiKhoan.Update(taiKhoanToTemporarilyDeleteById);
-            await _context.SaveChangesAsync();
-
-            return taiKhoanToTemporarilyDeleteById;
-        }
-
-        public async Task<TaiKhoan> UpdateById(int id, TaiKhoanForUpdateDto taiKhoan)
-        { 
-            
-            var taiKhoanToUpdate = new TaiKhoan
+            var oldRecord = await _context.DanhSachSanBong.AsNoTracking().FirstOrDefaultAsync(x => x.MaSanBong == id);
+            var sanBongToUpdate = new SanBong
             {
-                MaTaiKhoan = id,
-                HoVaTen = taiKhoan.HoVaTen,
-                NgaySinh = taiKhoan.NgaySinh,
-                SoDienThoai = taiKhoan.SoDienThoai,
-                Email = taiKhoan.Email,
-                DiaChi = taiKhoan.DiaChi,
-                QueQuan = taiKhoan.QueQuan,
-                PhanQuyen = taiKhoan.PhanQuyen,
+                MaSanBong = id,
+                TenSanBong = sanBong.TenSanBong,
+                ChieuDai = sanBong.ChieuDai,
+                ChieuRong = sanBong.ChieuRong,
+                GhiChu = sanBong.GhiChu,
+                ThoiGianTao = oldRecord.ThoiGianTao,
                 ThoiGianCapNhat = DateTime.Now,
-                TrangThai = taiKhoan.TrangThai
+                TrangThai = sanBong.TrangThai
             };
 
-            _context.DanhSachTaiKhoan.Update(taiKhoanToUpdate);
+            sanBongToUpdate.DienTich = sanBong.ChieuDai * sanBong.ChieuRong;
+
+            _context.DanhSachSanBong.Update(sanBongToUpdate);
             await _context.SaveChangesAsync();
-            return taiKhoanToUpdate;
+            return sanBongToUpdate;
         }
 
-        private bool KiemTraHash(string matKhau, byte[] hash, byte[] salt)
+        public ValidationResultDto ValidateBeforeCreate(SanBongForCreateDto sanBong)
         {
-            using (var hmac = new System.Security.Cryptography.HMACSHA512(salt))
+            var totalTenSanBong = _context.DanhSachSanBong.Count(x => x.TenSanBong.ToLower() == sanBong.TenSanBong.ToLower());
+            IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
+
+            if(totalTenSanBong >= 1)
             {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(matKhau));
-                for (int i = 0; i < computedHash.Length; i++)
+                Errors.Add("tenSanBong", new string[] { "tenSanBong is duplicated!" });
+
+                return new ValidationResultDto
                 {
-                    if (computedHash[i] != hash[i]) return false;
-                }
+                    IsValid = false,
+                    Errors = Errors
+                };
             }
-
-            return true;
+            else
+            {
+                return new ValidationResultDto
+                {
+                    IsValid = true
+                };
+            }
         }
 
-        private void TaoHash(string matKhau, out byte[] hash, out byte[] salt)
+        public ValidationResultDto ValidateBeforeUpdate(int id, SanBongForUpdateDto sanBong)
         {
-            using (var hmac = new System.Security.Cryptography.HMACSHA512())
+            var totalTenSanBong = _context.DanhSachSanBong.Count(x => (x.MaSanBong != id) && (x.TenSanBong.ToLower() == sanBong.TenSanBong.ToLower()));
+            IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
+
+            if(totalTenSanBong > 0)
             {
-                salt = hmac.Key;
-                hash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(matKhau));
+                Errors.Add("tenSanBong", new string[] { "tenSanBong is duplicated!" });
+
+                return new ValidationResultDto
+                {
+                    IsValid = false,
+                    Errors = Errors
+                };
             }
+            else
+            {
+                return new ValidationResultDto
+                {
+                    IsValid = true
+                };
+            }
+
         }
     }
 }

@@ -2,93 +2,64 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MFFMS.API.Dtos.TaiKhoanDto;
+using MFFMS.API.Dtos;
+using MFFMS.API.Dtos.DichVuDto;
 using MFFMS.API.Helpers;
 using MFFMS.API.Helpers.Params;
 using MFFMS.API.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace MFFMS.API.Data
+namespace MFFMS.API.Data.DichVuRepository
 {
-    public class TaiKhoanRepository : ITaiKhoanRepository
+    public class DichVuRepository : IDichVuRepository
     {
         private readonly DataContext _context;
         private int _totalItems;
         private int _totalPages;
 
-        public TaiKhoanRepository(DataContext context)
+        public DichVuRepository(DataContext context)
         {
             _context = context;
             _totalItems = 0;
             _totalPages = 0;
         }
-
-        public async Task<TaiKhoan> ChangePassword(int id, TaiKhoanForChangePasswordDto taiKhoan)
+        public async Task<DichVu> Create(DichVuForCreateDto dichVu)
         {
-            var result = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
-
-            if (result == null)
-                return null;
-
-            if (!KiemTraHash(taiKhoan.MatKhauCu, result.Hash, result.Salt))
-                return null;
-
-            if (taiKhoan.MatKhauMoi != taiKhoan.XacNhanMatKhauMoi)
-                return null;
-
-            byte[] hash, salt;
-            TaoHash(taiKhoan.MatKhauMoi, out hash, out salt);
-
-            var taiKhoanToUpdate = new TaiKhoan
+            var danhSachDichVu = await _context.DanhSachDichVu.OrderByDescending(x => x.MaDichVu).FirstOrDefaultAsync();
+            var maDichVu = 1;
+            if(danhSachDichVu == null)
             {
-                MaTaiKhoan = id,
-                Hash = hash,
-                Salt = salt,
-                HoVaTen = result.HoVaTen,
-                NgaySinh = result.NgaySinh,
-                SoDienThoai = result.SoDienThoai,
-                Email = result.Email,
-                DiaChi = result.DiaChi,
-                QueQuan = result.QueQuan,
-                PhanQuyen = result.PhanQuyen,
+                maDichVu = 1;
+            }
+            else
+            {
+                maDichVu = danhSachDichVu.MaDichVu + 1;
+            }
+
+            var newDichVu = new DichVu
+            {
+                MaDichVu = maDichVu,
+                TenDichVu = dichVu.TenDichVu,
+                DonGia = dichVu.DonGia,
+                DVT = dichVu.DVT,
+                GhiChu = dichVu.GhiChu,
+                ThoiGianTao = DateTime.Now,
                 ThoiGianCapNhat = DateTime.Now,
-                TrangThai = result.TrangThai
+                TrangThai = 1
             };
 
-            _context.DanhSachTaiKhoan.Update(taiKhoanToUpdate);
+            await _context.DanhSachDichVu.AddAsync(newDichVu);
             await _context.SaveChangesAsync();
-            return taiKhoanToUpdate;
+            return newDichVu;
+
         }
 
-        public async Task<TaiKhoan> DangNhap(string tenDangNhap, string matKhau)
+        public async Task<PagedList<DichVu>> GetAll(DichVuParams userParams)
         {
-            var taiKhoan = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.TenDangNhap == tenDangNhap);
-
-            if (taiKhoan == null)
-                return null;
-
-            if (!KiemTraHash(matKhau, taiKhoan.Hash, taiKhoan.Salt))
-                return null;
-
-            return taiKhoan;
-        }
-
-        public async Task<TaiKhoan> DeleteById(int id)
-        {
-            var taiKhoanToDelete = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
-
-            _context.DanhSachTaiKhoan.Remove(taiKhoanToDelete);
-            await _context.SaveChangesAsync();
-            return taiKhoanToDelete;
-        }
-
-        public async Task<PagedList<TaiKhoan>> GetAll(TaiKhoanParams userParams)
-        {
-            var result = _context.DanhSachTaiKhoan.AsQueryable();
+            var result = _context.DanhSachDichVu.AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
-            var phanQuyen = userParams.PhanQuyen;
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
@@ -98,12 +69,7 @@ namespace MFFMS.API.Data
 
             if (!string.IsNullOrEmpty(keyword))
             {
-                result = result.Where(x => x.TenDangNhap.ToLower().Contains(keyword.ToLower()) || x.MaTaiKhoan.ToString() == keyword);
-            }
-
-            if (!string.IsNullOrEmpty(phanQuyen))
-            {
-                result = result.Where(x => x.PhanQuyen.ToLower().Contains(phanQuyen.ToLower()));
+                result = result.Where(x => x.TenDichVu.ToLower().Contains(keyword.ToLower()) || x.DVT.ToLower().Contains(keyword.ToLower()) || x.MaDichVu.ToString() == keyword);
             }
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
@@ -120,49 +86,59 @@ namespace MFFMS.API.Data
             {
                 result = result.Where(x => x.TrangThai == trangThai);
             }
-            
-            if(daXoa == 1 || daXoa == 0)
+
+            if(daXoa == 0 || daXoa == 1)
             {
                 result = result.Where(x => x.DaXoa == daXoa);
             }
-
 
             if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
             {
                 switch (sortField)
                 {
-                    case "MaTaiKhoan":
+                    case "MaDichVu":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.MaTaiKhoan);
+                            result = result.OrderBy(x => x.MaDichVu);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.MaTaiKhoan);
+                            result = result.OrderByDescending(x => x.MaDichVu);
                         }
                         break;
 
-                    case "TenDangNhap":
+                    case "TenDichVu":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.TenDangNhap);
+                            result = result.OrderBy(x => x.TenDichVu);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.TenDangNhap);
+                            result = result.OrderByDescending(x => x.TenDichVu);
                         }
                         break;
 
-                    case "PhanQuyen":
+                    case "DonGia":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.PhanQuyen);
+                            result = result.OrderBy(x => x.DonGia);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.PhanQuyen);
+                            result = result.OrderByDescending(x => x.DonGia);
                         }
                         break;
+                    case "DVT":
+                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = result.OrderBy(x => x.DVT);
+                        }
+                        else
+                        {
+                            result = result.OrderByDescending(x => x.DVT);
+                        }
+                        break;
+
 
                     case "ThoiGianTao":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
@@ -203,36 +179,34 @@ namespace MFFMS.API.Data
                 }
             }
 
-            return await PagedList<TaiKhoan>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
+            _totalItems = result.Count();
+            _totalPages = (int)Math.Ceiling((double)_totalItems / (double)userParams.PageSize);
+
+            return await PagedList<DichVu>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<TaiKhoan> GetById(int id)
+        public async Task<DichVu> GetById(int id)
         {
-            var result = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
+            var result = await _context.DanhSachDichVu.FirstOrDefaultAsync(x => x.MaDichVu == id);
             return result;
         }
 
-        public object GetStatusStatistics(TaiKhoanParams userParams)
+        public object GetStatusStatistics(DichVuParams userParams)
         {
-            var result = _context.DanhSachTaiKhoan.AsQueryable();
+            var result = _context.DanhSachDichVu.AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
-            var phanQuyen = userParams.PhanQuyen;
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
+            var daXoa = userParams.DaXoa;
 
             if (!string.IsNullOrEmpty(keyword))
             {
-                result = result.Where(x => x.TenDangNhap.ToLower().Contains(keyword.ToLower()) || x.MaTaiKhoan.ToString() == keyword);
-            }
-
-            if (!string.IsNullOrEmpty(phanQuyen))
-            {
-                result = result.Where(x => x.PhanQuyen.ToLower().Contains(phanQuyen.ToLower()));
+                result = result.Where(x => x.TenDichVu.ToLower().Contains(keyword.ToLower()) || x.DVT.ToLower().Contains(keyword.ToLower()) || x.MaDichVu.ToString() == keyword);
             }
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
@@ -245,45 +219,50 @@ namespace MFFMS.API.Data
                 result = result.Where(x => x.ThoiGianCapNhat >= thoiGianCapNhatBatDau && x.ThoiGianCapNhat <= thoiGianCapNhatKetThuc);
             }
 
-            if (trangThai == -1 || trangThai == 1)
-            {
-                result = result.Where(x => x.TrangThai == trangThai);
-            }
-
             if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
             {
                 switch (sortField)
                 {
-                    case "MaTaiKhoan":
+                    case "MaDichVu":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.MaTaiKhoan);
+                            result = result.OrderBy(x => x.MaDichVu);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.MaTaiKhoan);
+                            result = result.OrderByDescending(x => x.MaDichVu);
                         }
                         break;
 
-                    case "TenDangNhap":
+                    case "TenDichVu":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.TenDangNhap);
+                            result = result.OrderBy(x => x.TenDichVu);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.TenDangNhap);
+                            result = result.OrderByDescending(x => x.TenDichVu);
                         }
                         break;
 
-                    case "PhanQuyen":
+                    case "DonGia":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.PhanQuyen);
+                            result = result.OrderBy(x => x.DonGia);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.PhanQuyen);
+                            result = result.OrderByDescending(x => x.DonGia);
+                        }
+                        break;
+                    case "DVT":
+                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = result.OrderBy(x => x.DVT);
+                        }
+                        else
+                        {
+                            result = result.OrderByDescending(x => x.DVT);
                         }
                         break;
 
@@ -321,6 +300,7 @@ namespace MFFMS.API.Data
                         break;
 
                     default:
+
                         result = result.OrderByDescending(x => x.ThoiGianTao);
                         break;
                 }
@@ -348,109 +328,105 @@ namespace MFFMS.API.Data
             return _totalPages;
         }
 
-        public async Task<TaiKhoan> PermanentlyDeleteById(int id)
+        public async Task<DichVu> PermanentlyDeleteById(int id)
         {
-            var taiKhoanToDelete = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
+            var dichVuToDelete = await _context.DanhSachDichVu.FirstOrDefaultAsync(x => x.MaDichVu == id);
 
-            _context.DanhSachTaiKhoan.Remove(taiKhoanToDelete);
+            _context.DanhSachDichVu.Remove(dichVuToDelete);
             await _context.SaveChangesAsync();
 
-            return taiKhoanToDelete;
+            return dichVuToDelete;
         }
 
-        public async Task<TaiKhoan> RestoreById(int id)
+        public async Task<DichVu> RestoreById(int id)
         {
-            var taiKhoanToRestoreById = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
+            var dichVuToRestoreById = await _context.DanhSachDichVu.FirstOrDefaultAsync(x => x.MaDichVu == id);
 
-            taiKhoanToRestoreById.DaXoa = 0;
-            taiKhoanToRestoreById.ThoiGianCapNhat = DateTime.Now;
+            dichVuToRestoreById.DaXoa = 0;
+            dichVuToRestoreById.ThoiGianCapNhat = DateTime.Now;
 
-            _context.DanhSachTaiKhoan.Update(taiKhoanToRestoreById);
+            _context.DanhSachDichVu.Update(dichVuToRestoreById);
             await _context.SaveChangesAsync();
-
-            return taiKhoanToRestoreById;
+            return dichVuToRestoreById;
         }
 
-        public async Task<bool> TaiKhoanTonTai(string tenDangNhap)
+        public async Task<DichVu> TemporarilyDeleteById(int id)
         {
-            if (await _context.DanhSachTaiKhoan.AnyAsync(x => x.TenDangNhap == tenDangNhap))
-                return true;
+            var dichVuToTemporarilyDeleteById = await _context.DanhSachDichVu.FirstOrDefaultAsync(x => x.MaDichVu == id);
 
-            return false;
-        }
+            dichVuToTemporarilyDeleteById.DaXoa = 1;
+            dichVuToTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
 
-        public async Task<TaiKhoan> TaoTaiKhoan(TaiKhoan taiKhoan, string matKhau)
-        {
-            byte[] hash, salt;
-            TaoHash(matKhau, out hash, out salt);
-
-            taiKhoan.Hash = hash;
-            taiKhoan.Salt = salt;
-            taiKhoan.ThoiGianTao = DateTime.Now;
-            taiKhoan.ThoiGianCapNhat = DateTime.Now;
-            taiKhoan.TrangThai = 1;
-
-            await _context.DanhSachTaiKhoan.AddAsync(taiKhoan);
+            _context.DanhSachDichVu.Update(dichVuToTemporarilyDeleteById);
             await _context.SaveChangesAsync();
-
-            return taiKhoan;
+            return dichVuToTemporarilyDeleteById;
         }
 
-        public async Task<TaiKhoan> TemporarilyDeleteById(int id)
+        public async Task<DichVu> UpdateById(int id, DichVuForUpdateDto dichVu)
         {
-            var taiKhoanToTemporarilyDeleteById = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
-
-            taiKhoanToTemporarilyDeleteById.DaXoa = 1;
-            taiKhoanToTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
-
-            _context.DanhSachTaiKhoan.Update(taiKhoanToTemporarilyDeleteById);
-            await _context.SaveChangesAsync();
-
-            return taiKhoanToTemporarilyDeleteById;
-        }
-
-        public async Task<TaiKhoan> UpdateById(int id, TaiKhoanForUpdateDto taiKhoan)
-        { 
-            
-            var taiKhoanToUpdate = new TaiKhoan
+            var oldRecord = await _context.DanhSachDichVu.AsNoTracking().FirstOrDefaultAsync(x => x.MaDichVu == id);
+            var dichVuToUpdate = new DichVu
             {
-                MaTaiKhoan = id,
-                HoVaTen = taiKhoan.HoVaTen,
-                NgaySinh = taiKhoan.NgaySinh,
-                SoDienThoai = taiKhoan.SoDienThoai,
-                Email = taiKhoan.Email,
-                DiaChi = taiKhoan.DiaChi,
-                QueQuan = taiKhoan.QueQuan,
-                PhanQuyen = taiKhoan.PhanQuyen,
-                ThoiGianCapNhat = DateTime.Now,
-                TrangThai = taiKhoan.TrangThai
+                MaDichVu = id,
+                TenDichVu = dichVu.TenDichVu,
+                DonGia = dichVu.DonGia,
+                DVT = dichVu.DVT,
+                GhiChu = dichVu.GhiChu,
+                TrangThai = dichVu.TrangThai,
+                ThoiGianTao = oldRecord.ThoiGianTao,
+                ThoiGianCapNhat = DateTime.Now
             };
 
-            _context.DanhSachTaiKhoan.Update(taiKhoanToUpdate);
+            _context.DanhSachDichVu.Update(dichVuToUpdate);
             await _context.SaveChangesAsync();
-            return taiKhoanToUpdate;
+            return dichVuToUpdate;
         }
 
-        private bool KiemTraHash(string matKhau, byte[] hash, byte[] salt)
+        public ValidationResultDto ValidateBeforeCreate(DichVuForCreateDto dichVu)
         {
-            using (var hmac = new System.Security.Cryptography.HMACSHA512(salt))
+            var totalTenDichVu = _context.DanhSachDichVu.Count(x=>x.TenDichVu == dichVu.TenDichVu);
+            IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
+
+            if (totalTenDichVu >= 1)
             {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(matKhau));
-                for (int i = 0; i < computedHash.Length; i++)
+                Errors.Add("tenDichVu", new string[] { "tenDichVu is duplicated!" });
+
+                return new ValidationResultDto
                 {
-                    if (computedHash[i] != hash[i]) return false;
-                }
+                    IsValid = false,
+                    Errors = Errors
+                };
             }
-
-            return true;
+            else
+            {
+                return new ValidationResultDto
+                {
+                    IsValid = true
+                };
+            }
         }
 
-        private void TaoHash(string matKhau, out byte[] hash, out byte[] salt)
+        public ValidationResultDto ValidateBeforeUpdate(int id, DichVuForUpdateDto dichVu)
         {
-            using (var hmac = new System.Security.Cryptography.HMACSHA512())
+            var totalTenDichVu = _context.DanhSachDichVu.Count(x => x.MaDichVu != id && x.TenDichVu == dichVu.TenDichVu);
+            IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
+
+            if(totalTenDichVu > 0)
             {
-                salt = hmac.Key;
-                hash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(matKhau));
+                Errors.Add("tenDichVu", new string[] { "tenDichVu is duplicated!" });
+
+                return new ValidationResultDto
+                {
+                    IsValid = false,
+                    Errors = Errors
+                };
+            }
+            else
+            {
+                return new ValidationResultDto
+                {
+                    IsValid = true
+                };
             }
         }
     }

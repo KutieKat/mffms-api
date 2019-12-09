@@ -1,50 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using MFFMS.API.Data;
-using MFFMS.API.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using MFFMS.API.Dtos.TaiKhoanDto;
-using Microsoft.AspNetCore.Authorization;
-using MFFMS.API.Helpers;
 using AutoMapper;
-using MFFMS.API.Helpers.Params;
+using MFFMS.API.Data.HoaDonDichVuRepository;
+using MFFMS.API.Dtos.HoaDonDichVuDto;
 using MFFMS.API.Dtos.ResponseDto;
+using MFFMS.API.Helpers;
+using MFFMS.API.Helpers.Params;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MFFMS.API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-
-    public class TaiKhoanController : ControllerBase
+    public class HoaDonDichVuController : ControllerBase
     {
-        private readonly ITaiKhoanRepository _repo;
-        private readonly IConfiguration _config;
+        private readonly IHoaDonDichVuRepository _repo;
         private readonly IMapper _mapper;
         private readonly string _entityName;
-
-        public TaiKhoanController(ITaiKhoanRepository repo, IConfiguration config, IMapper mapper)
+        public HoaDonDichVuController(IHoaDonDichVuRepository repo, IMapper mapper)
         {
-            _config = config;
             _repo = repo;
             _mapper = mapper;
-            _entityName = "tài khoản";
+            _entityName = "hóa đơn dịch vụ";
         }
 
-        //[Authorize(Roles = "NQL")]
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] TaiKhoanParams userParams)
+        public async Task<IActionResult> GetAll([FromQuery] HoaDonDichVuParams userParams)
         {
+
             try
             {
                 var result = await _repo.GetAll(userParams);
-                var resultToReturn = _mapper.Map<IEnumerable<TaiKhoanForListDto>>(result);
+                var resultToReturn = _mapper.Map<IEnumerable<HoaDonDichVuForListDto>>(result);
 
                 Response.AddPagination(result.CurrentPage, result.PageSize, result.TotalCount, result.TotalPages);
 
@@ -75,14 +65,13 @@ namespace MFFMS.API.Controllers
             }
         }
 
-        //[Authorize(Roles = "NQL")]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             try
             {
                 var result = await _repo.GetById(id);
-                var resultToReturn = _mapper.Map<TaiKhoanForViewDto>(result);
+                var resultToReturn = _mapper.Map<HoaDonDichVuForViewDto>(result);
 
                 return StatusCode(200, new SuccessResponseDto
                 {
@@ -106,13 +95,41 @@ namespace MFFMS.API.Controllers
             }
         }
 
-        //[Authorize(Roles = "NQL")]
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateById(int id, TaiKhoanForUpdateDto taiKhoan)
+        [HttpPost]
+        public async Task<IActionResult> Create(HoaDonDichVuForCreateDto hoaDonDichVu)
         {
             try
             {
-                var result = await _repo.UpdateById(id, taiKhoan);
+                var result = await _repo.Create(hoaDonDichVu);
+
+                return StatusCode(201, new SuccessResponseDto
+                {
+                    Message = "Tạo " + _entityName + " mới thành công!",
+                    Result = new SuccessResponseResultWithSingleDataDto
+                    {
+                        Data = result
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new FailedResponseDto
+                {
+                    Message = "Tạo " + _entityName + " mới thất bại!",
+                    Result = new FailedResponseResultDto
+                    {
+                        Errors = e
+                    }
+                });
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateById(int id, HoaDonDichVuForUpdateDto hoaDonDichVu)
+        {
+            try
+            {
+                var result = await _repo.UpdateById(id, hoaDonDichVu);
 
                 return StatusCode(200, new SuccessResponseDto
                 {
@@ -128,64 +145,6 @@ namespace MFFMS.API.Controllers
                 return StatusCode(500, new FailedResponseDto
                 {
                     Message = "Cập nhật " + _entityName + " thất bại!",
-                    Result = new FailedResponseResultDto
-                    {
-                        Errors = e
-                    }
-                });
-            }
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> ChangePassword(int id, TaiKhoanForChangePasswordDto taiKhoan)
-        {
-            try
-            {
-                var result = await _repo.ChangePassword(id, taiKhoan);
-
-                return StatusCode(200, new SuccessResponseDto
-                {
-                    Message = "Thay đổi mật khẩu cho tài khoản thành công!",
-                    Result = new SuccessResponseResultWithSingleDataDto
-                    {
-                        Data = result
-                    }
-                });
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, new FailedResponseDto
-                {
-                    Message = "Thay đổi mật khẩu cho tài khoản thất bại!",
-                    Result = new FailedResponseResultDto
-                    {
-                        Errors = e
-                    }
-                });
-            }
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> PermanentlyDeleteById(int id)
-        {
-            try
-            {
-                var result = await _repo.PermanentlyDeleteById(id);
-
-                return StatusCode(200, new SuccessResponseDto
-                {
-                    Message = "Xóa " + _entityName + " thành công!",
-                    Result = new SuccessResponseResultWithSingleDataDto
-                    {
-                        Data = result
-                    }
-                });
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, new FailedResponseDto
-                {
-                    Message = "Xóa " + _entityName + " thất bại!",
                     Result = new FailedResponseResultDto
                     {
                         Errors = e
@@ -223,6 +182,7 @@ namespace MFFMS.API.Controllers
             }
         }
 
+
         [HttpPut("{id}")]
         public async Task<IActionResult> RestoreById(int id)
         {
@@ -252,33 +212,19 @@ namespace MFFMS.API.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Register( TaiKhoanForCreateDto taiKhoan)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> PermanentlyDeleteById(int id)
         {
             try
             {
-                taiKhoan.TenDangNhap = taiKhoan.TenDangNhap.ToLower();
-
-                if (await _repo.TaiKhoanTonTai(taiKhoan.TenDangNhap))
-                {
-                    return BadRequest();
-                }
-
-                var taiKhoanMoi = new TaiKhoan
-                {
-                    TenDangNhap = taiKhoan.TenDangNhap,
-                    ThoiGianTao = DateTime.Now,
-                    PhanQuyen = taiKhoan.PhanQuyen
-                };
-
-                var taiKhoanDuocTao = await _repo.TaoTaiKhoan(taiKhoanMoi, taiKhoan.MatKhau);
+                var result = await _repo.PermanentlyDeleteById(id);
 
                 return StatusCode(200, new SuccessResponseDto
                 {
-                    Message = "Tạo tài khoản mới thành công!",
+                    Message = "Xóa " + _entityName + " thành công!",
                     Result = new SuccessResponseResultWithSingleDataDto
                     {
-                        Data = taiKhoanDuocTao
+                        Data = result
                     }
                 });
             }
@@ -286,61 +232,7 @@ namespace MFFMS.API.Controllers
             {
                 return StatusCode(500, new FailedResponseDto
                 {
-                    Message = "Tạo tài khoản mới thất bại!",
-                    Result = new FailedResponseResultDto
-                    {
-                        Errors = e
-                    }
-                });
-            }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Login([FromBody] TaiKhoanForLoginDto taiKhoan)
-        {
-            try
-            {
-                var taiKhoanDuocDangNhap = await _repo.DangNhap(taiKhoan.TenDangNhap.ToLower(), taiKhoan.MatKhau);
-
-                if (taiKhoanDuocDangNhap == null)
-                    return Unauthorized();
-
-                var claims = new[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, taiKhoanDuocDangNhap.MaTaiKhoan.ToString()),
-                    new Claim(ClaimTypes.Name, taiKhoanDuocDangNhap.TenDangNhap),
-                    new Claim(ClaimTypes.Role, taiKhoanDuocDangNhap.PhanQuyen)
-                };
-
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value));
-                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(claims),
-                    Expires = DateTime.Now.AddDays(1),
-                    SigningCredentials = creds
-                };
-
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-
-                return StatusCode(200, new SuccessResponseDto
-                {
-                    Message = "Đăng nhập vào hệ thống thành công!",
-                    Result = new SuccessResponseResultWithSingleDataDto
-                    {
-                        Data = new
-                        {
-                            token = tokenHandler.WriteToken(token)
-                        }
-                    }
-                });
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, new FailedResponseDto
-                {
-                    Message = "Đăng nhập vào hệ thống thất bại!",
+                    Message = "Xóa " + _entityName + " thất bại!",
                     Result = new FailedResponseResultDto
                     {
                         Errors = e
