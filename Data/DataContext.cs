@@ -51,7 +51,8 @@ namespace MFFMS.API.Data
 
             modelBuilder.Entity<SanBong>().HasIndex(x => x.TenSanBong).IsUnique();
             modelBuilder.Entity<SanBong>().Property(x => x.TenSanBong).IsRequired();
-            modelBuilder.Entity<SanBong>().Property(x => x.DienTich).IsRequired();
+            modelBuilder.Entity<SanBong>().Property(x => x.ChieuDai).IsRequired();
+            modelBuilder.Entity<SanBong>().Property(x => x.ChieuRong).IsRequired();
 
             modelBuilder.Entity<DichVu>().HasIndex(x => x.TenDichVu).IsUnique();
             modelBuilder.Entity<DichVu>().Property(x => x.TenDichVu).IsRequired();

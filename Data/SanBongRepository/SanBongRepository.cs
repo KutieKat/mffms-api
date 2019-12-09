@@ -40,12 +40,15 @@ namespace MFFMS.API.Data.SanBongRepository
             {
                 MaSanBong = maSanBong,
                 TenSanBong = sanBong.TenSanBong,
-                DienTich = sanBong.DienTich,
+                ChieuDai = sanBong.ChieuDai,
+                ChieuRong = sanBong.ChieuRong,
                 GhiChu = sanBong.GhiChu,
                 ThoiGianTao = DateTime.Now,
                 ThoiGianCapNhat = DateTime.Now,
                 TrangThai = 1
             };
+
+            newSanBong.DienTich = sanBong.ChieuDai * sanBong.ChieuRong;
 
             await _context.DanhSachSanBong.AddAsync(newSanBong);
             await _context.SaveChangesAsync();
@@ -63,15 +66,11 @@ namespace MFFMS.API.Data.SanBongRepository
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
-            var dienTich = userParams.DienTich;
+            var daXoa = userParams.DaXoa;
 
             if (!string.IsNullOrEmpty(keyword))
             {
-                result = result.Where(x => x.TenSanBong.ToLower().Contains(keyword.ToLower()) || x.DienTich.ToLower().Contains(keyword.ToLower()) || x.MaSanBong.ToString() == keyword);
-            }
-            if(!string.IsNullOrEmpty(dienTich))
-            {
-                result = result.Where(x => x.DienTich.ToLower().Contains(dienTich.ToLower()));
+                result = result.Where(x => x.TenSanBong.ToLower().Contains(keyword.ToLower()) ||  x.MaSanBong.ToString() == keyword);
             }
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
@@ -87,6 +86,11 @@ namespace MFFMS.API.Data.SanBongRepository
             if (trangThai == -1 || trangThai == 1)
             {
                 result = result.Where(x => x.TrangThai == trangThai);
+            }
+
+            if(daXoa == 1|| daXoa == 0)
+            {
+                result = result.Where(x => x.DaXoa == daXoa);
             }
 
             if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
@@ -112,6 +116,28 @@ namespace MFFMS.API.Data.SanBongRepository
                         else
                         {
                             result = result.OrderByDescending(x => x.TenSanBong);
+                        }
+                        break;
+
+                    case "ChieuDai":
+                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = result.OrderBy(x => x.ChieuDai);
+                        }
+                        else
+                        {
+                            result = result.OrderByDescending(x => x.ChieuDai);
+                        }
+                        break;
+
+                    case "ChieuRong":
+                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = result.OrderBy(x => x.ChieuRong);
+                        }
+                        else
+                        {
+                            result = result.OrderByDescending(x => x.ChieuRong);
                         }
                         break;
 
@@ -188,15 +214,11 @@ namespace MFFMS.API.Data.SanBongRepository
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
-            var dienTich = userParams.DienTich;
+            var daXoa = userParams.DaXoa;
 
             if (!string.IsNullOrEmpty(keyword))
             {
-                result = result.Where(x => x.TenSanBong.ToLower().Contains(keyword.ToLower()) || x.DienTich.ToLower().Contains(keyword.ToLower()) || x.MaSanBong.ToString() == keyword);
-            }
-            if (!string.IsNullOrEmpty(dienTich))
-            {
-                result = result.Where(x => x.DienTich.ToLower().Contains(dienTich.ToLower()));
+                result = result.Where(x => x.TenSanBong.ToLower().Contains(keyword.ToLower()) ||  x.MaSanBong.ToString() == keyword);
             }
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
@@ -232,6 +254,27 @@ namespace MFFMS.API.Data.SanBongRepository
                         else
                         {
                             result = result.OrderByDescending(x => x.TenSanBong);
+                        }
+                        break;
+                    case "ChieuDai":
+                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = result.OrderBy(x => x.ChieuDai);
+                        }
+                        else
+                        {
+                            result = result.OrderByDescending(x => x.ChieuDai);
+                        }
+                        break;
+
+                    case "ChieuRong":
+                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = result.OrderBy(x => x.ChieuRong);
+                        }
+                        else
+                        {
+                            result = result.OrderByDescending(x => x.ChieuRong);
                         }
                         break;
 
@@ -286,8 +329,8 @@ namespace MFFMS.API.Data.SanBongRepository
             }
 
             var all = result.Count();
-            var active = result.Count(x => x.TrangThai == 1);
-            var inactive = result.Count(x => x.TrangThai == -1);
+            var active = result.Count(x => x.DaXoa == 0);
+            var inactive = result.Count(x => x.DaXoa == 1);
 
             return new
             {
@@ -350,12 +393,15 @@ namespace MFFMS.API.Data.SanBongRepository
             {
                 MaSanBong = id,
                 TenSanBong = sanBong.TenSanBong,
-                DienTich = sanBong.DienTich,
+                ChieuDai = sanBong.ChieuDai,
+                ChieuRong = sanBong.ChieuRong,
                 GhiChu = sanBong.GhiChu,
                 ThoiGianTao = oldRecord.ThoiGianTao,
                 ThoiGianCapNhat = DateTime.Now,
                 TrangThai = sanBong.TrangThai
             };
+
+            sanBongToUpdate.DienTich = sanBong.ChieuDai * sanBong.ChieuRong;
 
             _context.DanhSachSanBong.Update(sanBongToUpdate);
             await _context.SaveChangesAsync();
