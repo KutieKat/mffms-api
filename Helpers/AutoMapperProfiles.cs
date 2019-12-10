@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MFFMS.API.Dtos.ChiTietHDDVDto;
 
 namespace MFFMS.API.Helpers
 {
@@ -25,6 +26,7 @@ namespace MFFMS.API.Helpers
             CreateMapForDichVu();
             CreateMapForHoaDonDichVu();
             CreateMapForCaiDat();
+            CreateMapForChiTietHoaDonDichVu();
         }
 
         private void CreateMapForTaiKhoan()
@@ -95,6 +97,16 @@ namespace MFFMS.API.Helpers
             CreateMap<CaiDat, CaiDatForViewDto>();
             CreateMap<CaiDat, CaiDatForUpdateDto>();
             CreateMap<CaiDatForUpdateDto, CaiDat>();  
+        }
+
+        private void CreateMapForChiTietHoaDonDichVu()
+        {
+            CreateMap<ChiTietHDDV, ChiTietHDDVForCreateDto>();
+            CreateMap<ChiTietHDDV, ChiTietHDDVForUpdateDto>();
+            CreateMap<ChiTietHDDV, ChiTietHDDVForViewDto>();
+            CreateMap<ChiTietHDDV, ChiTietHDDVForListDto>();
+            CreateMap<ChiTietHDDVForCreateDto, ChiTietHDDV>();
+            CreateMap<ChiTietHDDVForUpdateDto, ChiTietHDDV>();
         }
     }
 }
