@@ -7,6 +7,6 @@ namespace MFFMS.API.Helpers.Params
 {
     public class TaiSanThietBiParams : BaseParams
     {
-
+        public int MaNhaCungCap {get;set;}
     }
 }
