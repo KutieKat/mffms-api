@@ -221,12 +221,9 @@ namespace MFFMS.API.Data.KhachHangRepository
 
             return new
             {
-                Customers = new
-                {
-                    Total = totalCustomers,
-                    Males = maleCustomers,
-                    Females = femaleCustomers
-                }
+                Total = totalCustomers,
+                Males = maleCustomers,
+                Females = femaleCustomers
             };
         }
 
