@@ -32,6 +32,7 @@ using MFFMS.API.Data.DichVuRepository;
 using MFFMS.API.Data.HoaDonDichVuRepository;
 using MFFMS.API.Data.NhaCungCapRepository;
 using MFFMS.API.Data.CaiDatRepository;
+using MFFMS.API.Data.TaiSanThietBiRepository;
 
 namespace MFFMS.API
 {
@@ -62,6 +63,7 @@ namespace MFFMS.API
             services.AddScoped<IDichVuRepository, DichVuRepository>();
             services.AddScoped<IHoaDonDichVuRepository, HoaDonDichVuRepository>();
             services.AddScoped<INhaCungCapRepository, NhaCungCapRepository>();
+            services.AddScoped<ITaiSanThietBiRepository, TaiSanThietBiRepository>();
             services.AddScoped<ICaiDatRepository, CaiDatRepository>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

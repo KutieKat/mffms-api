@@ -1,14 +1,13 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using MFFMS.API.Models;
 
-namespace MFFMS.API.Models
+namespace MFFMS.API.Dtos.TaiSanThietBiDto
 {
-    public class TaiSanThietBi:BaseModel
+    public class TaiSanThietBiForViewDto:BaseDto
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int MaTSTB { get; set; }
         public int MaNhaCungCap { get; set; }
         public NhaCungCap NhaCungCap { get; set; }
@@ -16,7 +15,7 @@ namespace MFFMS.API.Models
         public string TinhTrang { get; set; }
         public string ThongTinBaoHanh { get; set; }
 
-       public ICollection<ChiTietDonNhapHang> ChiTietDonNhapHang { get; set; }
 
     }
+
 }
