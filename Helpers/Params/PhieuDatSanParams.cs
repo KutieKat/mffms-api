@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace MFFMS.API.Helpers.Params
 {
-    public class TaiSanThietBiParams : BaseParams
+    public class PhieuDatSanParams : BaseParams
     {
-        public int MaNhaCungCap {get;set;}
+
     }
 }

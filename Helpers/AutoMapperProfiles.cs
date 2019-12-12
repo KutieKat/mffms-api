@@ -11,6 +11,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MFFMS.API.Dtos.ChiTietHDDVDto;
+using MFFMS.API.Dtos.DonNhapHangDto;
+using MFFMS.API.Dtos.ChiTietDonNhapHangDto;
+using MFFMS.API.Dtos.PhieuDatSanDto;
 
 namespace MFFMS.API.Helpers
 {
@@ -25,6 +29,9 @@ namespace MFFMS.API.Helpers
             CreateMapForDichVu();
             CreateMapForHoaDonDichVu();
             CreateMapForCaiDat();
+            CreateMapForChiTietHoaDonDichVu();
+            CreateMapForDonNhapHang();
+            CreateMapForChiTietDonNhapHang();
         }
 
         private void CreateMapForTaiKhoan()
@@ -95,6 +102,46 @@ namespace MFFMS.API.Helpers
             CreateMap<CaiDat, CaiDatForViewDto>();
             CreateMap<CaiDat, CaiDatForUpdateDto>();
             CreateMap<CaiDatForUpdateDto, CaiDat>();  
+        }
+
+        private void CreateMapForChiTietHoaDonDichVu()
+        {
+            CreateMap<ChiTietHDDV, ChiTietHDDVForCreateDto>();
+            CreateMap<ChiTietHDDV, ChiTietHDDVForUpdateDto>();
+            CreateMap<ChiTietHDDV, ChiTietHDDVForViewDto>();
+            CreateMap<ChiTietHDDV, ChiTietHDDVForListDto>();
+            CreateMap<ChiTietHDDVForCreateDto, ChiTietHDDV>();
+            CreateMap<ChiTietHDDVForUpdateDto, ChiTietHDDV>();
+        }
+
+        private void CreateMapForDonNhapHang()
+        {
+            CreateMap<DonNhapHang, DonNhapHangForCreateDto>();
+            CreateMap<DonNhapHang, DonNhapHangForUpdateDto>();
+            CreateMap<DonNhapHang, DonNhapHangForViewDto>();
+            CreateMap<DonNhapHang, DonNhapHangForListDto>();
+            CreateMap<DonNhapHangForCreateDto, DonNhapHang>();
+            CreateMap<DonNhapHangForUpdateDto, DonNhapHang>();
+        }
+
+        private void CreateMapForChiTietDonNhapHang()
+        {
+            CreateMap<ChiTietDonNhapHang, ChiTietDonNhapHangForCreateDto>();
+            CreateMap<ChiTietDonNhapHang, ChiTietDonNhapHangForUpdateDto>();
+            CreateMap<ChiTietDonNhapHang, ChiTietDonNhapHangForViewDto>();
+            CreateMap<ChiTietDonNhapHang, ChiTietDonNhapHangForListDto>();
+            CreateMap<ChiTietDonNhapHangForCreateDto, ChiTietDonNhapHang>();
+            CreateMap<ChiTietDonNhapHangForUpdateDto, ChiTietDonNhapHang>();
+        }
+
+        private void CreateMapForPhieuDatSan()
+        {
+            CreateMap<PhieuDatSan, PhieuDatSanForCreateDto>();
+            CreateMap<PhieuDatSan, PhieuDatSanForUpdateDto>();
+            CreateMap<PhieuDatSan, PhieuDatSanForViewDto>();
+            CreateMap<PhieuDatSan, PhieuDatSanForListDto>();
+            CreateMap<PhieuDatSanForCreateDto, PhieuDatSan>();
+            CreateMap<PhieuDatSanForUpdateDto, PhieuDatSan>();
         }
     }
 }

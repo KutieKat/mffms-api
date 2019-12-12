@@ -1,61 +1,75 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MFFMS.API.Dtos;
-using MFFMS.API.Dtos.NhaCungCapDto;
+using MFFMS.API.Dtos.ChiTietHDDVDto;
 using MFFMS.API.Helpers;
 using MFFMS.API.Helpers.Params;
 using MFFMS.API.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace MFFMS.API.Data.NhaCungCapRepository
+namespace MFFMS.API.Data.ChiTietHDDVRepository
 {
-    public class NhaCungCapRepository : INhaCungCapRepository
+    public class ChiTietHDDVRepository : IChiTietHDDVRepository
     {
         private readonly DataContext _context;
         private int _totalItems;
         private int _totalPages;
 
-        public NhaCungCapRepository(DataContext context)
+        public ChiTietHDDVRepository(DataContext context)
         {
             _context = context;
             _totalItems = 0;
             _totalPages = 0;
+
         }
 
-        public async Task<NhaCungCap> Create(NhaCungCapForCreateDto nhaCungCap)
+        public async Task<ChiTietHDDV> Create(ChiTietHDDVForCreateDto chiTietHDDV)
         {
-            var danhSachNhaCungCap = await _context.DanhSachNhaCungCap.OrderByDescending(x => x.MaNhaCungCap).FirstOrDefaultAsync();
-            var maNhaCungCap = 1;
-            if (danhSachNhaCungCap == null)
+            var newChiTietHDDV = new ChiTietHDDV
             {
-                maNhaCungCap = 1;
-            }
-            else
-            {
-                maNhaCungCap = danhSachNhaCungCap.MaNhaCungCap + 1;
-            }
-
-            var newNhaCungCap = new NhaCungCap
-            {
-                MaNhaCungCap = maNhaCungCap,
-                TenNhaCungCap = nhaCungCap.TenNhaCungCap,
-                SoDienThoai = nhaCungCap.SoDienThoai,
-                DiaChi = nhaCungCap.DiaChi,
-                GhiChu = nhaCungCap.GhiChu,
-                ThoiGianCapNhat = DateTime.Now,
+                SoHDDV = chiTietHDDV.SoHDDV,
+                MaDichVu = chiTietHDDV.MaDichVu,
+                SoLuong = chiTietHDDV.SoLuong,
                 ThoiGianTao = DateTime.Now,
+                ThoiGianCapNhat = DateTime.Now,
                 TrangThai = 1
             };
-            await _context.DanhSachNhaCungCap.AddAsync(newNhaCungCap);
+
+            await _context.DanhSachChiTietHDDV.AddAsync(newChiTietHDDV);
             await _context.SaveChangesAsync();
-            return newNhaCungCap;
+            return newChiTietHDDV;
         }
 
-        public async Task<PagedList<NhaCungCap>> GetAll(NhaCungCapParams userParams)
+        public async Task<ICollection<ChiTietHDDV>> CreateMultiple(ICollection<ChiTietHDDVForCreateMultipleDto> danhSachChiTietHDDV)
         {
-            var result = _context.DanhSachNhaCungCap.AsQueryable();
+            ICollection<ChiTietHDDV> temp = new List<ChiTietHDDV>();
+            for(int i = 0; i < danhSachChiTietHDDV.Count; i++)
+            {
+                var chiTietHDDV = danhSachChiTietHDDV.ElementAt(i);
+                var newChiTietHDDV = new ChiTietHDDV
+                {
+                    SoHDDV = chiTietHDDV.SoHDDV,
+                    MaDichVu = chiTietHDDV.MaDichVu,
+                    SoLuong = chiTietHDDV.SoLuong,
+                    ThoiGianTao = DateTime.Now,
+                    ThoiGianCapNhat = DateTime.Now,
+                    TrangThai = 1
+                };
+
+                temp.Add(newChiTietHDDV);
+
+                await _context.DanhSachChiTietHDDV.AddAsync(newChiTietHDDV);
+                await _context.SaveChangesAsync();
+            }
+
+            return temp;
+        }
+
+        public async Task<PagedList<ChiTietHDDV>> GetAll(ChiTietHDDVParams userParams)
+        {
+            var result = _context.DanhSachChiTietHDDV.Include(x=>x.HoaDonDichVu).ThenInclude(x => x.KhachHang).Include(x=>x.DichVu).AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
@@ -68,7 +82,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
 
             if (!string.IsNullOrEmpty(keyword))
             {
-                result = result.Where(x => x.TenNhaCungCap.ToLower().Contains(keyword.ToLower()) || x.MaNhaCungCap.ToString() == keyword);
+                result = result.Where(x => x.MaDichVu.ToString().ToLower().Contains(keyword.ToLower()) || x.SoHDDV.ToString() == keyword);
             }
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
@@ -86,7 +100,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
                 result = result.Where(x => x.TrangThai == trangThai);
             }
 
-            if(daXoa == 1 || daXoa == 0)
+            if (daXoa == 0 || daXoa == 1)
             {
                 result = result.Where(x => x.DaXoa == daXoa);
             }
@@ -95,36 +109,25 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             {
                 switch (sortField)
                 {
-                    case "MaNhaCungCap":
+                    case "SoHDDV":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.MaNhaCungCap);
+                            result = result.OrderBy(x => x.SoHDDV);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.MaNhaCungCap);
+                            result = result.OrderByDescending(x => x.SoHDDV);
                         }
                         break;
 
-                    case "TenNhaCungCap":
+                    case "MaDichVu":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.TenNhaCungCap);
+                            result = result.OrderBy(x => x.MaDichVu);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.TenNhaCungCap);
-                        }
-                        break;
-
-                    case "SoDienThoai":
-                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
-                        {
-                            result = result.OrderBy(x => x.SoDienThoai);
-                        }
-                        else
-                        {
-                            result = result.OrderByDescending(x => x.SoDienThoai);
+                            result = result.OrderByDescending(x => x.MaDichVu);
                         }
                         break;
 
@@ -166,21 +169,22 @@ namespace MFFMS.API.Data.NhaCungCapRepository
                         break;
                 }
             }
+
             _totalItems = result.Count();
             _totalPages = (int)Math.Ceiling((double)_totalItems / (double)userParams.PageSize);
 
-            return await PagedList<NhaCungCap>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
+            return await PagedList<ChiTietHDDV>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<NhaCungCap> GetById(int id)
+        public async Task<ChiTietHDDV> GetById(int soHDDV, int maDichVu)
         {
-            var result = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
+            var result = await _context.DanhSachChiTietHDDV.Include(x => x.DichVu).Include(x => x.HoaDonDichVu).FirstOrDefaultAsync(x => x.SoHDDV == soHDDV && x.MaDichVu == maDichVu);
             return result;
         }
 
-        public object GetStatusStatistics(NhaCungCapParams userParams)
+        public object GetStatusStatistics(ChiTietHDDVParams userParams)
         {
-            var result = _context.DanhSachNhaCungCap.AsQueryable();
+            var result = _context.DanhSachChiTietHDDV.Include(x => x.HoaDonDichVu).ThenInclude(x=>x.KhachHang).Include(x => x.DichVu).AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
@@ -189,11 +193,11 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
-
+            var daXoa = userParams.DaXoa;
 
             if (!string.IsNullOrEmpty(keyword))
             {
-                result = result.Where(x => x.TenNhaCungCap.ToLower().Contains(keyword.ToLower()) || x.MaNhaCungCap.ToString() == keyword);
+                result = result.Where(x => x.MaDichVu.ToString().ToLower().Contains(keyword.ToLower()) || x.SoHDDV.ToString() == keyword);
             }
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
@@ -206,29 +210,39 @@ namespace MFFMS.API.Data.NhaCungCapRepository
                 result = result.Where(x => x.ThoiGianCapNhat >= thoiGianCapNhatBatDau && x.ThoiGianCapNhat <= thoiGianCapNhatKetThuc);
             }
 
+            if (trangThai == -1 || trangThai == 1)
+            {
+                result = result.Where(x => x.TrangThai == trangThai);
+            }
+
+            if (daXoa == 0 || daXoa == 1)
+            {
+                result = result.Where(x => x.DaXoa == daXoa);
+            }
+
             if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
             {
                 switch (sortField)
                 {
-                    case "MaNhaCungCap":
+                    case "SoHDDV":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.MaNhaCungCap);
+                            result = result.OrderBy(x => x.SoHDDV);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.MaNhaCungCap);
+                            result = result.OrderByDescending(x => x.SoHDDV);
                         }
                         break;
 
-                    case "TenNhaCungCap":
+                    case "MaDichVu":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.TenNhaCungCap);
+                            result = result.OrderBy(x => x.MaDichVu);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.TenNhaCungCap);
+                            result = result.OrderByDescending(x => x.MaDichVu);
                         }
                         break;
 
@@ -270,6 +284,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
                         break;
                 }
             }
+
             var all = result.Count();
             var active = result.Count(x => x.DaXoa == 0);
             var inactive = result.Count(x => x.DaXoa == 1);
@@ -282,119 +297,72 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             };
 
         }
+
         public int GetTotalItems()
         {
             return _totalItems;
         }
+
         public int GetTotalPages()
         {
             return _totalPages;
         }
 
-        public async Task<NhaCungCap> PermanentlyDeleteById(int id)
-        {
-            var nhaCungCapToDelete = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
+        
 
-            _context.DanhSachNhaCungCap.Remove(nhaCungCapToDelete);
+        public async Task<ChiTietHDDV> PermanentlyDeleteById(int soHDDV, int maDichVu)
+        {
+            var chiTietHDDVToDelete = await _context.DanhSachChiTietHDDV.FirstOrDefaultAsync(x => x.SoHDDV == soHDDV || x.MaDichVu == maDichVu);
+
+            _context.DanhSachChiTietHDDV.Remove(chiTietHDDVToDelete);
             await _context.SaveChangesAsync();
 
-            return nhaCungCapToDelete;
+            return chiTietHDDVToDelete;
         }
-
-        public async Task<NhaCungCap> RestoreById(int id)
+        public async Task<ChiTietHDDV> RestoreById(int soHDDV, int maDichVu)
         {
-            var nhaCungCapToRestoreById = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
+            var chiTietHDDVToRestoreById = await _context.DanhSachChiTietHDDV.FirstOrDefaultAsync(x => x.SoHDDV == soHDDV && x.MaDichVu == maDichVu);
 
-            nhaCungCapToRestoreById.DaXoa = 0;
-            nhaCungCapToRestoreById.ThoiGianCapNhat = DateTime.Now;
+            chiTietHDDVToRestoreById.DaXoa = 0;
+            chiTietHDDVToRestoreById.ThoiGianCapNhat = DateTime.Now;
 
-            _context.DanhSachNhaCungCap.Update(nhaCungCapToRestoreById);
+            _context.DanhSachChiTietHDDV.Update(chiTietHDDVToRestoreById);
             await _context.SaveChangesAsync();
-
-            return nhaCungCapToRestoreById;
+            return chiTietHDDVToRestoreById;
         }
 
-        public async Task<NhaCungCap> TemporarilyDeleteById(int id)
+        public async Task<ChiTietHDDV> TemporarilyDeleteById(int soHDDV, int maDichVu)
         {
-            var nhaCungCapTemporarilyDeleteById = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
+            var chiTietHDDVToTemporarilyDeleteById = await _context.DanhSachChiTietHDDV.FirstOrDefaultAsync(x => x.SoHDDV == soHDDV && x.MaDichVu == maDichVu);
 
-            nhaCungCapTemporarilyDeleteById.DaXoa = 1;
-            nhaCungCapTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
+            chiTietHDDVToTemporarilyDeleteById.DaXoa = 1;
+            chiTietHDDVToTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
 
-            _context.DanhSachNhaCungCap.Update(nhaCungCapTemporarilyDeleteById);
+            _context.DanhSachChiTietHDDV.Update(chiTietHDDVToTemporarilyDeleteById);
             await _context.SaveChangesAsync();
-
-            return nhaCungCapTemporarilyDeleteById;
+            return chiTietHDDVToTemporarilyDeleteById;
         }
 
-        public async Task<NhaCungCap> UpdateById(int id, NhaCungCapForUpdateDto nhaCungCap)
+        public async Task<ChiTietHDDV> UpdateById(int soHDDV, int maDichVu, ChiTietHDDVForUpdateDto chiTietHDDV)
         {
-            var oldRecord = await _context.DanhSachNhaCungCap.AsNoTracking().FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
-            var nhaCungCapToUpdate = new NhaCungCap
+            var oldRecord = await _context.DanhSachChiTietHDDV.AsNoTracking().FirstOrDefaultAsync(x => x.SoHDDV == soHDDV && x.MaDichVu == maDichVu);
+            var chiTietHDDVToUpdate = new ChiTietHDDV
             {
-                MaNhaCungCap = id,
-                TenNhaCungCap = nhaCungCap.TenNhaCungCap,
-                SoDienThoai = nhaCungCap.SoDienThoai,
-                DiaChi = nhaCungCap.DiaChi,
-                GhiChu = nhaCungCap.GhiChu,
+                SoHDDV = soHDDV,
+                MaDichVu = maDichVu,
+                SoLuong = chiTietHDDV.SoLuong,
+                TrangThai = chiTietHDDV.TrangThai,
                 ThoiGianTao = oldRecord.ThoiGianTao,
-                ThoiGianCapNhat = DateTime.Now,
-                TrangThai = nhaCungCap.TrangThai
+                ThoiGianCapNhat = DateTime.Now
             };
 
-            _context.DanhSachNhaCungCap.Update(nhaCungCapToUpdate);
+
+
+            _context.DanhSachChiTietHDDV.Update(chiTietHDDVToUpdate);
             await _context.SaveChangesAsync();
-            return nhaCungCapToUpdate;
+            return chiTietHDDVToUpdate;
         }
 
-        public ValidationResultDto ValidateBeforeCreate(NhaCungCapForCreateDto nhaCungCap)
-        {
-            var totalTenNhaCungCap = _context.DanhSachNhaCungCap.Count(x => x.TenNhaCungCap.ToLower() == nhaCungCap.TenNhaCungCap.ToLower());
-            IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
-
-            if (totalTenNhaCungCap >= 1)
-            {
-                Errors.Add("tenNhaCungCap", new string[] { "tenNhaCungCap is duplicated!" });
-
-                return new ValidationResultDto
-                {
-                    IsValid = false,
-                    Errors = Errors
-                };
-            }
-            else
-            {
-                return new ValidationResultDto
-                {
-                    IsValid = true
-                };
-            }
-        }
-
-        public ValidationResultDto ValidateBeforeUpdate(int id, NhaCungCapForUpdateDto nhaCungCap)
-        {
-            var totalTenNhaCungCap = _context.DanhSachNhaCungCap.Count(x => x.MaNhaCungCap != id && x.TenNhaCungCap.ToLower() == nhaCungCap.TenNhaCungCap.ToLower());
-            IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
-
-            if (totalTenNhaCungCap > 0)
-            {
-                Errors.Add("tenNhaCungCap", new string[] { "tenNhaCungCap is duplicated!" });
-
-                return new ValidationResultDto
-                {
-                    IsValid = false,
-                    Errors = Errors
-                };
-            }
-            else
-            {
-                return new ValidationResultDto
-                {
-                    IsValid = true
-                };
-            }
-
-        }
-
+        
     }
 }

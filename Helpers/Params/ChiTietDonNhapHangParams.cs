@@ -7,5 +7,6 @@ namespace MFFMS.API.Helpers.Params
 {
     public class ChiTietDonNhapHangParams : BaseParams
     {
+
     }
 }

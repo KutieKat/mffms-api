@@ -3,59 +3,60 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MFFMS.API.Dtos;
-using MFFMS.API.Dtos.NhaCungCapDto;
+using MFFMS.API.Dtos.TaiSanThietBiDto;
 using MFFMS.API.Helpers;
 using MFFMS.API.Helpers.Params;
 using MFFMS.API.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace MFFMS.API.Data.NhaCungCapRepository
+namespace MFFMS.API.Data.TaiSanThietBiRepository
 {
-    public class NhaCungCapRepository : INhaCungCapRepository
+    public class TaiSanThietBiRepository : ITaiSanThietBiRepository
     {
         private readonly DataContext _context;
         private int _totalItems;
         private int _totalPages;
 
-        public NhaCungCapRepository(DataContext context)
+        public TaiSanThietBiRepository (DataContext context)
         {
             _context = context;
             _totalItems = 0;
             _totalPages = 0;
         }
 
-        public async Task<NhaCungCap> Create(NhaCungCapForCreateDto nhaCungCap)
+        public async Task<TaiSanThietBi> Create(TaiSanThietBiForCreateDto taiSanThietBi)
         {
-            var danhSachNhaCungCap = await _context.DanhSachNhaCungCap.OrderByDescending(x => x.MaNhaCungCap).FirstOrDefaultAsync();
-            var maNhaCungCap = 1;
-            if (danhSachNhaCungCap == null)
+            var danhSachTaiSanThietBi = await _context.DanhSachTaiSanThietBi.OrderByDescending(x => x.MaTSTB).FirstOrDefaultAsync();
+            var maTSTB = 1;
+
+            if (danhSachTaiSanThietBi == null)
             {
-                maNhaCungCap = 1;
+                maTSTB = 1;
             }
             else
             {
-                maNhaCungCap = danhSachNhaCungCap.MaNhaCungCap + 1;
+                maTSTB = danhSachTaiSanThietBi.MaTSTB + 1;
             }
 
-            var newNhaCungCap = new NhaCungCap
+            var newTaiSanThietBi = new TaiSanThietBi
             {
-                MaNhaCungCap = maNhaCungCap,
-                TenNhaCungCap = nhaCungCap.TenNhaCungCap,
-                SoDienThoai = nhaCungCap.SoDienThoai,
-                DiaChi = nhaCungCap.DiaChi,
-                GhiChu = nhaCungCap.GhiChu,
+                MaTSTB = maTSTB ,
+                MaNhaCungCap = taiSanThietBi.MaNhaCungCap,
+                TenTSTB = taiSanThietBi.TenTSTB,
+                TinhTrang = taiSanThietBi.TinhTrang,
+                ThongTinBaoHanh = taiSanThietBi.ThongTinBaoHanh,
                 ThoiGianCapNhat = DateTime.Now,
                 ThoiGianTao = DateTime.Now,
                 TrangThai = 1
             };
-            await _context.DanhSachNhaCungCap.AddAsync(newNhaCungCap);
+            await _context.DanhSachTaiSanThietBi.AddAsync(newTaiSanThietBi);
             await _context.SaveChangesAsync();
-            return newNhaCungCap;
+            return newTaiSanThietBi;
         }
 
-        public async Task<PagedList<NhaCungCap>> GetAll(NhaCungCapParams userParams)
+        public async Task<PagedList<TaiSanThietBi>> GetAll(TaiSanThietBiParams userParams)
         {
-            var result = _context.DanhSachNhaCungCap.AsQueryable();
+            var result = _context.DanhSachTaiSanThietBi.Include(x=>x.NhaCungCap).AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
@@ -65,10 +66,9 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
             var daXoa = userParams.DaXoa;
-
             if (!string.IsNullOrEmpty(keyword))
             {
-                result = result.Where(x => x.TenNhaCungCap.ToLower().Contains(keyword.ToLower()) || x.MaNhaCungCap.ToString() == keyword);
+                result = result.Where(x => x.TenTSTB.ToLower().Contains(keyword.ToLower()) || x.MaTSTB.ToString() == keyword);
             }
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
@@ -86,7 +86,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
                 result = result.Where(x => x.TrangThai == trangThai);
             }
 
-            if(daXoa == 1 || daXoa == 0)
+            if(daXoa == 0 || daXoa == 1)
             {
                 result = result.Where(x => x.DaXoa == daXoa);
             }
@@ -95,36 +95,25 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             {
                 switch (sortField)
                 {
-                    case "MaNhaCungCap":
+                    case "MaTSTB":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.MaNhaCungCap);
+                            result = result.OrderBy(x => x.MaTSTB);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.MaNhaCungCap);
+                            result = result.OrderByDescending(x => x.MaTSTB);
                         }
                         break;
 
-                    case "TenNhaCungCap":
+                    case "TenTSTB":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.TenNhaCungCap);
+                            result = result.OrderBy(x => x.TenTSTB);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.TenNhaCungCap);
-                        }
-                        break;
-
-                    case "SoDienThoai":
-                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
-                        {
-                            result = result.OrderBy(x => x.SoDienThoai);
-                        }
-                        else
-                        {
-                            result = result.OrderByDescending(x => x.SoDienThoai);
+                            result = result.OrderByDescending(x => x.TenTSTB);
                         }
                         break;
 
@@ -169,18 +158,18 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             _totalItems = result.Count();
             _totalPages = (int)Math.Ceiling((double)_totalItems / (double)userParams.PageSize);
 
-            return await PagedList<NhaCungCap>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
+            return await PagedList<TaiSanThietBi>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<NhaCungCap> GetById(int id)
+         public async Task<TaiSanThietBi> GetById(int id)
         {
-            var result = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
+            var result = await _context.DanhSachTaiSanThietBi.Include(x => x.NhaCungCap).FirstOrDefaultAsync(x => x.MaTSTB == id);
             return result;
         }
 
-        public object GetStatusStatistics(NhaCungCapParams userParams)
+         public object GetStatusStatistics(TaiSanThietBiParams userParams)
         {
-            var result = _context.DanhSachNhaCungCap.AsQueryable();
+            var result = _context.DanhSachTaiSanThietBi.AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
@@ -190,10 +179,11 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
 
+            var daxoa = userParams.DaXoa;
 
             if (!string.IsNullOrEmpty(keyword))
             {
-                result = result.Where(x => x.TenNhaCungCap.ToLower().Contains(keyword.ToLower()) || x.MaNhaCungCap.ToString() == keyword);
+                result = result.Where(x => x.TenTSTB.ToLower().Contains(keyword.ToLower()) || x.MaTSTB.ToString() == keyword);
             }
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
@@ -210,25 +200,25 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             {
                 switch (sortField)
                 {
-                    case "MaNhaCungCap":
+                    case "MaTSTB":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.MaNhaCungCap);
+                            result = result.OrderBy(x => x.MaTSTB);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.MaNhaCungCap);
+                            result = result.OrderByDescending(x => x.MaTSTB);
                         }
                         break;
 
-                    case "TenNhaCungCap":
+                    case "TenTSTB":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.TenNhaCungCap);
+                            result = result.OrderBy(x => x.TenTSTB);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.TenNhaCungCap);
+                            result = result.OrderByDescending(x => x.TenTSTB);
                         }
                         break;
 
@@ -282,6 +272,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             };
 
         }
+
         public int GetTotalItems()
         {
             return _totalItems;
@@ -291,70 +282,70 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             return _totalPages;
         }
 
-        public async Task<NhaCungCap> PermanentlyDeleteById(int id)
+        public async Task<TaiSanThietBi> PermanentlyDeleteById(int id)
         {
-            var nhaCungCapToDelete = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
+            var TSTBToDelete = await _context.DanhSachTaiSanThietBi.FirstOrDefaultAsync(x => x.MaTSTB == id);
 
-            _context.DanhSachNhaCungCap.Remove(nhaCungCapToDelete);
+            _context.DanhSachTaiSanThietBi.Remove(TSTBToDelete);
             await _context.SaveChangesAsync();
 
-            return nhaCungCapToDelete;
+            return TSTBToDelete;
         }
 
-        public async Task<NhaCungCap> RestoreById(int id)
+        public async Task<TaiSanThietBi> RestoreById(int id)
         {
-            var nhaCungCapToRestoreById = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
+            var TSTBToRestoreById = await _context.DanhSachTaiSanThietBi.FirstOrDefaultAsync(x => x.MaTSTB == id);
 
-            nhaCungCapToRestoreById.DaXoa = 0;
-            nhaCungCapToRestoreById.ThoiGianCapNhat = DateTime.Now;
+            TSTBToRestoreById.DaXoa = 0;
+            TSTBToRestoreById.ThoiGianCapNhat = DateTime.Now;
 
-            _context.DanhSachNhaCungCap.Update(nhaCungCapToRestoreById);
+            _context.DanhSachTaiSanThietBi.Update(TSTBToRestoreById);
             await _context.SaveChangesAsync();
 
-            return nhaCungCapToRestoreById;
+            return TSTBToRestoreById;
         }
 
-        public async Task<NhaCungCap> TemporarilyDeleteById(int id)
+        public async Task<TaiSanThietBi> TemporarilyDeleteById(int id)
         {
-            var nhaCungCapTemporarilyDeleteById = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
+            var TSTBTemporarilyDeleteById = await _context.DanhSachTaiSanThietBi.FirstOrDefaultAsync(x => x.MaTSTB == id);
 
-            nhaCungCapTemporarilyDeleteById.DaXoa = 1;
-            nhaCungCapTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
+            TSTBTemporarilyDeleteById.DaXoa = 1;
+            TSTBTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
 
-            _context.DanhSachNhaCungCap.Update(nhaCungCapTemporarilyDeleteById);
+            _context.DanhSachTaiSanThietBi.Update(TSTBTemporarilyDeleteById);
             await _context.SaveChangesAsync();
 
-            return nhaCungCapTemporarilyDeleteById;
+            return TSTBTemporarilyDeleteById;
         }
 
-        public async Task<NhaCungCap> UpdateById(int id, NhaCungCapForUpdateDto nhaCungCap)
+        public async Task<TaiSanThietBi> UpdateById(int id, TaiSanThietBiForUpdateDto taiSanThietBi)
         {
-            var oldRecord = await _context.DanhSachNhaCungCap.AsNoTracking().FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
-            var nhaCungCapToUpdate = new NhaCungCap
+            var oldRecord = await _context.DanhSachTaiSanThietBi.AsNoTracking().FirstOrDefaultAsync(x => x.MaTSTB == id);
+            var TSTBToUpdate = new TaiSanThietBi
             {
-                MaNhaCungCap = id,
-                TenNhaCungCap = nhaCungCap.TenNhaCungCap,
-                SoDienThoai = nhaCungCap.SoDienThoai,
-                DiaChi = nhaCungCap.DiaChi,
-                GhiChu = nhaCungCap.GhiChu,
-                ThoiGianTao = oldRecord.ThoiGianTao,
+                MaTSTB = id,
+                MaNhaCungCap = taiSanThietBi.MaNhaCungCap,
+                TenTSTB = taiSanThietBi.TenTSTB,
+                TinhTrang = taiSanThietBi.TinhTrang,
+                ThongTinBaoHanh = taiSanThietBi.ThongTinBaoHanh,
                 ThoiGianCapNhat = DateTime.Now,
-                TrangThai = nhaCungCap.TrangThai
+                ThoiGianTao = DateTime.Now,
+                TrangThai = 1
             };
 
-            _context.DanhSachNhaCungCap.Update(nhaCungCapToUpdate);
+            _context.DanhSachTaiSanThietBi.Update(TSTBToUpdate);
             await _context.SaveChangesAsync();
-            return nhaCungCapToUpdate;
+            return TSTBToUpdate;
         }
 
-        public ValidationResultDto ValidateBeforeCreate(NhaCungCapForCreateDto nhaCungCap)
+        public ValidationResultDto ValidateBeforeCreate(TaiSanThietBiForCreateDto taiSanThietBi)
         {
-            var totalTenNhaCungCap = _context.DanhSachNhaCungCap.Count(x => x.TenNhaCungCap.ToLower() == nhaCungCap.TenNhaCungCap.ToLower());
+            var totalTSTB = _context.DanhSachTaiSanThietBi.Count(x => x.TenTSTB.ToLower() == taiSanThietBi.TenTSTB.ToLower());
             IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
 
-            if (totalTenNhaCungCap >= 1)
+            if (totalTSTB >= 1)
             {
-                Errors.Add("tenNhaCungCap", new string[] { "tenNhaCungCap is duplicated!" });
+                Errors.Add("tenTSTB", new string[] { "tenTSTB is duplicated!" });
 
                 return new ValidationResultDto
                 {
@@ -371,14 +362,14 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             }
         }
 
-        public ValidationResultDto ValidateBeforeUpdate(int id, NhaCungCapForUpdateDto nhaCungCap)
+        public ValidationResultDto ValidateBeforeUpdate(int id, TaiSanThietBiForUpdateDto taiSanThietBi)
         {
-            var totalTenNhaCungCap = _context.DanhSachNhaCungCap.Count(x => x.MaNhaCungCap != id && x.TenNhaCungCap.ToLower() == nhaCungCap.TenNhaCungCap.ToLower());
+            var totalTSTB = _context.DanhSachTaiSanThietBi.Count(x => x.MaTSTB != id && x.TenTSTB.ToLower() == taiSanThietBi.TenTSTB.ToLower());
             IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
 
-            if (totalTenNhaCungCap > 0)
+            if (totalTSTB > 0)
             {
-                Errors.Add("tenNhaCungCap", new string[] { "tenNhaCungCap is duplicated!" });
+                Errors.Add("tenTSTB", new string[] { "tenTSTB is duplicated!" });
 
                 return new ValidationResultDto
                 {
@@ -395,6 +386,5 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             }
 
         }
-
-    }
+    } 
 }

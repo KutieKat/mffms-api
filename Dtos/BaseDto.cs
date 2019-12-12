@@ -10,5 +10,6 @@ namespace MFFMS.API.Dtos
         public DateTime ThoiGianTao { get; set; }
         public DateTime ThoiGianCapNhat { get; set; }
         public int TrangThai { get; set; }
+        public int DaXoa { get; set; }
     }
 }
