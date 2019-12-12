@@ -13,7 +13,7 @@ namespace MFFMS.API.Data.TaiSanThietBiRepository
 {
     public class TaiSanThietBiRepository : ITaiSanThietBiRepository
     {
-        private DataContext _context;
+        private readonly DataContext _context;
         private int _totalItems;
         private int _totalPages;
 
@@ -41,8 +41,7 @@ namespace MFFMS.API.Data.TaiSanThietBiRepository
             var newTaiSanThietBi = new TaiSanThietBi
             {
                 MaTSTB = maTSTB ,
-                MaNhaCungCap = taiSanThietBi.NhaCungCap.MaNhaCungCap,
-                NhaCungCap = taiSanThietBi.NhaCungCap,
+                MaNhaCungCap = taiSanThietBi.MaNhaCungCap,
                 TenTSTB = taiSanThietBi.TenTSTB,
                 TinhTrang = taiSanThietBi.TinhTrang,
                 ThongTinBaoHanh = taiSanThietBi.ThongTinBaoHanh,
@@ -57,7 +56,7 @@ namespace MFFMS.API.Data.TaiSanThietBiRepository
 
         public async Task<PagedList<TaiSanThietBi>> GetAll(TaiSanThietBiParams userParams)
         {
-            var result = _context.DanhSachTaiSanThietBi.AsQueryable();
+            var result = _context.DanhSachTaiSanThietBi.Include(x=>x.NhaCungCap).AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
@@ -66,7 +65,7 @@ namespace MFFMS.API.Data.TaiSanThietBiRepository
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
-
+            var daXoa = userParams.DaXoa;
             if (!string.IsNullOrEmpty(keyword))
             {
                 result = result.Where(x => x.TenTSTB.ToLower().Contains(keyword.ToLower()) || x.MaTSTB.ToString() == keyword);
@@ -85,6 +84,11 @@ namespace MFFMS.API.Data.TaiSanThietBiRepository
             if (trangThai == -1 || trangThai == 1)
             {
                 result = result.Where(x => x.TrangThai == trangThai);
+            }
+
+            if(daXoa == 0 || daXoa == 1)
+            {
+                result = result.Where(x => x.DaXoa == daXoa);
             }
 
             if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
@@ -159,7 +163,7 @@ namespace MFFMS.API.Data.TaiSanThietBiRepository
 
          public async Task<TaiSanThietBi> GetById(int id)
         {
-            var result = await _context.DanhSachTaiSanThietBi.FirstOrDefaultAsync(x => x.MaTSTB == id);
+            var result = await _context.DanhSachTaiSanThietBi.Include(x => x.NhaCungCap).FirstOrDefaultAsync(x => x.MaTSTB == id);
             return result;
         }
 
@@ -174,6 +178,8 @@ namespace MFFMS.API.Data.TaiSanThietBiRepository
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
+
+            var daxoa = userParams.DaXoa;
 
             if (!string.IsNullOrEmpty(keyword))
             {
@@ -255,8 +261,8 @@ namespace MFFMS.API.Data.TaiSanThietBiRepository
                 }
             }
             var all = result.Count();
-            var active = result.Count(x => x.TrangThai == 1);
-            var inactive = result.Count(x => x.TrangThai == -1);
+            var active = result.Count(x => x.DaXoa == 0);
+            var inactive = result.Count(x => x.DaXoa == 1);
 
             return new
             {
@@ -290,7 +296,7 @@ namespace MFFMS.API.Data.TaiSanThietBiRepository
         {
             var TSTBToRestoreById = await _context.DanhSachTaiSanThietBi.FirstOrDefaultAsync(x => x.MaTSTB == id);
 
-            TSTBToRestoreById.TrangThai = 1;
+            TSTBToRestoreById.DaXoa = 0;
             TSTBToRestoreById.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachTaiSanThietBi.Update(TSTBToRestoreById);
@@ -303,7 +309,7 @@ namespace MFFMS.API.Data.TaiSanThietBiRepository
         {
             var TSTBTemporarilyDeleteById = await _context.DanhSachTaiSanThietBi.FirstOrDefaultAsync(x => x.MaTSTB == id);
 
-            TSTBTemporarilyDeleteById.TrangThai = -1;
+            TSTBTemporarilyDeleteById.DaXoa = 1;
             TSTBTemporarilyDeleteById.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachTaiSanThietBi.Update(TSTBTemporarilyDeleteById);
@@ -318,8 +324,7 @@ namespace MFFMS.API.Data.TaiSanThietBiRepository
             var TSTBToUpdate = new TaiSanThietBi
             {
                 MaTSTB = id,
-                MaNhaCungCap = taiSanThietBi.NhaCungCap.MaNhaCungCap,
-                NhaCungCap = taiSanThietBi.NhaCungCap,
+                MaNhaCungCap = taiSanThietBi.MaNhaCungCap,
                 TenTSTB = taiSanThietBi.TenTSTB,
                 TinhTrang = taiSanThietBi.TinhTrang,
                 ThongTinBaoHanh = taiSanThietBi.ThongTinBaoHanh,

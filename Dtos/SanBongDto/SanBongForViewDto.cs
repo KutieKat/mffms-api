@@ -11,6 +11,7 @@ namespace MFFMS.API.Dtos.SanBongDto
         public string TenSanBong { get; set; }
         public double ChieuDai { get; set; }
         public double ChieuRong { get; set; }
+        public double DienTich { get; set; }
         public string GhiChu { get; set; }
     }
 }
