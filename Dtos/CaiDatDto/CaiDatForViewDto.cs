@@ -12,5 +12,6 @@ namespace MFFMS.API.Dtos.CaiDatDto
         public string DiaChi { get; set; }
         public string SoDienThoai {get;set;}
         public string Fax {get;set;}
+        public string DiaChiTrenPhieu {get; set;}
     }
 }

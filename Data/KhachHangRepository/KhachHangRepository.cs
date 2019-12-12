@@ -205,35 +205,37 @@ namespace MFFMS.API.Data.KhachHangRepository
         {
             var result = _context.DanhSachKhachHang.AsQueryable();
             var totalCustomers = 0;
-            var maleCustomers = 0;
-            var femaleCustomers = 0;
-
-            var studentCustomers = 0; // Khách hàng có tuổi < 19
+            // var maleCustomers = 0;
+            // var femaleCustomers = 0;
+            var studentCustomers =0; // Khách hàng có tuổi < 19
             var youthCustomers = 0;  // Khách hàng có tuổi từ 19 -> 30
             var adultCustomers = 0;  // Khách hàng có tuổi >30
 
-            
-
-
             if (userParams != null && userParams.StartingTime.GetHashCode() != 0 && userParams.EndingTime.GetHashCode() != 0)
             {
-                totalCustomers = result.Count();
-                maleCustomers = result.Where(x => x.GioiTinh == "Nam" && x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Count();
-                femaleCustomers = result.Where(x => x.GioiTinh == "Nữ" && x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Count();
+                totalCustomers = result.Count();  
                 studentCustomers = result.Where(x => DateTime.Now.Year - x.NgaySinh.Year < 19 && x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Count();
+                youthCustomers =  result.Where(x => DateTime.Now.Year - x.NgaySinh.Year >= 19 && DateTime.Now.Year - x.NgaySinh.Year < 30 && x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Count();
+                adultCustomers = result.Where(x => DateTime.Now.Year - x.NgaySinh.Year >= 30 && x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Count();
+
             }
             else
             {
                 totalCustomers = result.Count();
-                maleCustomers = result.Where(x => x.GioiTinh == "Nam").Count();
-                femaleCustomers = result.Where(x => x.GioiTinh == "Nữ").Count();
+                studentCustomers = result.Where(x => DateTime.Now.Year - x.NgaySinh.Year < 19).Count();
+                youthCustomers =  result.Where(x => DateTime.Now.Year - x.NgaySinh.Year >= 19 && DateTime.Now.Year - x.NgaySinh.Year < 30 ).Count();
+                adultCustomers = result.Where(x => DateTime.Now.Year - x.NgaySinh.Year >= 30).Count();
+
             }
 
             return new
             {
                 Total = totalCustomers,
-                Males = maleCustomers,
-                Females = femaleCustomers
+                //Males = maleCustomers,
+                //Females = femaleCustomers,
+                Student = studentCustomers,
+                Youth = youthCustomers,
+                Adult = adultCustomers
             };
         }
 

@@ -24,8 +24,6 @@ namespace MFFMS.API.Data.NhanVienRepository
         Object GetStatusStatistics(NhanVienParams userParams);
         ValidationResultDto ValidateBeforeCreate(NhanVienForCreateDto nhanVien);
         ValidationResultDto ValidateBeforeUpdate(string id, NhanVienForUpdateDto nhanVien);
-
         Task<Object> GetGeneralStatistics(NhanVienStatisticsParams userParams);
-       // Task<object> GetDetailsStatistics(NhanVienStatisticsParams userParams);
     }
 }
