@@ -599,19 +599,55 @@ namespace MFFMS.API.Data.NhanVienRepository
         public async Task<Object> GetGeneralStatistics (NhanVienStatisticsParams userParams)
         {
             var result = _context.DanhSachNhanVien.AsQueryable();
-            double totalSalary = 0;
-            var totalQuantity = 0;
+            var totalQuantity = 0;      // tổng số lượng nhân viên
+            var totalAllSalary = 0.0 ;  // tổng lương cho toàn bộ nhân viên
 
+            var totalManageQuantity =0;  // tổng số lượng nhân viên quản lý
+            var totalManageSalary = 0.0; // tổng lương cho nhân viên quản lý
+            var avgManageSalary =0.0;    // lương trung bình cho nhân viên quản lý
+            var minManageSalary =0.0;    // lương thấp nhất cho nhân viên quản lý   
+            var maxManageSalary =0.0;    // lương cao nhất cho nhân viên quản lý
+
+            var totalServiceQuantity =0; // tổng số lượng nhân viên phục vụ
+            var totalServiceSalary =0.0; // tổng lương cho nhân viên phục vụ
+            var avgServiceSalary =0.0;   // lương trung bình cho nhân viên phục vụ
+            var minServiceSalary = 0.0;  // lương thấp nhất cho nhân viên phục vụ
+            var maxServiceSalary = 0.0;  // lương cao nhất cho nhân viên phục vụ         
+            
             if (userParams != null && userParams.StartingTime.GetHashCode() != 0 && userParams.EndingTime.GetHashCode() != 0)
             {
                 totalQuantity = result.Count();
-                totalSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Sum(x=>x.Luong);
+                totalAllSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Sum(x =>x.Luong);
+
+                totalManageQuantity = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Người quản lý").Count();
+                totalManageSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Người quản lý").Sum(x =>x.Luong);
+                avgManageSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Người quản lý").Average(x =>x.Luong);
+                minManageSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Người quản lý").Min(x =>x.Luong);
+                maxManageSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Người quản lý").Max(x =>x.Luong);
+
+                totalServiceQuantity = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Nhân viên").Count();
+                totalServiceSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Nhân viên").Sum(x =>x.Luong);
+                avgServiceSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Nhân viên").Average(x =>x.Luong);
+                minServiceSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Nhân viên").Min(x =>x.Luong);
+                maxServiceSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Nhân viên").Max(x =>x.Luong);
             }
             else
-            {
-               
+            {               
                 totalQuantity = result.Count();
-                totalSalary = result.Sum(x=>x.Luong);
+                totalAllSalary = result.Sum(x=>x.Luong);
+
+                totalManageQuantity = result.Where(x=>x.ChucVu=="Người quản lý").Count();
+                totalManageSalary = result.Where(x=>x.ChucVu=="Người quản lý").Sum(x =>x.Luong);
+                avgManageSalary = result.Where(x=>x.ChucVu=="Người quản lý").Average(x =>x.Luong);
+                minManageSalary = result.Where(x=>x.ChucVu=="Người quản lý").Min(x =>x.Luong);
+                maxManageSalary = result.Where(x=>x.ChucVu=="Người quản lý").Max(x =>x.Luong);
+
+                totalServiceQuantity = result.Where(x=>x.ChucVu=="Nhân viên").Count();
+                totalServiceSalary = result.Where(x=>x.ChucVu=="Nhân viên").Sum(x =>x.Luong);
+                avgServiceSalary = result.Where(x=>x.ChucVu=="Nhân viên").Average(x =>x.Luong);
+                minServiceSalary = result.Where(x=>x.ChucVu=="Nhân viên").Min(x =>x.Luong);
+                maxServiceSalary = result.Where(x=>x.ChucVu=="Nhân viên").Max(x =>x.Luong);
+                
             }
 
             return new
@@ -619,7 +655,17 @@ namespace MFFMS.API.Data.NhanVienRepository
                 generalEmployee = new
                 {
                     TotalQuantity = totalQuantity,
-                    TotalSalary = totalSalary
+                    TotalAllSalary = totalAllSalary,
+                    TotalManageQuantity = totalManageQuantity,
+                    TotalManageSalary = totalManageSalary,
+                    AvgManageSalary = avgManageSalary,
+                    MinManageSalary = minManageSalary,
+                    MaxManageSalary = maxManageSalary,
+                    TotalServiceQuantity = totalServiceQuantity,
+                    TotalServiceSalary = totalServiceSalary,
+                    AvgServiceSalary = avgServiceSalary, 
+                    MinServiceSalary = minServiceSalary,
+                    MaxServiceSalary = maxServiceSalary,
                 }
             };
         }

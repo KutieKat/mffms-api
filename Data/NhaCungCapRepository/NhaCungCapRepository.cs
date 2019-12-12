@@ -172,6 +172,17 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             return await PagedList<NhaCungCap>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
+        public async Task<Object> GetGeneralStatistics(NhaCungCapStatisticsParams userParams)
+        {
+            var result = _context.DanhSachNhaCungCap.AsQueryable();
+            var totalProvider = result.Count();
+
+            return new
+            {
+                Total = totalProvider
+            };
+        }
+
         public async Task<NhaCungCap> GetById(int id)
         {
             var result = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);

@@ -340,6 +340,34 @@ namespace MFFMS.API.Data.SanBongRepository
             };
         }
 
+        public async Task<Object> GetGeneralStatistics(SanBongStatisticsParams userParams)
+        {
+            var result = _context.DanhSachSanBong.AsQueryable();
+            var totalPitch = 0; // tổng số sân bóng
+            var minAreaPitch =0.0; // diện tích nhỏ nhất
+            var maxAreaePich = 0.0;  // diện tích lớn nhất       
+
+            if (userParams != null && userParams.StartingTime.GetHashCode() != 0 && userParams.EndingTime.GetHashCode() != 0)
+            {
+                totalPitch = result.Count();
+                minAreaPitch = result.Where(x =>x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Min(x => x.DienTich);
+                maxAreaePich = result.Where(x =>x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Max(x => x.DienTich);
+            }
+            else
+            {
+                totalPitch = result.Count();
+                minAreaPitch = result.Min(x => x.DienTich);
+                maxAreaePich = result.Max (x =>x.DienTich);
+            }
+
+            return new
+            {
+                Total = totalPitch,
+                MinArea = minAreaPitch,
+                MaxArea = maxAreaePich        
+            };
+        }        
+
         public int GetTotalItems()
         {
             return _totalItems;
