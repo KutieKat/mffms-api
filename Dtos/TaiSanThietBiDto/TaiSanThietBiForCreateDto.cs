@@ -11,9 +11,6 @@ namespace MFFMS.API.Dtos.TaiSanThietBiDto
     {
         [Required]
         public int MaNhaCungCap{get;set;}
-        
-        [Required]
-        public NhaCungCap NhaCungCap { get; set; } 
 
         [Required]
         public string TenTSTB { get; set; }

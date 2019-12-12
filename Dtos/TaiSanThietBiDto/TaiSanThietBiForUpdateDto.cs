@@ -10,7 +10,7 @@ namespace MFFMS.API.Dtos.TaiSanThietBiDto
     public class TaiSanThietBiForUpdateDto:BaseDto
     {
         [Required]
-        public NhaCungCap NhaCungCap { get; set; } 
+        public int MaNhaCungCap { get; set; } 
 
         [Required]
         public string TenTSTB { get; set; }

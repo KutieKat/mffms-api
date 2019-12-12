@@ -348,6 +348,8 @@ namespace MFFMS.API.Data.ChiTietHDDVRepository
             var oldRecord = await _context.DanhSachChiTietHDDV.AsNoTracking().FirstOrDefaultAsync(x => x.SoHDDV == soHDDV && x.MaDichVu == maDichVu);
             var chiTietHDDVToUpdate = new ChiTietHDDV
             {
+                SoHDDV = soHDDV,
+                MaDichVu = maDichVu,
                 SoLuong = chiTietHDDV.SoLuong,
                 TrangThai = chiTietHDDV.TrangThai,
                 ThoiGianTao = oldRecord.ThoiGianTao,
