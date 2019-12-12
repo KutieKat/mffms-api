@@ -13,7 +13,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
 {
     public class NhaCungCapRepository : INhaCungCapRepository
     {
-        private DataContext _context;
+        private readonly DataContext _context;
         private int _totalItems;
         private int _totalPages;
 
