@@ -21,6 +21,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
         Task<HoaDonDichVu> PermanentlyDeleteById(int id);
         int GetTotalPages();
         int GetTotalItems();
+        //Task<Object> GetGeneralStatisticsParams(HoaDonDichVuStatisticsParams userParams);
         Object GetStatusStatistics(HoaDonDichVuParams userParams);
     }
 }
