@@ -38,6 +38,7 @@ namespace MFFMS.API.Data.CaiDatRepository
                 DiaChi = caiDat.DiaChi,
                 SoDienThoai = caiDat.SoDienThoai,
                 Fax = caiDat.Fax,
+                DiaChiTrenPhieu = caiDat.DiaChiTrenPhieu,
                 ThoiGianTao = oldRecord.ThoiGianTao,
                 ThoiGianCapNhat = DateTime.Now,
                 TrangThai = caiDat.TrangThai
@@ -57,6 +58,7 @@ namespace MFFMS.API.Data.CaiDatRepository
             caiDatToRestore.DiaChi = "Khu phố 6, phường Linh Trung, quận Thủ Đức";
             caiDatToRestore.SoDienThoai = "0782 500 555";
             caiDatToRestore.Fax = "0274 3567 225";
+            caiDatToRestore.DiaChiTrenPhieu = "Khu phố 6, phường Linh Trung, quận Thủ Đức";
             caiDatToRestore.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachCaiDat.Update(caiDatToRestore);

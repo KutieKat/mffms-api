@@ -24,6 +24,8 @@ namespace MFFMS.API.Data.NhaCungCapRepository
         int GetTotalItems();
 
         Object GetStatusStatistics(NhaCungCapParams userParams);
+        Task<Object> GetGeneralStatistics(NhaCungCapStatisticsParams userParams);
+        
         ValidationResultDto ValidateBeforeCreate(NhaCungCapForCreateDto nhaCungCap);
         ValidationResultDto ValidateBeforeUpdate(int id, NhaCungCapForUpdateDto nhaCungCap);
 
