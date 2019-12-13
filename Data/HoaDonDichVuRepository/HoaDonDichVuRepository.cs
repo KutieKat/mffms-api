@@ -24,7 +24,6 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             _totalPages = 0;
         }
 
-
         public async Task<HoaDonDichVu> Create(HoaDonDichVuForCreateDto hoaDonDichVu)
         {
             var danhSachHDDV = await _context.DanhSachHoaDonDichVu.OrderByDescending(x => x.SoHDDV).FirstOrDefaultAsync();
@@ -42,20 +41,18 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             newHoaDonDichVu.SoHDDV = soHDDV;
             newHoaDonDichVu.NgayLap = hoaDonDichVu.NgayLap;
             newHoaDonDichVu.NgaySuDung = hoaDonDichVu.NgaySuDung;
+            newHoaDonDichVu.ThanhTien = hoaDonDichVu.ThanhTien;
+            newHoaDonDichVu.DaThanhToan = hoaDonDichVu.DaThanhToan;
             newHoaDonDichVu.GhiChu = hoaDonDichVu.GhiChu;
             newHoaDonDichVu.MaKhachHang = hoaDonDichVu.MaKhachHang;
             newHoaDonDichVu.MaDichVu = hoaDonDichVu.MaDichVu;
             newHoaDonDichVu.ThoiGianTao = DateTime.Now;
             newHoaDonDichVu.ThoiGianCapNhat = DateTime.Now;
-            newHoaDonDichVu.TrangThai = 1;
-           
+            newHoaDonDichVu.TrangThai = 1;           
 
             await _context.DanhSachHoaDonDichVu.AddAsync(newHoaDonDichVu);
             await _context.SaveChangesAsync();
             return newHoaDonDichVu;
-            
-
-
         }
 
         public async Task<PagedList<HoaDonDichVu>> GetAll(HoaDonDichVuParams userParams)
@@ -395,18 +392,16 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
                 MaDichVu = hoaDonDichVu.MaDichVu,
                 NgayLap = hoaDonDichVu.NgayLap,
                 NgaySuDung = hoaDonDichVu.NgaySuDung,
+                ThanhTien = hoaDonDichVu.ThanhTien,
+                DaThanhToan = hoaDonDichVu.DaThanhToan,
                 TrangThai = hoaDonDichVu.TrangThai,
                 ThoiGianTao = oldRecord.ThoiGianTao,
                 ThoiGianCapNhat = DateTime.Now
-            };
-
-            
+            };          
 
             _context.DanhSachHoaDonDichVu.Update(hoaDonDichVuToUpdate);
             await _context.SaveChangesAsync();
             return hoaDonDichVuToUpdate;
-        }
-
-        
+        }        
     }
 }

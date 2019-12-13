@@ -32,6 +32,8 @@ namespace MFFMS.API.Data.ChiTietHDDVRepository
                 SoHDDV = chiTietHDDV.SoHDDV,
                 MaDichVu = chiTietHDDV.MaDichVu,
                 SoLuong = chiTietHDDV.SoLuong,
+                DonGia = chiTietHDDV.DonGia,
+                ThanhTien = chiTietHDDV.ThanhTien,
                 ThoiGianTao = DateTime.Now,
                 ThoiGianCapNhat = DateTime.Now,
                 TrangThai = 1
@@ -52,18 +54,18 @@ namespace MFFMS.API.Data.ChiTietHDDVRepository
                 {
                     SoHDDV = chiTietHDDV.SoHDDV,
                     MaDichVu = chiTietHDDV.MaDichVu,
-                    SoLuong = chiTietHDDV.SoLuong,
+                    SoLuong = chiTietHDDV.SoLuong, 
+                    DonGia = chiTietHDDV.DonGia,
+                    ThanhTien = chiTietHDDV.ThanhTien,
                     ThoiGianTao = DateTime.Now,
                     ThoiGianCapNhat = DateTime.Now,
                     TrangThai = 1
                 };
 
                 temp.Add(newChiTietHDDV);
-
                 await _context.DanhSachChiTietHDDV.AddAsync(newChiTietHDDV);
                 await _context.SaveChangesAsync();
             }
-
             return temp;
         }
 
@@ -295,7 +297,6 @@ namespace MFFMS.API.Data.ChiTietHDDVRepository
                 Active = active,
                 Inactive = inactive
             };
-
         }
 
         public int GetTotalItems()
@@ -307,8 +308,6 @@ namespace MFFMS.API.Data.ChiTietHDDVRepository
         {
             return _totalPages;
         }
-
-        
 
         public async Task<ChiTietHDDV> PermanentlyDeleteById(int soHDDV, int maDichVu)
         {
@@ -351,18 +350,16 @@ namespace MFFMS.API.Data.ChiTietHDDVRepository
                 SoHDDV = soHDDV,
                 MaDichVu = maDichVu,
                 SoLuong = chiTietHDDV.SoLuong,
+                DonGia = chiTietHDDV.DonGia,
+                ThanhTien = chiTietHDDV.ThanhTien,
                 TrangThai = chiTietHDDV.TrangThai,
                 ThoiGianTao = oldRecord.ThoiGianTao,
                 ThoiGianCapNhat = DateTime.Now
             };
 
-
-
             _context.DanhSachChiTietHDDV.Update(chiTietHDDVToUpdate);
             await _context.SaveChangesAsync();
             return chiTietHDDVToUpdate;
-        }
-
-        
+        } 
     }
 }

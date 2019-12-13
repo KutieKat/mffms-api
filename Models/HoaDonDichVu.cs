@@ -17,7 +17,8 @@ namespace MFFMS.API.Models
         public DateTime NgaySuDung { get; set; }
         public DateTime NgayLap { get; set; }
         public string GhiChu { get; set; }
-
+        public double ThanhTien {get;set;}
+        public string DaThanhToan{get;set;}
         public ICollection<ChiTietHDDV> ChiTietHDDV { get; set; }
 
     }
