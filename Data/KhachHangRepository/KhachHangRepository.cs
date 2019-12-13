@@ -48,7 +48,16 @@ namespace MFFMS.API.Data.KhachHangRepository
             var result = _context.DanhSachKhachHang.AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
-            var keyword = userParams.Keyword;
+
+            var maKhachHang = userParams.MaKhachHang;
+            var tenKhachHang = userParams.TenKhachHang;
+            var gioiTinh = userParams.GioiTinh;
+            var ngaySinhBatDau = userParams.NgaySinhBatDau;
+            var ngaySinhKetThuc = userParams.NgaySinhKetThuc;
+            var soDienThoai = userParams.SoDienThoai;
+            var diaChi = userParams.DiaChi;
+            var ghiChu = userParams.GhiChu;
+
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
@@ -56,12 +65,44 @@ namespace MFFMS.API.Data.KhachHangRepository
             var trangThai = userParams.TrangThai;
             var daXoa = userParams.DaXoa;
 
-            
+            // KhachHang
 
-            if (!string.IsNullOrEmpty(keyword))
+            if (!string.IsNullOrEmpty(maKhachHang))
             {
-                result = result.Where(x => x.TenKhachHang.ToLower().Contains(keyword.ToLower()) || x.SoDienThoai.ToLower().Contains(keyword.ToLower()) || x.DiaChi.ToLower().Contains(keyword.ToLower()) || x.MaKhachHang == keyword);
+                result = result.Where(x => x.MaKhachHang.ToLower().Contains(maKhachHang.ToLower()));
             }
+
+            if (!string.IsNullOrEmpty(tenKhachHang))
+            {
+                result = result.Where(x => x.TenKhachHang.ToLower().Contains(tenKhachHang.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(gioiTinh))
+            {
+                result = result.Where(x => x.GioiTinh.ToLower().Contains(gioiTinh.ToLower()));
+            }
+
+            if (ngaySinhBatDau.GetHashCode() != 0 && ngaySinhKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.NgaySinh >= ngaySinhBatDau && x.ThoiGianTao <= ngaySinhKetThuc);
+            }
+
+            if (!string.IsNullOrEmpty(soDienThoai))
+            {
+                result = result.Where(x => x.SoDienThoai.ToLower().Contains(soDienThoai.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(diaChi))
+            {
+                result = result.Where(x => x.DiaChi.ToLower().Contains(diaChi.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(ghiChu))
+            {
+                result = result.Where(x => x.GhiChu.ToLower().Contains(ghiChu.ToLower()));
+            }
+
+            // Base
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
             {
@@ -78,7 +119,7 @@ namespace MFFMS.API.Data.KhachHangRepository
                 result = result.Where(x => x.TrangThai == trangThai);
             }
 
-            if(daXoa ==1||daXoa == 0)
+            if (daXoa == 1 || daXoa == 0)
             {
                 result = result.Where(x => x.DaXoa == daXoa);
             }
@@ -119,6 +160,7 @@ namespace MFFMS.API.Data.KhachHangRepository
                             result = result.OrderByDescending(x => x.GioiTinh);
                         }
                         break;
+
                     case "SoDienThoai":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
@@ -129,6 +171,7 @@ namespace MFFMS.API.Data.KhachHangRepository
                             result = result.OrderByDescending(x => x.SoDienThoai);
                         }
                         break;
+
                     case "DiaChi":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
@@ -139,6 +182,7 @@ namespace MFFMS.API.Data.KhachHangRepository
                             result = result.OrderByDescending(x => x.DiaChi);
                         }
                         break;
+
                     case "NgaySinh":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
@@ -188,6 +232,7 @@ namespace MFFMS.API.Data.KhachHangRepository
                         break;
                 }
             }
+
             _totalItems = result.Count();
             _totalPages = (int)Math.Ceiling((double)_totalItems / (double)userParams.PageSize);
 
@@ -205,11 +250,9 @@ namespace MFFMS.API.Data.KhachHangRepository
         {
             var result = _context.DanhSachKhachHang.AsQueryable();
             var totalCustomers = 0;
-            // var maleCustomers = 0;
-            // var femaleCustomers = 0;
-            var studentCustomers =0; // Khách hàng có tuổi < 19
-            var youthCustomers = 0;  // Khách hàng có tuổi từ 19 -> 30
-            var adultCustomers = 0;  // Khách hàng có tuổi >30
+            var studentCustomers = 0;
+            var youthCustomers = 0;
+            var adultCustomers = 0;
 
             if (userParams != null && userParams.StartingTime.GetHashCode() != 0 && userParams.EndingTime.GetHashCode() != 0)
             {
@@ -231,8 +274,6 @@ namespace MFFMS.API.Data.KhachHangRepository
             return new
             {
                 Total = totalCustomers,
-                //Males = maleCustomers,
-                //Females = femaleCustomers,
                 Student = studentCustomers,
                 Youth = youthCustomers,
                 Adult = adultCustomers
