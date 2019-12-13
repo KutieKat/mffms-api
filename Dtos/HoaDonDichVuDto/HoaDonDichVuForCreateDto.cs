@@ -15,6 +15,10 @@ namespace MFFMS.API.Dtos.HoaDonDichVuDto
         public DateTime NgaySuDung { get; set; }
         [Required]
         public DateTime NgayLap { get; set; }
+        [Required]
+        public double ThanhTien{get;set;}
+        [Required]
+        public string DaThanhToan{get;set;}
         public string GhiChu { get; set; }
     }
 }
