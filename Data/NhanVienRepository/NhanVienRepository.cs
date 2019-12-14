@@ -55,31 +55,77 @@ namespace MFFMS.API.Data.NhanVienRepository
             var result = _context.DanhSachNhanVien.AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
-            var keyword = userParams.Keyword;
+
+            var maNhanVien = userParams.MaNhanVien;
+            var tenNhanVien = userParams.TenNhanVien;
+            var gioiTinh = userParams.GioiTinh;
+            var ngaySinhBatDau = userParams.NgaySinhBatDau;
+            var ngaySinhKetThuc = userParams.NgaySinhKetThuc;
+            var chucVu = userParams.ChucVu;
+            var soDienThoai = userParams.SoDienThoai;
+            var soCMND = userParams.SoCMND;
+            var luongBatDau = userParams.LuongBatDau;
+            var luongKetThuc = userParams.LuongKetThuc;
+            var ghiChu = userParams.GhiChu;
+            var diaChi = userParams.DiaChi;
+
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
-            var ngaySinhBatDau = userParams.NgaySinhBatDau;
-            var ngaySinhKetThuc = userParams.NgaySinhKetThuc;
-            var chucVu = userParams.ChucVu;
             var daXoa = userParams.DaXoa;
 
-            if (!string.IsNullOrEmpty(keyword))
+            // NhanVien
+
+            if (!string.IsNullOrEmpty(maNhanVien))
             {
-                result = result.Where(x => x.TenNhanVien.ToLower().Contains(keyword.ToLower()) ||
-                                           x.DiaChi.ToLower().Contains(keyword.ToLower()) ||
-                                           x.MaNhanVien.ToLower().Contains(keyword.ToLower()) ||
-                                           x.SoDienThoai.ToLower().Contains(keyword.ToLower()) ||
-                                           x.DiaChi.ToLower().Contains(keyword.ToLower()) ||
-                                           x.GioiTinh.ToLower().Contains(keyword.ToLower()));
+                result = result.Where(x => x.MaNhanVien.ToLower().Contains(maNhanVien.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(tenNhanVien))
+            {
+                result = result.Where(x => x.TenNhanVien.ToLower().Contains(tenNhanVien.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(gioiTinh))
+            {
+                result = result.Where(x => x.GioiTinh.ToLower().Contains(gioiTinh.ToLower()));
+            }
+
+            if (ngaySinhBatDau.GetHashCode() != 0 && ngaySinhKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.NgaySinh >= ngaySinhBatDau && x.NgaySinh <= ngaySinhKetThuc);
             }
 
             if (!string.IsNullOrEmpty(chucVu))
             {
                 result = result.Where(x => x.ChucVu.ToLower().Contains(chucVu.ToLower()));
             }
+
+            if (!string.IsNullOrEmpty(soDienThoai))
+            {
+                result = result.Where(x => x.SoDienThoai.ToLower().Contains(soDienThoai.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(soCMND))
+            {
+                result = result.Where(x => x.SoCMND.ToLower().Contains(soCMND.ToLower()));
+            }
+
+            result = result.Where(x => x.Luong >= luongBatDau && x.Luong <= luongKetThuc);
+
+            if (!string.IsNullOrEmpty(ghiChu))
+            {
+                result = result.Where(x => x.GhiChu.ToLower().Contains(ghiChu.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(diaChi))
+            {
+                result = result.Where(x => x.DiaChi.ToLower().Contains(diaChi.ToLower()));
+            }
+
+            // Base
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
             {
@@ -96,12 +142,7 @@ namespace MFFMS.API.Data.NhanVienRepository
                 result = result.Where(x => x.TrangThai == trangThai);
             }
 
-            if (ngaySinhBatDau.GetHashCode() != 0 && ngaySinhKetThuc.GetHashCode() != 0)
-            {
-                result = result.Where(x => x.NgaySinh >= ngaySinhBatDau && x.NgaySinh <= ngaySinhKetThuc);
-            }
-
-            if(daXoa == 1 || daXoa == 0)
+            if (daXoa == 1 || daXoa == 0)
             {
                 result = result.Where(x => x.DaXoa == daXoa);
             }
