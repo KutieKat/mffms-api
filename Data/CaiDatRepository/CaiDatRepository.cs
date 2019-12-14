@@ -54,11 +54,11 @@ namespace MFFMS.API.Data.CaiDatRepository
         {
             var caiDatToRestore = await _context.DanhSachCaiDat.FirstOrDefaultAsync();
 
-            caiDatToRestore.TenSanBong = "Sân bóng mini ĐHTDTT";
-            caiDatToRestore.DiaChi = "Khu phố 6, phường Linh Trung, quận Thủ Đức";
-            caiDatToRestore.SoDienThoai = "0782 500 555";
-            caiDatToRestore.Fax = "0274 3567 225";
-            caiDatToRestore.DiaChiTrenPhieu = "Khu phố 6, phường Linh Trung, quận Thủ Đức";
+            caiDatToRestore.TenSanBong = "Tên sân bóng mini";
+            caiDatToRestore.DiaChi = "Địa chỉ của sân bóng mini";
+            caiDatToRestore.SoDienThoai = "0000000000";
+            caiDatToRestore.Fax = "0000000000";
+            caiDatToRestore.DiaChiTrenPhieu = "Địa chỉ được sử dụng trên các phiếu và báo biểu";
             caiDatToRestore.ThoiGianCapNhat = DateTime.Now;
 
             _context.DanhSachCaiDat.Update(caiDatToRestore);
