@@ -11,7 +11,7 @@ namespace MFFMS.API.Dtos.DichVuDto
         [Required]
         public string TenDichVu { get; set; }
         [Required]
-        public decimal DonGia { get; set; }
+        public double DonGia { get; set; }
         [Required]
         public string DVT { get; set; }
         public string GhiChu { get; set; }

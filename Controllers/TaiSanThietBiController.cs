@@ -67,7 +67,7 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(string id)
         {
             try
             {
@@ -142,7 +142,7 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateById(int id, TaiSanThietBiForUpdateDto taiSanThietBi)
+        public async Task<IActionResult> UpdateById(string id, TaiSanThietBiForUpdateDto taiSanThietBi)
         {
             try
             {
@@ -187,7 +187,7 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> TemporarilyDeleteById(int id)
+        public async Task<IActionResult> TemporarilyDeleteById(string id)
         {
             try
             {
@@ -216,7 +216,7 @@ namespace MFFMS.API.Controllers
         }
 
          [HttpPut("{id}")]
-        public async Task<IActionResult> RestoreById(int id)
+        public async Task<IActionResult> RestoreById(string id)
         {
             try
             {
@@ -245,7 +245,7 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> PermanentlyDeleteById(int id)
+        public async Task<IActionResult> PermanentlyDeleteById(string id)
         {
             try
             {

@@ -11,7 +11,7 @@ namespace MFFMS.API.Dtos.ChiTietDonNhapHangDto
         [Required]
         public int SoLuong { get; set; }
         [Required]
-        public decimal DonGia { get; set; }
+        public double DonGia { get; set; }
         [Required]
         public string DVT { get; set; }
     }

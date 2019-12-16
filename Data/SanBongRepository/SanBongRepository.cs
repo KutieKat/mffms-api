@@ -17,28 +17,32 @@ namespace MFFMS.API.Data.SanBongRepository
         private int _totalItems;
         private int _totalPages;
 
-        public SanBongRepository (DataContext context)
+        public SanBongRepository(DataContext context)
         {
             _context = context;
             _totalItems = 0;
             _totalPages = 0;
         }
-        public async Task<SanBong> Create(SanBongForCreateDto sanBong)
+        private string GenerateId()
         {
-            var danhSachSanBong = await _context.DanhSachSanBong.OrderByDescending(x => x.MaSanBong).FirstOrDefaultAsync();
-            var maSanBong = 1;
-            if(danhSachSanBong == null)
+            int count = _context.DanhSachSanBong.Count() + 1;
+            string tempId = count.ToString();
+            string currentYear = DateTime.Now.ToString("yy");
+
+            while (tempId.Length < 4)
             {
-                maSanBong = 1;
-            }
-            else
-            {
-                maSanBong = danhSachSanBong.MaSanBong + 1;
+                tempId = "0" + tempId;
             }
 
+            tempId = "SB" + currentYear + tempId;
+
+            return tempId;
+        }
+        public async Task<SanBong> Create(SanBongForCreateDto sanBong)
+        {
             var newSanBong = new SanBong
             {
-                MaSanBong = maSanBong,
+                MaSanBong = GenerateId(),
                 TenSanBong = sanBong.TenSanBong,
                 ChieuDai = sanBong.ChieuDai,
                 ChieuRong = sanBong.ChieuRong,
@@ -61,6 +65,16 @@ namespace MFFMS.API.Data.SanBongRepository
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
+
+            var maSanBong = userParams.MaSanBong;
+            var tenSanBong = userParams.TenSanBong;
+            var chieuDaiBatDau = userParams.ChieuDaiBatDau;
+            var chieuDaiKetThuc = userParams.ChieuDaiKetThuc;
+            var chieuRongBatDau = userParams.ChieuRongBatDau;
+            var chieuRongKetThuc = userParams.ChieuRongKetThuc;
+            var dienTichBatDau = userParams.DienTichBatDau;
+            var dienTichKetThuc = userParams.DienTichKetThuc;
+
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
@@ -68,11 +82,33 @@ namespace MFFMS.API.Data.SanBongRepository
             var trangThai = userParams.TrangThai;
             var daXoa = userParams.DaXoa;
 
-            if (!string.IsNullOrEmpty(keyword))
+            // SanBong 
+            if (!string.IsNullOrEmpty(maSanBong))
             {
-                result = result.Where(x => x.TenSanBong.ToLower().Contains(keyword.ToLower()) ||  x.MaSanBong.ToString() == keyword);
+                result = result.Where(x => x.MaSanBong.ToLower().Contains(maSanBong.ToLower()));
             }
 
+            if (!string.IsNullOrEmpty(tenSanBong))
+            {
+                result = result.Where(x => x.TenSanBong.ToLower().Contains(tenSanBong.ToLower()));
+            }
+
+            if (chieuDaiBatDau.GetHashCode() != 0 && chieuDaiKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.ChieuDai >= chieuDaiBatDau && x.ChieuDai <= chieuDaiKetThuc);
+            }	
+
+            if (chieuRongBatDau.GetHashCode() != 0 && chieuRongKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.ChieuRong >= chieuRongBatDau && x.ChieuRong <= chieuRongKetThuc);
+            }	
+
+            if (dienTichBatDau.GetHashCode() != 0 && dienTichKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.DienTich >= dienTichBatDau && x.DienTich <= dienTichKetThuc);
+            }	                             
+
+            // Base
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.ThoiGianTao >= thoiGianTaoBatDau && x.ThoiGianTao <= thoiGianTaoKetThuc);
@@ -88,7 +124,7 @@ namespace MFFMS.API.Data.SanBongRepository
                 result = result.Where(x => x.TrangThai == trangThai);
             }
 
-            if(daXoa == 1|| daXoa == 0)
+            if (daXoa == 1 || daXoa == 0)
             {
                 result = result.Where(x => x.DaXoa == daXoa);
             }
@@ -197,7 +233,7 @@ namespace MFFMS.API.Data.SanBongRepository
             return await PagedList<SanBong>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<SanBong> GetById(int id)
+        public async Task<SanBong> GetById(string id)
         {
             var result = await _context.DanhSachSanBong.FirstOrDefaultAsync(x => x.MaSanBong == id);
             return result;
@@ -218,7 +254,7 @@ namespace MFFMS.API.Data.SanBongRepository
 
             if (!string.IsNullOrEmpty(keyword))
             {
-                result = result.Where(x => x.TenSanBong.ToLower().Contains(keyword.ToLower()) ||  x.MaSanBong.ToString() == keyword);
+                result = result.Where(x => x.TenSanBong.ToLower().Contains(keyword.ToLower()) || x.MaSanBong.ToString() == keyword);
             }
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
@@ -344,29 +380,29 @@ namespace MFFMS.API.Data.SanBongRepository
         {
             var result = _context.DanhSachSanBong.AsQueryable();
             var totalPitch = 0; // tổng số sân bóng
-            var minAreaPitch =0.0; // diện tích nhỏ nhất
+            var minAreaPitch = 0.0; // diện tích nhỏ nhất
             var maxAreaePich = 0.0;  // diện tích lớn nhất       
 
             if (userParams != null && userParams.StartingTime.GetHashCode() != 0 && userParams.EndingTime.GetHashCode() != 0)
             {
                 totalPitch = result.Count();
-                minAreaPitch = result.Where(x =>x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Min(x => x.DienTich);
-                maxAreaePich = result.Where(x =>x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Max(x => x.DienTich);
+                minAreaPitch = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Min(x => x.DienTich);
+                maxAreaePich = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Max(x => x.DienTich);
             }
             else
             {
                 totalPitch = result.Count();
                 minAreaPitch = result.Min(x => x.DienTich);
-                maxAreaePich = result.Max (x =>x.DienTich);
+                maxAreaePich = result.Max(x => x.DienTich);
             }
 
             return new
             {
                 Total = totalPitch,
                 MinArea = minAreaPitch,
-                MaxArea = maxAreaePich        
+                MaxArea = maxAreaePich
             };
-        }        
+        }
 
         public int GetTotalItems()
         {
@@ -378,7 +414,7 @@ namespace MFFMS.API.Data.SanBongRepository
             return _totalPages;
         }
 
-        public async Task<SanBong> PermanentlyDeleteById(int id)
+        public async Task<SanBong> PermanentlyDeleteById(string id)
         {
             var sanBongToDelete = await _context.DanhSachSanBong.FirstOrDefaultAsync(x => x.MaSanBong == id);
 
@@ -388,7 +424,7 @@ namespace MFFMS.API.Data.SanBongRepository
             return sanBongToDelete;
         }
 
-        public async Task<SanBong> RestoreById(int id)
+        public async Task<SanBong> RestoreById(string id)
         {
             var sanBongToRestoreById = await _context.DanhSachSanBong.FirstOrDefaultAsync(x => x.MaSanBong == id);
 
@@ -401,7 +437,7 @@ namespace MFFMS.API.Data.SanBongRepository
             return sanBongToRestoreById;
         }
 
-        public async Task<SanBong> TemporarilyDeleteById(int id)
+        public async Task<SanBong> TemporarilyDeleteById(string id)
         {
             var sanBongToTemporarilyDeleteById = await _context.DanhSachSanBong.FirstOrDefaultAsync(x => x.MaSanBong == id);
 
@@ -414,7 +450,7 @@ namespace MFFMS.API.Data.SanBongRepository
             return sanBongToTemporarilyDeleteById;
         }
 
-        public async Task<SanBong> UpdateById(int id, SanBongForUpdateDto sanBong)
+        public async Task<SanBong> UpdateById(string id, SanBongForUpdateDto sanBong)
         {
             var oldRecord = await _context.DanhSachSanBong.AsNoTracking().FirstOrDefaultAsync(x => x.MaSanBong == id);
             var sanBongToUpdate = new SanBong
@@ -441,7 +477,7 @@ namespace MFFMS.API.Data.SanBongRepository
             var totalTenSanBong = _context.DanhSachSanBong.Count(x => x.TenSanBong.ToLower() == sanBong.TenSanBong.ToLower());
             IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
 
-            if(totalTenSanBong >= 1)
+            if (totalTenSanBong >= 1)
             {
                 Errors.Add("tenSanBong", new string[] { "tenSanBong is duplicated!" });
 
@@ -460,12 +496,12 @@ namespace MFFMS.API.Data.SanBongRepository
             }
         }
 
-        public ValidationResultDto ValidateBeforeUpdate(int id, SanBongForUpdateDto sanBong)
+        public ValidationResultDto ValidateBeforeUpdate(string id, SanBongForUpdateDto sanBong)
         {
             var totalTenSanBong = _context.DanhSachSanBong.Count(x => (x.MaSanBong != id) && (x.TenSanBong.ToLower() == sanBong.TenSanBong.ToLower()));
             IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
 
-            if(totalTenSanBong > 0)
+            if (totalTenSanBong > 0)
             {
                 Errors.Add("tenSanBong", new string[] { "tenSanBong is duplicated!" });
 

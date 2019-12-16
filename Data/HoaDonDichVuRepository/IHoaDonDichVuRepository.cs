@@ -13,12 +13,12 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
     public interface IHoaDonDichVuRepository
     {
         Task<PagedList<HoaDonDichVu>> GetAll(HoaDonDichVuParams userParams);
-        Task<HoaDonDichVu> GetById(int id);
+        Task<HoaDonDichVu> GetById(string id);
         Task<HoaDonDichVu> Create(HoaDonDichVuForCreateDto hoaDonDichVu);
-        Task<HoaDonDichVu> UpdateById(int id, HoaDonDichVuForUpdateDto hoaDonDichVu);
-        Task<HoaDonDichVu> TemporarilyDeleteById(int id);
-        Task<HoaDonDichVu> RestoreById(int id);
-        Task<HoaDonDichVu> PermanentlyDeleteById(int id);
+        Task<HoaDonDichVu> UpdateById(string id, HoaDonDichVuForUpdateDto hoaDonDichVu);
+        Task<HoaDonDichVu> TemporarilyDeleteById(string id);
+        Task<HoaDonDichVu> RestoreById(string id);
+        Task<HoaDonDichVu> PermanentlyDeleteById(string id);
         int GetTotalPages();
         int GetTotalItems();
         //Task<Object> GetGeneralStatisticsParams(HoaDonDichVuStatisticsParams userParams);

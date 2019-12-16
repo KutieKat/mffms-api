@@ -22,8 +22,23 @@ namespace MFFMS.API.Data
             _totalItems = 0;
             _totalPages = 0;
         }
+        private string GenerateId()
+        {
+            int count = _context.DanhSachTaiKhoan.Count() + 1;
+            string tempId = count.ToString();
+            string currentYear = DateTime.Now.ToString("yy");
+ 
+            while (tempId.Length < 4)
+            {
+                tempId = "0" + tempId;
+            }
+ 
+            tempId = "TK" + currentYear + tempId;
+ 
+            return tempId;
+        }
 
-        public async Task<TaiKhoan> ChangePassword(int id, TaiKhoanForChangePasswordDto taiKhoan)
+        public async Task<TaiKhoan> ChangePassword(string id, TaiKhoanForChangePasswordDto taiKhoan)
         {
             var result = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
 
@@ -73,7 +88,7 @@ namespace MFFMS.API.Data
             return taiKhoan;
         }
 
-        public async Task<TaiKhoan> DeleteById(int id)
+        public async Task<TaiKhoan> DeleteById(string id)
         {
             var taiKhoanToDelete = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
 
@@ -88,7 +103,19 @@ namespace MFFMS.API.Data
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
+
+            var maTaiKhoan = userParams.MaTaiKhoan;
+            var tenDangNhap = userParams.TenDangNhap;
             var phanQuyen = userParams.PhanQuyen;
+            var hoVaTen = userParams.HoVaTen;
+            var gioiTinh = userParams.GioiTinh;
+            var ngaySinhBatDau = userParams.NgaySinhBatDau;
+            var ngaySinhKetThuc = userParams.NgaySinhKetThuc;
+            var email = userParams.Email;
+            var queQuan = userParams.QueQuan;
+            var diaChi = userParams.DiaChi;
+            var soDienThoai = userParams.SoDienThoai;
+
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
@@ -96,16 +123,53 @@ namespace MFFMS.API.Data
             var trangThai = userParams.TrangThai;
             var daXoa = userParams.DaXoa;
 
-            if (!string.IsNullOrEmpty(keyword))
+           // Tai khoan
+           if (!string.IsNullOrEmpty(maTaiKhoan))
             {
-                result = result.Where(x => x.TenDangNhap.ToLower().Contains(keyword.ToLower()) || x.MaTaiKhoan.ToString() == keyword);
+                result = result.Where(x => x.MaTaiKhoan.ToLower().Contains(maTaiKhoan.ToLower()));
             }
 
-            if (!string.IsNullOrEmpty(phanQuyen))
+            if (!string.IsNullOrEmpty(tenDangNhap))
             {
-                result = result.Where(x => x.PhanQuyen.ToLower().Contains(phanQuyen.ToLower()));
+                result = result.Where(x => x.TenDangNhap.ToLower().Contains(tenDangNhap.ToLower()));
             }
 
+            if (!string.IsNullOrEmpty(hoVaTen))
+            {
+                result = result.Where(x => x.HoVaTen.ToLower().Contains(hoVaTen.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(gioiTinh))
+            {
+                result = result.Where(x => x.GioiTinh.ToLower().Contains(gioiTinh.ToLower()));
+            }
+
+            if (ngaySinhBatDau.GetHashCode() != 0 && ngaySinhKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.NgaySinh >= ngaySinhBatDau && x.NgaySinh <= ngaySinhKetThuc);
+            }
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                result = result.Where(x => x.Email.ToLower().Contains(email.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(queQuan))
+            {
+                result = result.Where(x => x.QueQuan.ToLower().Contains(queQuan.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(diaChi))
+            {
+                result = result.Where(x => x.DiaChi.ToLower().Contains(diaChi.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(soDienThoai))
+            {
+                result = result.Where(x => x.SoDienThoai.ToLower().Contains(soDienThoai.ToLower()));
+            }
+
+            // Base 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.ThoiGianTao >= thoiGianTaoBatDau && x.ThoiGianTao <= thoiGianTaoKetThuc);
@@ -125,7 +189,6 @@ namespace MFFMS.API.Data
             {
                 result = result.Where(x => x.DaXoa == daXoa);
             }
-
 
             if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
             {
@@ -206,7 +269,7 @@ namespace MFFMS.API.Data
             return await PagedList<TaiKhoan>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<TaiKhoan> GetById(int id)
+        public async Task<TaiKhoan> GetById(string id)
         {
             var result = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
             return result;
@@ -348,7 +411,7 @@ namespace MFFMS.API.Data
             return _totalPages;
         }
 
-        public async Task<TaiKhoan> PermanentlyDeleteById(int id)
+        public async Task<TaiKhoan> PermanentlyDeleteById(string id)
         {
             var taiKhoanToDelete = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
 
@@ -358,7 +421,7 @@ namespace MFFMS.API.Data
             return taiKhoanToDelete;
         }
 
-        public async Task<TaiKhoan> RestoreById(int id)
+        public async Task<TaiKhoan> RestoreById(string id)
         {
             var taiKhoanToRestoreById = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
 
@@ -396,7 +459,7 @@ namespace MFFMS.API.Data
             return taiKhoan;
         }
 
-        public async Task<TaiKhoan> TemporarilyDeleteById(int id)
+        public async Task<TaiKhoan> TemporarilyDeleteById(string id)
         {
             var taiKhoanToTemporarilyDeleteById = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
 
@@ -409,7 +472,7 @@ namespace MFFMS.API.Data
             return taiKhoanToTemporarilyDeleteById;
         }
 
-        public async Task<TaiKhoan> UpdateById(int id, TaiKhoanForUpdateDto taiKhoan)
+        public async Task<TaiKhoan> UpdateById(string id, TaiKhoanForUpdateDto taiKhoan)
         { 
             
             var taiKhoanToUpdate = new TaiKhoan

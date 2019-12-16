@@ -9,14 +9,13 @@ namespace MFFMS.API.Models
     public class PhieuDatSan : BaseModel
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int MaPhieuDatSan { get; set; }
+        public string MaPhieuDatSan { get; set; }
         public string MaKhachHang { get; set; }
         public KhachHang KhachHang { get; set; }
         public string MaNhanVien { get; set; }
         public NhanVien NhanVien { get; set; }
         public DateTime NgayLap { get; set; }
-
-        public decimal TongTien { get; set; }
+        public double TongTien { get; set; }
 
         public ICollection<ChiTietPhieuDatSan> ChiTietPhieuDatSan { get; set; }
     }

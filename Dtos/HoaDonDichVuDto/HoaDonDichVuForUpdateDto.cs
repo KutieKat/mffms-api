@@ -10,7 +10,7 @@ namespace MFFMS.API.Dtos.HoaDonDichVuDto
     {
         public string MaKhachHang { get; set; }
         [Required]
-        public int MaDichVu { get; set; }
+        public string MaDichVu { get; set; }
         [Required]
         public DateTime NgaySuDung { get; set; }
         [Required]

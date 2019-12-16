@@ -13,17 +13,17 @@ namespace MFFMS.API.Data.SanBongRepository
     public interface ISanBongRepository
     {
         Task<PagedList<SanBong>> GetAll(SanBongParams userParams);
-        Task<SanBong> GetById(int id);
+        Task<SanBong> GetById(string id);
         Task<SanBong> Create(SanBongForCreateDto sanBong);
-        Task<SanBong> UpdateById(int id, SanBongForUpdateDto sanBong);
-        Task<SanBong> TemporarilyDeleteById(int id);
-        Task<SanBong> RestoreById(int id);
-        Task<SanBong> PermanentlyDeleteById(int id);
+        Task<SanBong> UpdateById(string id, SanBongForUpdateDto sanBong);
+        Task<SanBong> TemporarilyDeleteById(string id);
+        Task<SanBong> RestoreById(string id);
+        Task<SanBong> PermanentlyDeleteById(string id);
         int GetTotalPages();
         int GetTotalItems();
         Object GetStatusStatistics(SanBongParams userParams);
         Task<Object> GetGeneralStatistics(SanBongStatisticsParams userParams);
         ValidationResultDto ValidateBeforeCreate(SanBongForCreateDto sanBong);
-        ValidationResultDto ValidateBeforeUpdate(int id, SanBongForUpdateDto sanBong);
+        ValidationResultDto ValidateBeforeUpdate(string id, SanBongForUpdateDto sanBong);
     }
 }

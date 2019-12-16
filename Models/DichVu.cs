@@ -9,9 +9,9 @@ namespace MFFMS.API.Models
     public class DichVu : BaseModel
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int MaDichVu { get; set; }
+        public string MaDichVu { get; set; }
         public string TenDichVu { get; set; }
-        public decimal DonGia { get; set; }
+        public double DonGia { get; set; }
         public string DVT { get; set; }
         public string GhiChu { get; set; }
 

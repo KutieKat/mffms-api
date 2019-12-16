@@ -8,10 +8,10 @@ namespace MFFMS.API.Dtos.PhieuDatSanDto
 {
     public class PhieuDatSanForListDto : BaseDto
     {
-        public int MaPhieuDatSan { get; set; }
+        public string MaPhieuDatSan { get; set; }
         public KhachHang KhachHang { get; set; }
         public NhanVien NhanVien { get; set; }
         public DateTime NgayLap { get; set; }
-        public decimal TongTien { get; set; }
+        public double TongTien { get; set; }
     }
 }
