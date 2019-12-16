@@ -15,8 +15,6 @@ namespace MFFMS.API.Models
         public string TenTSTB { get; set; }
         public string TinhTrang { get; set; }
         public string ThongTinBaoHanh { get; set; }
-
        public ICollection<ChiTietDonNhapHang> ChiTietDonNhapHang { get; set; }
-
     }
 }

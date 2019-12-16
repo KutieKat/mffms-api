@@ -65,6 +65,16 @@ namespace MFFMS.API.Data.SanBongRepository
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
+
+            var maSanBong = userParams.MaSanBong;
+            var tenSanBong = userParams.TenSanBong;
+            var chieuDaiBatDau = userParams.ChieuDaiBatDau;
+            var chieuDaiKetThuc = userParams.ChieuDaiKetThuc;
+            var chieuRongBatDau = userParams.ChieuRongBatDau;
+            var chieuRongKetThuc = userParams.ChieuRongKetThuc;
+            var dienTichBatDau = userParams.DienTichBatDau;
+            var dienTichKetThuc = userParams.DienTichKetThuc;
+
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
@@ -72,11 +82,33 @@ namespace MFFMS.API.Data.SanBongRepository
             var trangThai = userParams.TrangThai;
             var daXoa = userParams.DaXoa;
 
-            if (!string.IsNullOrEmpty(keyword))
+            // SanBong 
+            if (!string.IsNullOrEmpty(maSanBong))
             {
-                result = result.Where(x => x.TenSanBong.ToLower().Contains(keyword.ToLower()) || x.MaSanBong.ToString() == keyword);
+                result = result.Where(x => x.MaSanBong.ToLower().Contains(maSanBong.ToLower()));
             }
 
+            if (!string.IsNullOrEmpty(tenSanBong))
+            {
+                result = result.Where(x => x.TenSanBong.ToLower().Contains(tenSanBong.ToLower()));
+            }
+
+            if (chieuDaiBatDau.GetHashCode() != 0 && chieuDaiKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.ChieuDai >= chieuDaiBatDau && x.ChieuDai <= chieuDaiKetThuc);
+            }	
+
+            if (chieuRongBatDau.GetHashCode() != 0 && chieuRongKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.ChieuRong >= chieuRongBatDau && x.ChieuRong <= chieuRongKetThuc);
+            }	
+
+            if (dienTichBatDau.GetHashCode() != 0 && dienTichKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.DienTich >= dienTichBatDau && x.DienTich <= dienTichKetThuc);
+            }	                             
+
+            // Base
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.ThoiGianTao >= thoiGianTaoBatDau && x.ThoiGianTao <= thoiGianTaoKetThuc);

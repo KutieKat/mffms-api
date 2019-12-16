@@ -46,7 +46,6 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                 MaNhaCungCap = donNhapHang.MaNhaCungCap,
                 MaNhanVien = donNhapHang.MaNhanVien,
                 NgayGiaoHang = donNhapHang.NgayGiaoHang,
-                NoiNhanHang = donNhapHang.NoiNhanHang,
                 ThoiGianCapNhat = DateTime.Now,
                 ThoiGianTao = DateTime.Now,
                 TrangThai = 1,
@@ -63,21 +62,46 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             var result = _context.DanhSachDonNhapHang.Include(x=>x.NhaCungCap).Include(x=>x.NhanVien).AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
-            var keyword = userParams.Keyword;
+            
+            var maDonNhapHang = userParams.MaDonNhapHang;
+            var maNhaCungCap = userParams.MaNhaCungCap;
+            var maNhanVien = userParams.MaNhanVien;
+            var ngayGiaoHangBatDau = userParams.NgayGiaoHangBatDau;
+            var ngayGiaoHangKetThuc = userParams.NgayGiaoHangKetThuc;
+
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
             var daXoa = userParams.DaXoa;
-            var ngayGiaoHangBatDau = userParams.NgayGiaoHangBatDau;
-            var ngayGiaoHangKetThuc = userParams.NgayGiaoHangKetThuc;
 
-            if (!string.IsNullOrEmpty(keyword))
+            // DonNhapHang 
+            if (!string.IsNullOrEmpty(maDonNhapHang))
             {
-                result = result.Where(x => x.NoiNhanHang.ToLower().Contains(keyword.ToLower()) || x.MaNhanVien.ToLower().Contains(keyword.ToLower())|| x.MaDonNhapHang.ToString() == keyword || x.MaDonNhapHang.ToString() == keyword);
+                result = result.Where(x => x.MaDonNhapHang.ToLower().Contains(maDonNhapHang.ToLower()));
             }
 
+            if (!string.IsNullOrEmpty(maNhaCungCap))
+            {
+                result = result.Where(x => x.MaNhaCungCap.ToLower().Contains(maNhaCungCap.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(maNhanVien))
+            {
+                result = result.Where(x => x.MaNhanVien.ToLower().Contains(maNhanVien.ToLower()));
+            }
+            if (!string.IsNullOrEmpty(maNhanVien))
+            {
+                result = result.Where(x => x.MaNhanVien.ToLower().Contains(maNhanVien.ToLower()));
+            }
+            
+            if (ngayGiaoHangBatDau.GetHashCode() != 0 && ngayGiaoHangKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.NgayGiaoHang >= ngayGiaoHangBatDau && x.NgayGiaoHang <= ngayGiaoHangKetThuc);
+            }
+
+            // Base 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.ThoiGianTao >= thoiGianTaoBatDau && x.ThoiGianTao <= thoiGianTaoKetThuc);
@@ -150,19 +174,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                         }
                         break;
 
-                    case "NoiNhanHang":
-                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
-                        {
-                            result = result.OrderBy(x => x.NoiNhanHang);
-                        }
-                        else
-                        {
-                            result = result.OrderByDescending(x => x.NoiNhanHang);
-                        }
-                        break;
-
-
-                    case "ThoiGianTao":
+                        case "ThoiGianTao":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
                             result = result.OrderBy(x => x.ThoiGianTao);
@@ -230,7 +242,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
 
             if (!string.IsNullOrEmpty(keyword))
             {
-                result = result.Where(x => x.NoiNhanHang.ToLower().Contains(keyword.ToLower()) || x.MaNhanVien.ToLower().Contains(keyword.ToLower()) || x.MaDonNhapHang.ToString() == keyword || x.MaDonNhapHang.ToString() == keyword);
+                result = result.Where(x => x.MaNhanVien.ToLower().Contains(keyword.ToLower()) || x.MaDonNhapHang.ToString() == keyword || x.MaDonNhapHang.ToString() == keyword);
             }
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
@@ -303,18 +315,6 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                             result = result.OrderByDescending(x => x.NgayGiaoHang);
                         }
                         break;
-
-                    case "NoiNhanHang":
-                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
-                        {
-                            result = result.OrderBy(x => x.NoiNhanHang);
-                        }
-                        else
-                        {
-                            result = result.OrderByDescending(x => x.NoiNhanHang);
-                        }
-                        break;
-
 
                     case "ThoiGianTao":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
@@ -415,7 +415,6 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                 MaNhaCungCap = donNhapHang.MaNhaCungCap,
                 MaNhanVien = donNhapHang.MaNhanVien,
                 NgayGiaoHang = donNhapHang.NgayGiaoHang,
-                NoiNhanHang = donNhapHang.NoiNhanHang,
                 TrangThai = donNhapHang.TrangThai,
                 ThoiGianTao = oldRecord.ThoiGianTao,
                 DaXoa = oldRecord.DaXoa

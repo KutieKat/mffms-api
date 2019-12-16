@@ -14,7 +14,6 @@ namespace MFFMS.API.Dtos.DonNhapHangDto
         public string MaNhanVien { get; set; }
         [Required]
         public DateTime NgayGiaoHang { get; set; }
-        [Required]
-        public string NoiNhanHang { get; set; }
+     
     }
 }

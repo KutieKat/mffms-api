@@ -48,6 +48,13 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
+
+            var maNhaCungCap = userParams.MaNhaCungCap;
+            var tenNhaCungCap = userParams.TenNhaCungCap;
+            var soDienThoai = userParams.SoDienThoai;
+            var diaChi = userParams.DiaChi;
+            var ghiChu = userParams.GhiChu;
+
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
@@ -55,11 +62,33 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             var trangThai = userParams.TrangThai;
             var daXoa = userParams.DaXoa;
 
-            if (!string.IsNullOrEmpty(keyword))
+            // Nha cung cap
+            if (!string.IsNullOrEmpty(maNhaCungCap))
             {
-                result = result.Where(x => x.TenNhaCungCap.ToLower().Contains(keyword.ToLower()) || x.MaNhaCungCap.ToString() == keyword);
+                result = result.Where(x => x.MaNhaCungCap.ToLower().Contains(maNhaCungCap.ToLower()));
             }
 
+            if (!string.IsNullOrEmpty(tenNhaCungCap))
+            {
+                result = result.Where(x => x.TenNhaCungCap.ToLower().Contains(tenNhaCungCap.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(soDienThoai))
+            {
+                result = result.Where(x => x.SoDienThoai.ToLower().Contains(soDienThoai.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(diaChi))
+            {
+                result = result.Where(x => x.DiaChi.ToLower().Contains(diaChi.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(ghiChu))
+            {
+                result = result.Where(x => x.GhiChu.ToLower().Contains(ghiChu.ToLower()));
+            }
+
+            // Base
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.ThoiGianTao >= thoiGianTaoBatDau && x.ThoiGianTao <= thoiGianTaoKetThuc);

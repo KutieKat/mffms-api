@@ -63,7 +63,15 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
             var result = _context.DanhSachPhieuDatSan.Include(x => x.KhachHang).Include(x => x.NhanVien).AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
-            var keyword = userParams.Keyword;
+
+            var maPhieuDatSan = userParams.MaPhieuDatSan;
+            var maKhachHang = userParams.MaKhachHang;
+            var maNhanVien = userParams.MaNhanVien;
+            var ngayLapBatDau = userParams.NgayLapBatDau;
+            var ngayLapKetThuc = userParams.NgayLapKetThuc;
+            var tongTienBatDau = userParams.TongTienBatDau;
+            var tongTienKetThuc = userParams.TongTienKetThuc;
+
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
@@ -71,11 +79,30 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
             var trangThai = userParams.TrangThai;
             var daXoa = userParams.DaXoa;
 
-            if (!string.IsNullOrEmpty(keyword))
+            // PhieuDatSan 
+            if (!string.IsNullOrEmpty(maPhieuDatSan))
             {
-                result = result.Where(x => x.MaKhachHang.ToLower().Contains(keyword.ToLower()) || x.MaNhanVien.ToLower().Contains(keyword.ToLower()));
+                result = result.Where(x => x.MaPhieuDatSan.ToLower().Contains(maPhieuDatSan.ToLower()));
             }
 
+            if (!string.IsNullOrEmpty(maKhachHang))
+            {
+                result = result.Where(x => x.MaKhachHang.ToLower().Contains(maKhachHang.ToLower()));
+            }
+            if (!string.IsNullOrEmpty(maNhanVien))
+            {
+                result = result.Where(x => x.MaNhanVien.ToLower().Contains(maNhanVien.ToLower()));
+            }
+            if (ngayLapBatDau.GetHashCode() != 0 && ngayLapKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.NgayLap >= ngayLapBatDau && x.NgayLap <= ngayLapKetThuc);
+            }
+            if (tongTienBatDau.GetHashCode() != 0 && tongTienKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.TongTien >= tongTienBatDau && x.TongTien <= tongTienKetThuc);
+            }
+
+           // Base 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.ThoiGianTao >= thoiGianTaoBatDau && x.ThoiGianTao <= thoiGianTaoKetThuc);

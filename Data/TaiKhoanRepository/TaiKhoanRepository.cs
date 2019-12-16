@@ -103,7 +103,19 @@ namespace MFFMS.API.Data
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
+
+            var maTaiKhoan = userParams.MaTaiKhoan;
+            var tenDangNhap = userParams.TenDangNhap;
             var phanQuyen = userParams.PhanQuyen;
+            var hoVaTen = userParams.HoVaTen;
+            var gioiTinh = userParams.GioiTinh;
+            var ngaySinhBatDau = userParams.NgaySinhBatDau;
+            var ngaySinhKetThuc = userParams.NgaySinhKetThuc;
+            var email = userParams.Email;
+            var queQuan = userParams.QueQuan;
+            var diaChi = userParams.DiaChi;
+            var soDienThoai = userParams.SoDienThoai;
+
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
@@ -111,16 +123,53 @@ namespace MFFMS.API.Data
             var trangThai = userParams.TrangThai;
             var daXoa = userParams.DaXoa;
 
-            if (!string.IsNullOrEmpty(keyword))
+           // Tai khoan
+           if (!string.IsNullOrEmpty(maTaiKhoan))
             {
-                result = result.Where(x => x.TenDangNhap.ToLower().Contains(keyword.ToLower()) || x.MaTaiKhoan.ToString() == keyword);
+                result = result.Where(x => x.MaTaiKhoan.ToLower().Contains(maTaiKhoan.ToLower()));
             }
 
-            if (!string.IsNullOrEmpty(phanQuyen))
+            if (!string.IsNullOrEmpty(tenDangNhap))
             {
-                result = result.Where(x => x.PhanQuyen.ToLower().Contains(phanQuyen.ToLower()));
+                result = result.Where(x => x.TenDangNhap.ToLower().Contains(tenDangNhap.ToLower()));
             }
 
+            if (!string.IsNullOrEmpty(hoVaTen))
+            {
+                result = result.Where(x => x.HoVaTen.ToLower().Contains(hoVaTen.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(gioiTinh))
+            {
+                result = result.Where(x => x.GioiTinh.ToLower().Contains(gioiTinh.ToLower()));
+            }
+
+            if (ngaySinhBatDau.GetHashCode() != 0 && ngaySinhKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.NgaySinh >= ngaySinhBatDau && x.NgaySinh <= ngaySinhKetThuc);
+            }
+
+            if (!string.IsNullOrEmpty(email))
+            {
+                result = result.Where(x => x.Email.ToLower().Contains(email.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(queQuan))
+            {
+                result = result.Where(x => x.QueQuan.ToLower().Contains(queQuan.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(diaChi))
+            {
+                result = result.Where(x => x.DiaChi.ToLower().Contains(diaChi.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(soDienThoai))
+            {
+                result = result.Where(x => x.SoDienThoai.ToLower().Contains(soDienThoai.ToLower()));
+            }
+
+            // Base 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.ThoiGianTao >= thoiGianTaoBatDau && x.ThoiGianTao <= thoiGianTaoKetThuc);
@@ -140,7 +189,6 @@ namespace MFFMS.API.Data
             {
                 result = result.Where(x => x.DaXoa == daXoa);
             }
-
 
             if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
             {

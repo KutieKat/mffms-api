@@ -66,19 +66,68 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             var result = _context.DanhSachHoaDonDichVu.Include(x => x.KhachHang).Include(x => x.DichVu).AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
-            var keyword = userParams.Keyword;
+            
+            var soHDDV = userParams.SoHDDV;
+            var maKhachHang = userParams.MaKhachHang;
+            var maDichVu = userParams.MaDichVu;
+            var ngaySuDungBatDau = userParams.NgaySuDungBatDau;
+            var ngaySuDungKetThuc = userParams.NgaySuDungKetThuc;
+            var ngayLapBatDau = userParams.NgayLapBatDau;
+            var ngayLapKetThuc = userParams.NgayLapKetThuc;
+            var ghiChu = userParams.GhiChu;
+            var thanhTienBatDau = userParams.ThanhTienBatDau;
+            var thanhTienKetThuc = userParams.ThanhTienKetThuc;
+            var daThanhToan = userParams.DaThanhToan;
+
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
             var daXoa = userParams.DaXoa;
-
-            if (!string.IsNullOrEmpty(keyword))
+            
+            // HoaDonDichVu
+            if (!string.IsNullOrEmpty(soHDDV))
             {
-                result = result.Where(x => x.MaKhachHang.ToLower().Contains(keyword.ToLower()) || x.MaDichVu.ToString().ToLower().Contains(keyword.ToLower()) || x.SoHDDV.ToString() == keyword);
+                result = result.Where(x => x.SoHDDV.ToLower().Contains(soHDDV.ToLower()));
             }
 
+            if (!string.IsNullOrEmpty(maKhachHang))
+            {
+                result = result.Where(x => x.MaKhachHang.ToLower().Contains(maKhachHang.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(maDichVu))
+            {
+                result = result.Where(x => x.MaDichVu.ToLower().Contains(maDichVu.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(ghiChu))
+            {
+                result = result.Where(x => x.GhiChu.ToLower().Contains(ghiChu.ToLower()));
+            }
+            if (!string.IsNullOrEmpty(daThanhToan))
+            {
+                result = result.Where(x => x.DaThanhToan.ToLower().Contains(daThanhToan.ToLower()));
+            }
+
+            // Base
+            if (ngayLapBatDau.GetHashCode() != 0 && ngayLapKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.NgayLap >= ngayLapBatDau && x.NgayLap <= ngayLapKetThuc);
+            }
+
+            if (ngaySuDungBatDau.GetHashCode() != 0 && ngaySuDungKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.NgaySuDung >= ngaySuDungBatDau && x.NgaySuDung <= ngaySuDungKetThuc);
+            }
+
+            if (thanhTienBatDau.GetHashCode() != 0 && thanhTienKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.ThanhTien >= thanhTienBatDau && x.ThanhTien <= thanhTienKetThuc);
+            }
+
+            // Base
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.ThoiGianTao >= thoiGianTaoBatDau && x.ThoiGianTao <= thoiGianTaoKetThuc);

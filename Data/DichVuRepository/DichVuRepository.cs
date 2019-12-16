@@ -55,7 +55,6 @@ namespace MFFMS.API.Data.DichVuRepository
             await _context.DanhSachDichVu.AddAsync(newDichVu);
             await _context.SaveChangesAsync();
             return newDichVu;
-
         }
 
         public async Task<PagedList<DichVu>> GetAll(DichVuParams userParams)
@@ -64,6 +63,14 @@ namespace MFFMS.API.Data.DichVuRepository
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
+            
+            var maDichVu = userParams.MaDichVu;
+            var tenDichVu = userParams.TenDichVu;
+            var donGiaBatDau = userParams.DonGiaBatDau;
+            var donGiaKetThuc = userParams.DonGiaKetThuc;
+            var dVT = userParams.DVT;
+            var ghiChu = userParams.GhiChu;
+
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
@@ -71,11 +78,33 @@ namespace MFFMS.API.Data.DichVuRepository
             var trangThai = userParams.TrangThai;
             var daXoa = userParams.DaXoa;
 
-            if (!string.IsNullOrEmpty(keyword))
+            // Dich vu 
+            if (!string.IsNullOrEmpty(maDichVu))
             {
-                result = result.Where(x => x.TenDichVu.ToLower().Contains(keyword.ToLower()) || x.DVT.ToLower().Contains(keyword.ToLower()) || x.MaDichVu.ToString() == keyword);
+                result = result.Where(x => x.MaDichVu.ToLower().Contains(maDichVu.ToLower()));
             }
 
+            if (!string.IsNullOrEmpty(tenDichVu))
+            {
+                result = result.Where(x => x.TenDichVu.ToLower().Contains(tenDichVu.ToLower()));
+            }
+
+            if (donGiaBatDau.GetHashCode() !=0 && donGiaKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.DonGia >= donGiaBatDau && x.DonGia <= donGiaKetThuc);
+            }
+
+            if (!string.IsNullOrEmpty(dVT))
+            {
+                result = result.Where(x => x.DVT.ToLower().Contains(dVT.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(ghiChu))
+            {
+                result = result.Where(x => x.GhiChu.ToLower().Contains(ghiChu.ToLower()));
+            }
+           
+            // Base    
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.ThoiGianTao >= thoiGianTaoBatDau && x.ThoiGianTao <= thoiGianTaoKetThuc);
