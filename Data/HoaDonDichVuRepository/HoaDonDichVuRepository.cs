@@ -24,32 +24,38 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             _totalPages = 0;
         }
 
+        private string GenerateId()
+        {
+            int count = _context.DanhSachHoaDonDichVu.Count() + 1;
+            string tempId = count.ToString();
+            string currentYear = DateTime.Now.ToString("yy");
+
+            while (tempId.Length < 4)
+            {
+                tempId = "0" + tempId;
+            }
+
+            tempId = "HDDV" + currentYear + tempId;
+
+            return tempId;
+        }
+
         public async Task<HoaDonDichVu> Create(HoaDonDichVuForCreateDto hoaDonDichVu)
         {
-            var danhSachHDDV = await _context.DanhSachHoaDonDichVu.OrderByDescending(x => x.SoHDDV).FirstOrDefaultAsync();
-            var soHDDV = 1;
-            if(danhSachHDDV == null)
+            var newHoaDonDichVu = new HoaDonDichVu
             {
-                soHDDV = 1;
-            }
-            else
-            {
-                soHDDV = danhSachHDDV.SoHDDV + 1;
-            }
-
-            var newHoaDonDichVu = new HoaDonDichVu();
-            newHoaDonDichVu.SoHDDV = soHDDV;
-            newHoaDonDichVu.NgayLap = hoaDonDichVu.NgayLap;
-            newHoaDonDichVu.NgaySuDung = hoaDonDichVu.NgaySuDung;
-            newHoaDonDichVu.ThanhTien = hoaDonDichVu.ThanhTien;
-            newHoaDonDichVu.DaThanhToan = hoaDonDichVu.DaThanhToan;
-            newHoaDonDichVu.GhiChu = hoaDonDichVu.GhiChu;
-            newHoaDonDichVu.MaKhachHang = hoaDonDichVu.MaKhachHang;
-            newHoaDonDichVu.MaDichVu = hoaDonDichVu.MaDichVu;
-            newHoaDonDichVu.ThoiGianTao = DateTime.Now;
-            newHoaDonDichVu.ThoiGianCapNhat = DateTime.Now;
-            newHoaDonDichVu.TrangThai = 1;           
-
+                SoHDDV = GenerateId(),
+                NgayLap = hoaDonDichVu.NgayLap,
+                NgaySuDung = hoaDonDichVu.NgaySuDung,
+                ThanhTien = hoaDonDichVu.ThanhTien,
+                DaThanhToan = hoaDonDichVu.DaThanhToan,
+                GhiChu = hoaDonDichVu.GhiChu,
+                MaKhachHang = hoaDonDichVu.MaKhachHang,
+                MaDichVu = hoaDonDichVu.MaDichVu,
+                ThoiGianTao = DateTime.Now,
+                ThoiGianCapNhat = DateTime.Now,
+                TrangThai = 1
+            };
             await _context.DanhSachHoaDonDichVu.AddAsync(newHoaDonDichVu);
             await _context.SaveChangesAsync();
             return newHoaDonDichVu;
@@ -57,7 +63,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
 
         public async Task<PagedList<HoaDonDichVu>> GetAll(HoaDonDichVuParams userParams)
         {
-            var result = _context.DanhSachHoaDonDichVu.Include(x=>x.KhachHang).Include(x=>x.DichVu).AsQueryable();
+            var result = _context.DanhSachHoaDonDichVu.Include(x => x.KhachHang).Include(x => x.DichVu).AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
@@ -88,7 +94,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
                 result = result.Where(x => x.TrangThai == trangThai);
             }
 
-            if(daXoa == 0 || daXoa == 1)
+            if (daXoa == 0 || daXoa == 1)
             {
                 result = result.Where(x => x.DaXoa == daXoa);
             }
@@ -195,9 +201,9 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             return await PagedList<HoaDonDichVu>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<HoaDonDichVu> GetById(int id)
+        public async Task<HoaDonDichVu> GetById(string id)
         {
-            var result = await _context.DanhSachHoaDonDichVu.Include(x=>x.DichVu).Include(x=>x.KhachHang).FirstOrDefaultAsync(x => x.SoHDDV == id);
+            var result = await _context.DanhSachHoaDonDichVu.Include(x => x.DichVu).Include(x => x.KhachHang).FirstOrDefaultAsync(x => x.SoHDDV == id);
             return result;
         }
 
@@ -219,7 +225,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
                 result = result.Where(x => x.MaKhachHang.ToLower().Contains(keyword.ToLower()) || x.MaDichVu.ToString().ToLower().Contains(keyword.ToLower()) || x.SoHDDV.ToString() == keyword);
             }
 
-           
+
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.ThoiGianTao >= thoiGianTaoBatDau && x.ThoiGianTao <= thoiGianTaoKetThuc);
@@ -348,7 +354,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             return _totalPages;
         }
 
-        public async Task<HoaDonDichVu> PermanentlyDeleteById(int id)
+        public async Task<HoaDonDichVu> PermanentlyDeleteById(string id)
         {
             var hoaDonDichVuToDelete = await _context.DanhSachHoaDonDichVu.FirstOrDefaultAsync(x => x.SoHDDV == id);
 
@@ -358,7 +364,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             return hoaDonDichVuToDelete;
         }
 
-        public async Task<HoaDonDichVu> RestoreById(int id)
+        public async Task<HoaDonDichVu> RestoreById(string id)
         {
             var hoaDonDichVuToRestoreById = await _context.DanhSachHoaDonDichVu.FirstOrDefaultAsync(x => x.SoHDDV == id);
 
@@ -370,7 +376,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             return hoaDonDichVuToRestoreById;
         }
 
-        public async Task<HoaDonDichVu> TemporarilyDeleteById(int id)
+        public async Task<HoaDonDichVu> TemporarilyDeleteById(string id)
         {
             var hoaDonDichVuToTemporarilyDeleteById = await _context.DanhSachHoaDonDichVu.FirstOrDefaultAsync(x => x.SoHDDV == id);
 
@@ -382,7 +388,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             return hoaDonDichVuToTemporarilyDeleteById;
         }
 
-        public async Task<HoaDonDichVu> UpdateById(int id, HoaDonDichVuForUpdateDto hoaDonDichVu)
+        public async Task<HoaDonDichVu> UpdateById(string id, HoaDonDichVuForUpdateDto hoaDonDichVu)
         {
             var oldRecord = await _context.DanhSachHoaDonDichVu.AsNoTracking().FirstOrDefaultAsync(x => x.SoHDDV == id);
             var hoaDonDichVuToUpdate = new HoaDonDichVu
@@ -397,11 +403,11 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
                 TrangThai = hoaDonDichVu.TrangThai,
                 ThoiGianTao = oldRecord.ThoiGianTao,
                 ThoiGianCapNhat = DateTime.Now
-            };          
+            };
 
             _context.DanhSachHoaDonDichVu.Update(hoaDonDichVuToUpdate);
             await _context.SaveChangesAsync();
             return hoaDonDichVuToUpdate;
-        }        
+        }
     }
 }

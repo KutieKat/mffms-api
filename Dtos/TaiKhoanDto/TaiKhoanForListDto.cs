@@ -8,7 +8,7 @@ namespace MFFMS.API.Dtos.TaiKhoanDto
 {
     public class TaiKhoanForListDto : BaseDto
     {
-        public int MaTaiKhoan { get; set; }
+        public string MaTaiKhoan { get; set; }
         public string TenDangNhap { get; set; }
         public string PhanQuyen { get; set; }
 

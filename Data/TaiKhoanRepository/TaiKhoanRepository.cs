@@ -22,8 +22,23 @@ namespace MFFMS.API.Data
             _totalItems = 0;
             _totalPages = 0;
         }
+        private string GenerateId()
+        {
+            int count = _context.DanhSachTaiKhoan.Count() + 1;
+            string tempId = count.ToString();
+            string currentYear = DateTime.Now.ToString("yy");
+ 
+            while (tempId.Length < 4)
+            {
+                tempId = "0" + tempId;
+            }
+ 
+            tempId = "TK" + currentYear + tempId;
+ 
+            return tempId;
+        }
 
-        public async Task<TaiKhoan> ChangePassword(int id, TaiKhoanForChangePasswordDto taiKhoan)
+        public async Task<TaiKhoan> ChangePassword(string id, TaiKhoanForChangePasswordDto taiKhoan)
         {
             var result = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
 
@@ -73,7 +88,7 @@ namespace MFFMS.API.Data
             return taiKhoan;
         }
 
-        public async Task<TaiKhoan> DeleteById(int id)
+        public async Task<TaiKhoan> DeleteById(string id)
         {
             var taiKhoanToDelete = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
 
@@ -206,7 +221,7 @@ namespace MFFMS.API.Data
             return await PagedList<TaiKhoan>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<TaiKhoan> GetById(int id)
+        public async Task<TaiKhoan> GetById(string id)
         {
             var result = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
             return result;
@@ -348,7 +363,7 @@ namespace MFFMS.API.Data
             return _totalPages;
         }
 
-        public async Task<TaiKhoan> PermanentlyDeleteById(int id)
+        public async Task<TaiKhoan> PermanentlyDeleteById(string id)
         {
             var taiKhoanToDelete = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
 
@@ -358,7 +373,7 @@ namespace MFFMS.API.Data
             return taiKhoanToDelete;
         }
 
-        public async Task<TaiKhoan> RestoreById(int id)
+        public async Task<TaiKhoan> RestoreById(string id)
         {
             var taiKhoanToRestoreById = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
 
@@ -396,7 +411,7 @@ namespace MFFMS.API.Data
             return taiKhoan;
         }
 
-        public async Task<TaiKhoan> TemporarilyDeleteById(int id)
+        public async Task<TaiKhoan> TemporarilyDeleteById(string id)
         {
             var taiKhoanToTemporarilyDeleteById = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
 
@@ -409,7 +424,7 @@ namespace MFFMS.API.Data
             return taiKhoanToTemporarilyDeleteById;
         }
 
-        public async Task<TaiKhoan> UpdateById(int id, TaiKhoanForUpdateDto taiKhoan)
+        public async Task<TaiKhoan> UpdateById(string id, TaiKhoanForUpdateDto taiKhoan)
         { 
             
             var taiKhoanToUpdate = new TaiKhoan

@@ -22,23 +22,27 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             _totalItems = 0;
             _totalPages = 0;
         }
+        private string GenerateId()
+        {
+            int count = _context.DanhSachDonNhapHang.Count() + 1;
+            string tempId = count.ToString();
+            string currentYear = DateTime.Now.ToString("yy");
+ 
+            while (tempId.Length < 4)
+            {
+                tempId = "0" + tempId;
+            }
+ 
+            tempId = "DNH" + currentYear + tempId;
+ 
+            return tempId;
+        }
 
         public async Task<DonNhapHang> Create(DonNhapHangForCreateDto donNhapHang)
         {
-            var danhSachDonNhapHang = await _context.DanhSachDonNhapHang.OrderByDescending(x=>x.MaDonNhapHang).FirstOrDefaultAsync();
-            var maDonNhapHang = 1;
-            if(danhSachDonNhapHang == null)
-            {
-                maDonNhapHang = 1;
-            }
-            else
-            {
-                maDonNhapHang = danhSachDonNhapHang.MaDonNhapHang + 1;
-            }
-
             var newDonNhapHang = new DonNhapHang
             {
-                MaDonNhapHang = maDonNhapHang,
+                MaDonNhapHang = GenerateId(),
                 MaNhaCungCap = donNhapHang.MaNhaCungCap,
                 MaNhanVien = donNhapHang.MaNhanVien,
                 NgayGiaoHang = donNhapHang.NgayGiaoHang,
@@ -203,7 +207,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             return await PagedList<DonNhapHang>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<DonNhapHang> GetById(int id)
+        public async Task<DonNhapHang> GetById(string id)
         {
             var result = await _context.DanhSachDonNhapHang.Include(x => x.NhanVien).Include(x => x.NhaCungCap).FirstOrDefaultAsync(x => x.MaDonNhapHang == id);
             return result;
@@ -374,7 +378,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             return _totalPages;
         }
 
-        public async Task<DonNhapHang> PermanentlyDeleteById(int id)
+        public async Task<DonNhapHang> PermanentlyDeleteById(string id)
         {
             var donNhapHangToDelete = await _context.DanhSachDonNhapHang.FirstOrDefaultAsync(x => x.MaDonNhapHang == id);
             _context.DanhSachDonNhapHang.Remove(donNhapHangToDelete);
@@ -382,7 +386,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             return donNhapHangToDelete;
         }
 
-        public async Task<DonNhapHang> RestoreById(int id)
+        public async Task<DonNhapHang> RestoreById(string id)
         {
             var donNhapHangToRestoreById = await _context.DanhSachDonNhapHang.FirstOrDefaultAsync(x => x.MaDonNhapHang == id);
             donNhapHangToRestoreById.DaXoa = 0;
@@ -392,7 +396,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             return donNhapHangToRestoreById;
         }
 
-        public async Task<DonNhapHang> TemporarilyDeleteById(int id)
+        public async Task<DonNhapHang> TemporarilyDeleteById(string id)
         {
             var donNhapHangToTemporarilyDeleteById = await _context.DanhSachDonNhapHang.FirstOrDefaultAsync(x => x.MaDonNhapHang == id);
             donNhapHangToTemporarilyDeleteById.DaXoa = 1;
@@ -402,7 +406,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             return donNhapHangToTemporarilyDeleteById;
         }
 
-        public async Task<DonNhapHang> UpdateById(int id, DonNhapHangForUpdateDto donNhapHang)
+        public async Task<DonNhapHang> UpdateById(string id, DonNhapHangForUpdateDto donNhapHang)
         {
             var oldRecord = await _context.DanhSachDonNhapHang.AsNoTracking().FirstOrDefaultAsync(x => x.MaDonNhapHang == id);
             var donNhapHangToUpdateById = new DonNhapHang

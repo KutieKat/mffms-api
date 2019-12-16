@@ -17,6 +17,21 @@ namespace MFFMS.API.Data.DichVuRepository
         private int _totalItems;
         private int _totalPages;
 
+        private string GenerateId()
+        {
+            int count = _context.DanhSachDichVu.Count() + 1;
+            string tempId = count.ToString();
+            string currentYear = DateTime.Now.ToString("yy");
+
+            while (tempId.Length < 4)
+            {
+                tempId = "0" + tempId;
+            }
+
+            tempId = "DV" + currentYear + tempId;
+
+            return tempId;
+        }
         public DichVuRepository(DataContext context)
         {
             _context = context;
@@ -25,20 +40,9 @@ namespace MFFMS.API.Data.DichVuRepository
         }
         public async Task<DichVu> Create(DichVuForCreateDto dichVu)
         {
-            var danhSachDichVu = await _context.DanhSachDichVu.OrderByDescending(x => x.MaDichVu).FirstOrDefaultAsync();
-            var maDichVu = 1;
-            if(danhSachDichVu == null)
-            {
-                maDichVu = 1;
-            }
-            else
-            {
-                maDichVu = danhSachDichVu.MaDichVu + 1;
-            }
-
             var newDichVu = new DichVu
             {
-                MaDichVu = maDichVu,
+                MaDichVu = GenerateId(),
                 TenDichVu = dichVu.TenDichVu,
                 DonGia = dichVu.DonGia,
                 DVT = dichVu.DVT,
@@ -87,7 +91,7 @@ namespace MFFMS.API.Data.DichVuRepository
                 result = result.Where(x => x.TrangThai == trangThai);
             }
 
-            if(daXoa == 0 || daXoa == 1)
+            if (daXoa == 0 || daXoa == 1)
             {
                 result = result.Where(x => x.DaXoa == daXoa);
             }
@@ -185,7 +189,7 @@ namespace MFFMS.API.Data.DichVuRepository
             return await PagedList<DichVu>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<DichVu> GetById(int id)
+        public async Task<DichVu> GetById(string id)
         {
             var result = await _context.DanhSachDichVu.FirstOrDefaultAsync(x => x.MaDichVu == id);
             return result;
@@ -328,7 +332,7 @@ namespace MFFMS.API.Data.DichVuRepository
             return _totalPages;
         }
 
-        public async Task<DichVu> PermanentlyDeleteById(int id)
+        public async Task<DichVu> PermanentlyDeleteById(string id)
         {
             var dichVuToDelete = await _context.DanhSachDichVu.FirstOrDefaultAsync(x => x.MaDichVu == id);
 
@@ -338,7 +342,7 @@ namespace MFFMS.API.Data.DichVuRepository
             return dichVuToDelete;
         }
 
-        public async Task<DichVu> RestoreById(int id)
+        public async Task<DichVu> RestoreById(string id)
         {
             var dichVuToRestoreById = await _context.DanhSachDichVu.FirstOrDefaultAsync(x => x.MaDichVu == id);
 
@@ -350,7 +354,7 @@ namespace MFFMS.API.Data.DichVuRepository
             return dichVuToRestoreById;
         }
 
-        public async Task<DichVu> TemporarilyDeleteById(int id)
+        public async Task<DichVu> TemporarilyDeleteById(string id)
         {
             var dichVuToTemporarilyDeleteById = await _context.DanhSachDichVu.FirstOrDefaultAsync(x => x.MaDichVu == id);
 
@@ -362,7 +366,7 @@ namespace MFFMS.API.Data.DichVuRepository
             return dichVuToTemporarilyDeleteById;
         }
 
-        public async Task<DichVu> UpdateById(int id, DichVuForUpdateDto dichVu)
+        public async Task<DichVu> UpdateById(string id, DichVuForUpdateDto dichVu)
         {
             var oldRecord = await _context.DanhSachDichVu.AsNoTracking().FirstOrDefaultAsync(x => x.MaDichVu == id);
             var dichVuToUpdate = new DichVu
@@ -384,7 +388,7 @@ namespace MFFMS.API.Data.DichVuRepository
 
         public ValidationResultDto ValidateBeforeCreate(DichVuForCreateDto dichVu)
         {
-            var totalTenDichVu = _context.DanhSachDichVu.Count(x=>x.TenDichVu == dichVu.TenDichVu);
+            var totalTenDichVu = _context.DanhSachDichVu.Count(x => x.TenDichVu == dichVu.TenDichVu);
             IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
 
             if (totalTenDichVu >= 1)
@@ -406,12 +410,12 @@ namespace MFFMS.API.Data.DichVuRepository
             }
         }
 
-        public ValidationResultDto ValidateBeforeUpdate(int id, DichVuForUpdateDto dichVu)
+        public ValidationResultDto ValidateBeforeUpdate(string id, DichVuForUpdateDto dichVu)
         {
             var totalTenDichVu = _context.DanhSachDichVu.Count(x => x.MaDichVu != id && x.TenDichVu == dichVu.TenDichVu);
             IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
 
-            if(totalTenDichVu > 0)
+            if (totalTenDichVu > 0)
             {
                 Errors.Add("tenDichVu", new string[] { "tenDichVu is duplicated!" });
 

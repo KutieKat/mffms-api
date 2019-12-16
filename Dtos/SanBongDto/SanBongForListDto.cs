@@ -7,7 +7,7 @@ namespace MFFMS.API.Dtos.SanBongDto
 {
     public class SanBongForListDto : BaseDto
     {
-        public int MaSanBong { get; set; }
+        public string MaSanBong { get; set; }
         public string TenSanBong { get; set; }
         public double ChieuRong { get; set; }
         public double ChieuDai { get; set; }

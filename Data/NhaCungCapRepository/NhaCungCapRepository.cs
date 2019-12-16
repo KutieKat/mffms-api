@@ -26,20 +26,9 @@ namespace MFFMS.API.Data.NhaCungCapRepository
 
         public async Task<NhaCungCap> Create(NhaCungCapForCreateDto nhaCungCap)
         {
-            var danhSachNhaCungCap = await _context.DanhSachNhaCungCap.OrderByDescending(x => x.MaNhaCungCap).FirstOrDefaultAsync();
-            var maNhaCungCap = 1;
-            if (danhSachNhaCungCap == null)
-            {
-                maNhaCungCap = 1;
-            }
-            else
-            {
-                maNhaCungCap = danhSachNhaCungCap.MaNhaCungCap + 1;
-            }
-
             var newNhaCungCap = new NhaCungCap
             {
-                MaNhaCungCap = maNhaCungCap,
+                MaNhaCungCap = GenerateId(),
                 TenNhaCungCap = nhaCungCap.TenNhaCungCap,
                 SoDienThoai = nhaCungCap.SoDienThoai,
                 DiaChi = nhaCungCap.DiaChi,
@@ -183,7 +172,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             };
         }
 
-        public async Task<NhaCungCap> GetById(int id)
+        public async Task<NhaCungCap> GetById(string id)
         {
             var result = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
             return result;
@@ -302,7 +291,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             return _totalPages;
         }
 
-        public async Task<NhaCungCap> PermanentlyDeleteById(int id)
+        public async Task<NhaCungCap> PermanentlyDeleteById(string id)
         {
             var nhaCungCapToDelete = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
 
@@ -312,7 +301,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             return nhaCungCapToDelete;
         }
 
-        public async Task<NhaCungCap> RestoreById(int id)
+        public async Task<NhaCungCap> RestoreById(string id)
         {
             var nhaCungCapToRestoreById = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
 
@@ -325,7 +314,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             return nhaCungCapToRestoreById;
         }
 
-        public async Task<NhaCungCap> TemporarilyDeleteById(int id)
+        public async Task<NhaCungCap> TemporarilyDeleteById(string id)
         {
             var nhaCungCapTemporarilyDeleteById = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
 
@@ -338,7 +327,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             return nhaCungCapTemporarilyDeleteById;
         }
 
-        public async Task<NhaCungCap> UpdateById(int id, NhaCungCapForUpdateDto nhaCungCap)
+        public async Task<NhaCungCap> UpdateById(string id, NhaCungCapForUpdateDto nhaCungCap)
         {
             var oldRecord = await _context.DanhSachNhaCungCap.AsNoTracking().FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
             var nhaCungCapToUpdate = new NhaCungCap
@@ -382,7 +371,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             }
         }
 
-        public ValidationResultDto ValidateBeforeUpdate(int id, NhaCungCapForUpdateDto nhaCungCap)
+        public ValidationResultDto ValidateBeforeUpdate(string id, NhaCungCapForUpdateDto nhaCungCap)
         {
             var totalTenNhaCungCap = _context.DanhSachNhaCungCap.Count(x => x.MaNhaCungCap != id && x.TenNhaCungCap.ToLower() == nhaCungCap.TenNhaCungCap.ToLower());
             IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
@@ -405,6 +394,22 @@ namespace MFFMS.API.Data.NhaCungCapRepository
                 };
             }
 
+        }
+
+        private string GenerateId()
+        {
+            int count = _context.DanhSachNhaCungCap.Count() + 1;
+            string tempId = count.ToString();
+            string currentYear = DateTime.Now.ToString("yy");
+
+            while (tempId.Length < 4)
+            {
+                tempId = "0" + tempId;
+            }
+
+            tempId = "NCC" + currentYear + tempId;
+
+            return tempId;
         }
 
     }
