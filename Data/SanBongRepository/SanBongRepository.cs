@@ -25,20 +25,11 @@ namespace MFFMS.API.Data.SanBongRepository
         }
         public async Task<SanBong> Create(SanBongForCreateDto sanBong)
         {
-            var danhSachSanBong = await _context.DanhSachSanBong.OrderByDescending(x => x.MaSanBong).FirstOrDefaultAsync();
-            var maSanBong = 1;
-            if(danhSachSanBong == null)
-            {
-                maSanBong = 1;
-            }
-            else
-            {
-                maSanBong = danhSachSanBong.MaSanBong + 1;
-            }
+            
 
             var newSanBong = new SanBong
             {
-                MaSanBong = maSanBong,
+                MaSanBong = GenerateId(),
                 TenSanBong = sanBong.TenSanBong,
                 ChieuDai = sanBong.ChieuDai,
                 ChieuRong = sanBong.ChieuRong,
@@ -70,7 +61,7 @@ namespace MFFMS.API.Data.SanBongRepository
 
             if (!string.IsNullOrEmpty(keyword))
             {
-                result = result.Where(x => x.TenSanBong.ToLower().Contains(keyword.ToLower()) ||  x.MaSanBong.ToString() == keyword);
+                result = result.Where(x => x.TenSanBong.ToLower().Contains(keyword.ToLower()) ||  x.MaSanBong == keyword);
             }
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
@@ -197,7 +188,7 @@ namespace MFFMS.API.Data.SanBongRepository
             return await PagedList<SanBong>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<SanBong> GetById(int id)
+        public async Task<SanBong> GetById(string id)
         {
             var result = await _context.DanhSachSanBong.FirstOrDefaultAsync(x => x.MaSanBong == id);
             return result;
@@ -350,7 +341,7 @@ namespace MFFMS.API.Data.SanBongRepository
             return _totalPages;
         }
 
-        public async Task<SanBong> PermanentlyDeleteById(int id)
+        public async Task<SanBong> PermanentlyDeleteById(string id)
         {
             var sanBongToDelete = await _context.DanhSachSanBong.FirstOrDefaultAsync(x => x.MaSanBong == id);
 
@@ -360,7 +351,7 @@ namespace MFFMS.API.Data.SanBongRepository
             return sanBongToDelete;
         }
 
-        public async Task<SanBong> RestoreById(int id)
+        public async Task<SanBong> RestoreById(string id)
         {
             var sanBongToRestoreById = await _context.DanhSachSanBong.FirstOrDefaultAsync(x => x.MaSanBong == id);
 
@@ -373,7 +364,7 @@ namespace MFFMS.API.Data.SanBongRepository
             return sanBongToRestoreById;
         }
 
-        public async Task<SanBong> TemporarilyDeleteById(int id)
+        public async Task<SanBong> TemporarilyDeleteById(string id)
         {
             var sanBongToTemporarilyDeleteById = await _context.DanhSachSanBong.FirstOrDefaultAsync(x => x.MaSanBong == id);
 
@@ -386,7 +377,7 @@ namespace MFFMS.API.Data.SanBongRepository
             return sanBongToTemporarilyDeleteById;
         }
 
-        public async Task<SanBong> UpdateById(int id, SanBongForUpdateDto sanBong)
+        public async Task<SanBong> UpdateById(string id, SanBongForUpdateDto sanBong)
         {
             var oldRecord = await _context.DanhSachSanBong.AsNoTracking().FirstOrDefaultAsync(x => x.MaSanBong == id);
             var sanBongToUpdate = new SanBong
@@ -432,7 +423,7 @@ namespace MFFMS.API.Data.SanBongRepository
             }
         }
 
-        public ValidationResultDto ValidateBeforeUpdate(int id, SanBongForUpdateDto sanBong)
+        public ValidationResultDto ValidateBeforeUpdate(string id, SanBongForUpdateDto sanBong)
         {
             var totalTenSanBong = _context.DanhSachSanBong.Count(x => (x.MaSanBong != id) && (x.TenSanBong.ToLower() == sanBong.TenSanBong.ToLower()));
             IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
@@ -455,6 +446,22 @@ namespace MFFMS.API.Data.SanBongRepository
                 };
             }
 
+        }
+
+        private string GenerateId()
+        {
+            int count = _context.DanhSachSanBong.Count() + 1;
+            string tempId = count.ToString();
+            string currentYear = DateTime.Now.ToString("yy");
+
+            while (tempId.Length < 4)
+            {
+                tempId = "0" + tempId;
+            }
+
+            tempId = "SB" + currentYear + tempId;
+
+            return tempId;
         }
     }
 }

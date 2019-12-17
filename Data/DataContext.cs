@@ -63,14 +63,12 @@ namespace MFFMS.API.Data
             modelBuilder.Entity<NhaCungCap>().HasIndex(x => x.SoDienThoai).IsUnique();
             modelBuilder.Entity<NhaCungCap>().Property(x => x.SoDienThoai).IsRequired();
 
-            modelBuilder.Entity<TaiSanThietBi>().HasIndex(x => x.TenTSTB).IsUnique();
+            modelBuilder.Entity<TaiSanThietBi>().HasIndex(x => x.TenTSTB).IsUnique();   
             modelBuilder.Entity<TaiSanThietBi>().Property(x => x.TenTSTB).IsRequired();
 
-            modelBuilder.Entity<ChiTietPhieuDatSan>().HasIndex(x => x.ThoiGianBatDau).IsUnique();
             modelBuilder.Entity<ChiTietPhieuDatSan>().Property(x => x.ThoiGianBatDau).IsRequired();
-            modelBuilder.Entity<ChiTietPhieuDatSan>().HasIndex(x => x.ThoiGianKetThuc).IsUnique();
             modelBuilder.Entity<ChiTietPhieuDatSan>().Property(x => x.ThoiGianKetThuc).IsRequired();
-
+            modelBuilder.Entity<ChiTietPhieuDatSan>().HasIndex(x => new { x.MaSanBong, x.ThoiGianBatDau }).IsUnique();
             //Relationships
             
 

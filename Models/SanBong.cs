@@ -9,7 +9,7 @@ namespace MFFMS.API.Models
     public class SanBong : BaseModel
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int MaSanBong { get; set; }
+        public string MaSanBong { get; set; }
         public string TenSanBong { get; set; }
         public double ChieuDai { get; set; }
         public double ChieuRong { get; set; }

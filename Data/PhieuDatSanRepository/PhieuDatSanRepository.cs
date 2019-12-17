@@ -45,7 +45,7 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
                 TongTien = phieuDatSan.TongTien,
                 ThoiGianCapNhat = DateTime.Now,
                 ThoiGianTao = DateTime.Now,
-                TrangThai = 1,
+                TrangThai = 0,
                 DaXoa = 0
             };
 
@@ -53,6 +53,9 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
             await _context.SaveChangesAsync();
             return newPhieuDatSan;
         }
+
+       
+        
 
         public async Task<PagedList<PhieuDatSan>> GetAll(PhieuDatSanParams userParams)
         {

@@ -15,6 +15,7 @@ using MFFMS.API.Dtos.ChiTietHDDVDto;
 using MFFMS.API.Dtos.DonNhapHangDto;
 using MFFMS.API.Dtos.ChiTietDonNhapHangDto;
 using MFFMS.API.Dtos.PhieuDatSanDto;
+using MFFMS.API.Dtos.ChiTietPhieuDatSanDto;
 
 namespace MFFMS.API.Helpers
 {
@@ -32,6 +33,8 @@ namespace MFFMS.API.Helpers
             CreateMapForChiTietHoaDonDichVu();
             CreateMapForDonNhapHang();
             CreateMapForChiTietDonNhapHang();
+            CreateMapForPhieuDatSan();
+            CreateMapForChiTietPhieuDatSan();
         }
 
         private void CreateMapForTaiKhoan()
@@ -143,5 +146,17 @@ namespace MFFMS.API.Helpers
             CreateMap<PhieuDatSanForCreateDto, PhieuDatSan>();
             CreateMap<PhieuDatSanForUpdateDto, PhieuDatSan>();
         }
+
+        private void CreateMapForChiTietPhieuDatSan()
+        {
+            CreateMap<ChiTietPhieuDatSan, ChiTietPhieuDatSanForCreateDto>();
+            CreateMap<ChiTietPhieuDatSan, ChiTietPhieuDatSanForUpdateDto>();
+            CreateMap<ChiTietPhieuDatSan, ChiTietPhieuDatSanForViewDto>();
+            CreateMap<ChiTietPhieuDatSan, ChiTietPhieuDatSanForListDto>();
+            CreateMap<ChiTietPhieuDatSanForCreateDto, ChiTietPhieuDatSan>();
+            CreateMap<ChiTietPhieuDatSanForUpdateDto, ChiTietPhieuDatSan>();
+        }
+
+
     }
 }
