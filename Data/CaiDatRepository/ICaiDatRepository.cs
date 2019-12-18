@@ -7,7 +7,7 @@ namespace MFFMS.API.Data.CaiDatRepository
     public interface ICaiDatRepository
     {
         Task<CaiDat> GetAll();
-        Task<CaiDat> UpdateById(int id, CaiDatForUpdateDto caiDat);
+        Task<CaiDat> UpdateById(string id, CaiDatForUpdateDto caiDat);
         Task<CaiDat> Restore();
     }
 }

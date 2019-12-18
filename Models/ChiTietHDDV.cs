@@ -8,10 +8,12 @@ namespace MFFMS.API.Models
 {
     public class ChiTietHDDV : BaseModel
     {
-        public int SoHDDV { get; set; }
+        public string SoHDDV { get; set; }
         public HoaDonDichVu HoaDonDichVu { get; set; }
-        public int MaDichVu { get; set; }
-        public DichVu DichVu { get; set; }
+        public string MaDichVu { get; set; }
+        public DichVu DichVu { get; set;}
+        public double DonGia{get;set;}
+        public double ThanhTien{get;set;}
         public int SoLuong { get; set; }
     }
 }

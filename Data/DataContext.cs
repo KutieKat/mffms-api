@@ -70,8 +70,6 @@ namespace MFFMS.API.Data
             modelBuilder.Entity<ChiTietPhieuDatSan>().Property(x => x.ThoiGianKetThuc).IsRequired();
             modelBuilder.Entity<ChiTietPhieuDatSan>().HasIndex(x => new { x.MaSanBong, x.ThoiGianBatDau }).IsUnique();
             //Relationships
-            
-
             modelBuilder.Entity<HoaDonDichVu>()
                 .HasOne(x => x.KhachHang)
                 .WithMany(x => x.HoaDonDichVu)
@@ -89,7 +87,6 @@ namespace MFFMS.API.Data
                 .HasOne(x => x.HoaDonDichVu)
                 .WithMany(x => x.ChiTietHDDV)
                 .IsRequired();
-
 
             modelBuilder.Entity<TaiSanThietBi>()
                 .HasOne(x => x.NhaCungCap)

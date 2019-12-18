@@ -9,11 +9,15 @@ namespace MFFMS.API.Dtos.ChiTietHDDVDto
     public class ChiTietHDDVForCreateMultipleDto : BaseDto
     {
         [Required]
-        public int SoHDDV { get; set; }
+        public string SoHDDV { get; set; }
         [Required]
-        public int MaDichVu { get; set; }
+        public string MaDichVu { get; set; }
         [Required]
         public int SoLuong { get; set; }
+        [Required]
+        public double DonGia{get;set;}
+        [Required]
+        public double ThanhTien{get;set;}
 
         public override string ToString()
         {

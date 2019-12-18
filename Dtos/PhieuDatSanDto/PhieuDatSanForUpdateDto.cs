@@ -13,6 +13,6 @@ namespace MFFMS.API.Dtos.PhieuDatSanDto
         [Required]
         public string MaNhanVien { get; set; }
         [Required]
-        public decimal TongTien { get; set; }
+        public double TongTien { get; set; }
     }
 }

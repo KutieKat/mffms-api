@@ -11,5 +11,7 @@ namespace MFFMS.API.Dtos.ChiTietHDDVDto
         public HoaDonDichVu HoaDonDichVu { get; set; }
         public DichVu DichVu { get; set; }
         public int SoLuong { get; set; }
+        public double DonGia{get;set;}
+        public double ThanhTien{get;set;}
     }
 }

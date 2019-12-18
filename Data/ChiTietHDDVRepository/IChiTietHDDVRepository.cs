@@ -13,12 +13,12 @@ namespace MFFMS.API.Data.ChiTietHDDVRepository
     public interface IChiTietHDDVRepository
     {
         Task<PagedList<ChiTietHDDV>> GetAll(ChiTietHDDVParams userParams);
-        Task<ChiTietHDDV> GetById(int soHDDV, int maDichVu);
+        Task<ChiTietHDDV> GetById(string soHDDV, string maDichVu);
         Task<ChiTietHDDV> Create(ChiTietHDDVForCreateDto chiTietHDDV);
-        Task<ChiTietHDDV> UpdateById(int soHDDV, int maDichVu, ChiTietHDDVForUpdateDto chiTietHDDV);
-        Task<ChiTietHDDV> TemporarilyDeleteById(int soHDDV, int maDichVu);
-        Task<ChiTietHDDV> RestoreById(int soHDDV, int maDichVu);
-        Task<ChiTietHDDV> PermanentlyDeleteById(int soHDDV, int maDichVu);
+        Task<ChiTietHDDV> UpdateById(string soHDDV, string maDichVu, ChiTietHDDVForUpdateDto chiTietHDDV);
+        Task<ChiTietHDDV> TemporarilyDeleteById(string soHDDV, string maDichVu);
+        Task<ChiTietHDDV> RestoreById(string soHDDV, string maDichVu);
+        Task<ChiTietHDDV> PermanentlyDeleteById(string soHDDV, string maDichVu);
         int GetTotalPages();
         int GetTotalItems();
         Object GetStatusStatistics(ChiTietHDDVParams userParams);

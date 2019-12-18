@@ -9,13 +9,13 @@ namespace MFFMS.API.Dtos.ChiTietDonNhapHangDto
     public class ChiTietDonNhapHangForCreateMultiple : BaseDto
     {
         [Required]
-        public int MaDonNhapHang { get; set; }
+        public string MaDonNhapHang { get; set; }
         [Required]
-        public int MaTSTB { get; set; }
+        public string MaTSTB { get; set; }
         [Required]
         public int SoLuong { get; set; }
         [Required]
-        public decimal DonGia { get; set; }
+        public double DonGia { get; set; }
         [Required]
         public string DVT { get; set; }
 

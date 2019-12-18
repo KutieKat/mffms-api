@@ -11,7 +11,7 @@ namespace MFFMS.API.Dtos.ChiTietDonNhapHangDto
         public DonNhapHang DonNhapHang { get; set; }
         public TaiSanThietBi TaiSanThietBi { get; set; }
         public int SoLuong { get; set; }
-        public decimal DonGia { get; set; }
+        public double DonGia { get; set; }
         public string DVT { get; set; }
     }
 }

@@ -55,31 +55,77 @@ namespace MFFMS.API.Data.NhanVienRepository
             var result = _context.DanhSachNhanVien.AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
-            var keyword = userParams.Keyword;
+
+            var maNhanVien = userParams.MaNhanVien;
+            var tenNhanVien = userParams.TenNhanVien;
+            var gioiTinh = userParams.GioiTinh;
+            var ngaySinhBatDau = userParams.NgaySinhBatDau;
+            var ngaySinhKetThuc = userParams.NgaySinhKetThuc;
+            var chucVu = userParams.ChucVu;
+            var soDienThoai = userParams.SoDienThoai;
+            var soCMND = userParams.SoCMND;
+            var luongBatDau = userParams.LuongBatDau;
+            var luongKetThuc = userParams.LuongKetThuc;
+            var ghiChu = userParams.GhiChu;
+            var diaChi = userParams.DiaChi;
+
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
-            var ngaySinhBatDau = userParams.NgaySinhBatDau;
-            var ngaySinhKetThuc = userParams.NgaySinhKetThuc;
-            var chucVu = userParams.ChucVu;
             var daXoa = userParams.DaXoa;
 
-            if (!string.IsNullOrEmpty(keyword))
+            // NhanVien
+
+            if (!string.IsNullOrEmpty(maNhanVien))
             {
-                result = result.Where(x => x.TenNhanVien.ToLower().Contains(keyword.ToLower()) ||
-                                           x.DiaChi.ToLower().Contains(keyword.ToLower()) ||
-                                           x.MaNhanVien.ToLower().Contains(keyword.ToLower()) ||
-                                           x.SoDienThoai.ToLower().Contains(keyword.ToLower()) ||
-                                           x.DiaChi.ToLower().Contains(keyword.ToLower()) ||
-                                           x.GioiTinh.ToLower().Contains(keyword.ToLower()));
+                result = result.Where(x => x.MaNhanVien.ToLower().Contains(maNhanVien.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(tenNhanVien))
+            {
+                result = result.Where(x => x.TenNhanVien.ToLower().Contains(tenNhanVien.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(gioiTinh))
+            {
+                result = result.Where(x => x.GioiTinh.ToLower().Contains(gioiTinh.ToLower()));
+            }
+
+            if (ngaySinhBatDau.GetHashCode() != 0 && ngaySinhKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.NgaySinh >= ngaySinhBatDau && x.NgaySinh <= ngaySinhKetThuc);
             }
 
             if (!string.IsNullOrEmpty(chucVu))
             {
                 result = result.Where(x => x.ChucVu.ToLower().Contains(chucVu.ToLower()));
             }
+
+            if (!string.IsNullOrEmpty(soDienThoai))
+            {
+                result = result.Where(x => x.SoDienThoai.ToLower().Contains(soDienThoai.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(soCMND))
+            {
+                result = result.Where(x => x.SoCMND.ToLower().Contains(soCMND.ToLower()));
+            }
+
+            result = result.Where(x => x.Luong >= luongBatDau && x.Luong <= luongKetThuc);
+
+            if (!string.IsNullOrEmpty(ghiChu))
+            {
+                result = result.Where(x => x.GhiChu.ToLower().Contains(ghiChu.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(diaChi))
+            {
+                result = result.Where(x => x.DiaChi.ToLower().Contains(diaChi.ToLower()));
+            }
+
+            // Base
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
             {
@@ -96,12 +142,7 @@ namespace MFFMS.API.Data.NhanVienRepository
                 result = result.Where(x => x.TrangThai == trangThai);
             }
 
-            if (ngaySinhBatDau.GetHashCode() != 0 && ngaySinhKetThuc.GetHashCode() != 0)
-            {
-                result = result.Where(x => x.NgaySinh >= ngaySinhBatDau && x.NgaySinh <= ngaySinhKetThuc);
-            }
-
-            if(daXoa == 1 || daXoa == 0)
+            if (daXoa == 1 || daXoa == 0)
             {
                 result = result.Where(x => x.DaXoa == daXoa);
             }
@@ -599,19 +640,55 @@ namespace MFFMS.API.Data.NhanVienRepository
         public async Task<Object> GetGeneralStatistics (NhanVienStatisticsParams userParams)
         {
             var result = _context.DanhSachNhanVien.AsQueryable();
-            double totalSalary = 0;
-            var totalQuantity = 0;
+            var totalQuantity = 0;      // tổng số lượng nhân viên
+            var totalAllSalary = 0.0 ;  // tổng lương cho toàn bộ nhân viên
 
+            var totalManageQuantity =0;  // tổng số lượng nhân viên quản lý
+            var totalManageSalary = 0.0; // tổng lương cho nhân viên quản lý
+            var avgManageSalary =0.0;    // lương trung bình cho nhân viên quản lý
+            var minManageSalary =0.0;    // lương thấp nhất cho nhân viên quản lý   
+            var maxManageSalary =0.0;    // lương cao nhất cho nhân viên quản lý
+
+            var totalServiceQuantity =0; // tổng số lượng nhân viên phục vụ
+            var totalServiceSalary =0.0; // tổng lương cho nhân viên phục vụ
+            var avgServiceSalary =0.0;   // lương trung bình cho nhân viên phục vụ
+            var minServiceSalary = 0.0;  // lương thấp nhất cho nhân viên phục vụ
+            var maxServiceSalary = 0.0;  // lương cao nhất cho nhân viên phục vụ         
+            
             if (userParams != null && userParams.StartingTime.GetHashCode() != 0 && userParams.EndingTime.GetHashCode() != 0)
             {
                 totalQuantity = result.Count();
-                totalSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Sum(x=>x.Luong);
+                totalAllSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Sum(x =>x.Luong);
+
+                totalManageQuantity = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Người quản lý").Count();
+                totalManageSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Người quản lý").Sum(x =>x.Luong);
+                avgManageSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Người quản lý").Average(x =>x.Luong);
+                minManageSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Người quản lý").Min(x =>x.Luong);
+                maxManageSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Người quản lý").Max(x =>x.Luong);
+
+                totalServiceQuantity = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Nhân viên").Count();
+                totalServiceSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Nhân viên").Sum(x =>x.Luong);
+                avgServiceSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Nhân viên").Average(x =>x.Luong);
+                minServiceSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Nhân viên").Min(x =>x.Luong);
+                maxServiceSalary = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.ChucVu=="Nhân viên").Max(x =>x.Luong);
             }
             else
-            {
-               
+            {               
                 totalQuantity = result.Count();
-                totalSalary = result.Sum(x=>x.Luong);
+                totalAllSalary = result.Sum(x=>x.Luong);
+
+                totalManageQuantity = result.Where(x=>x.ChucVu=="Người quản lý").Count();
+                totalManageSalary = result.Where(x=>x.ChucVu=="Người quản lý").Sum(x =>x.Luong);
+                avgManageSalary = result.Where(x=>x.ChucVu=="Người quản lý").Average(x =>x.Luong);
+                minManageSalary = result.Where(x=>x.ChucVu=="Người quản lý").Min(x =>x.Luong);
+                maxManageSalary = result.Where(x=>x.ChucVu=="Người quản lý").Max(x =>x.Luong);
+
+                totalServiceQuantity = result.Where(x=>x.ChucVu=="Nhân viên").Count();
+                totalServiceSalary = result.Where(x=>x.ChucVu=="Nhân viên").Sum(x =>x.Luong);
+                avgServiceSalary = result.Where(x=>x.ChucVu=="Nhân viên").Average(x =>x.Luong);
+                minServiceSalary = result.Where(x=>x.ChucVu=="Nhân viên").Min(x =>x.Luong);
+                maxServiceSalary = result.Where(x=>x.ChucVu=="Nhân viên").Max(x =>x.Luong);
+                
             }
 
             return new
@@ -619,7 +696,17 @@ namespace MFFMS.API.Data.NhanVienRepository
                 generalEmployee = new
                 {
                     TotalQuantity = totalQuantity,
-                    TotalSalary = totalSalary
+                    TotalAllSalary = totalAllSalary,
+                    TotalManageQuantity = totalManageQuantity,
+                    TotalManageSalary = totalManageSalary,
+                    AvgManageSalary = avgManageSalary,
+                    MinManageSalary = minManageSalary,
+                    MaxManageSalary = maxManageSalary,
+                    TotalServiceQuantity = totalServiceQuantity,
+                    TotalServiceSalary = totalServiceSalary,
+                    AvgServiceSalary = avgServiceSalary, 
+                    MinServiceSalary = minServiceSalary,
+                    MaxServiceSalary = maxServiceSalary,
                 }
             };
         }

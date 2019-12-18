@@ -22,27 +22,30 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             _totalItems = 0;
             _totalPages = 0;
         }
+        private string GenerateId()
+        {
+            int count = _context.DanhSachDonNhapHang.Count() + 1;
+            string tempId = count.ToString();
+            string currentYear = DateTime.Now.ToString("yy");
+ 
+            while (tempId.Length < 4)
+            {
+                tempId = "0" + tempId;
+            }
+ 
+            tempId = "DNH" + currentYear + tempId;
+ 
+            return tempId;
+        }
 
         public async Task<DonNhapHang> Create(DonNhapHangForCreateDto donNhapHang)
         {
-            var danhSachDonNhapHang = await _context.DanhSachDonNhapHang.OrderByDescending(x=>x.MaDonNhapHang).FirstOrDefaultAsync();
-            var maDonNhapHang = 1;
-            if(danhSachDonNhapHang == null)
-            {
-                maDonNhapHang = 1;
-            }
-            else
-            {
-                maDonNhapHang = danhSachDonNhapHang.MaDonNhapHang + 1;
-            }
-
             var newDonNhapHang = new DonNhapHang
             {
-                MaDonNhapHang = maDonNhapHang,
+                MaDonNhapHang = GenerateId(),
                 MaNhaCungCap = donNhapHang.MaNhaCungCap,
                 MaNhanVien = donNhapHang.MaNhanVien,
                 NgayGiaoHang = donNhapHang.NgayGiaoHang,
-                NoiNhanHang = donNhapHang.NoiNhanHang,
                 ThoiGianCapNhat = DateTime.Now,
                 ThoiGianTao = DateTime.Now,
                 TrangThai = 1,
@@ -59,21 +62,46 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             var result = _context.DanhSachDonNhapHang.Include(x=>x.NhaCungCap).Include(x=>x.NhanVien).AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
-            var keyword = userParams.Keyword;
+            
+            var maDonNhapHang = userParams.MaDonNhapHang;
+            var maNhaCungCap = userParams.MaNhaCungCap;
+            var maNhanVien = userParams.MaNhanVien;
+            var ngayGiaoHangBatDau = userParams.NgayGiaoHangBatDau;
+            var ngayGiaoHangKetThuc = userParams.NgayGiaoHangKetThuc;
+
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
             var thoiGianCapNhatKetThuc = userParams.ThoiGianCapNhatKetThuc;
             var trangThai = userParams.TrangThai;
             var daXoa = userParams.DaXoa;
-            var ngayGiaoHangBatDau = userParams.NgayGiaoHangBatDau;
-            var ngayGiaoHangKetThuc = userParams.NgayGiaoHangKetThuc;
 
-            if (!string.IsNullOrEmpty(keyword))
+            // DonNhapHang 
+            if (!string.IsNullOrEmpty(maDonNhapHang))
             {
-                result = result.Where(x => x.NoiNhanHang.ToLower().Contains(keyword.ToLower()) || x.MaNhanVien.ToLower().Contains(keyword.ToLower())|| x.MaDonNhapHang.ToString() == keyword || x.MaDonNhapHang.ToString() == keyword);
+                result = result.Where(x => x.MaDonNhapHang.ToLower().Contains(maDonNhapHang.ToLower()));
             }
 
+            if (!string.IsNullOrEmpty(maNhaCungCap))
+            {
+                result = result.Where(x => x.MaNhaCungCap.ToLower().Contains(maNhaCungCap.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(maNhanVien))
+            {
+                result = result.Where(x => x.MaNhanVien.ToLower().Contains(maNhanVien.ToLower()));
+            }
+            if (!string.IsNullOrEmpty(maNhanVien))
+            {
+                result = result.Where(x => x.MaNhanVien.ToLower().Contains(maNhanVien.ToLower()));
+            }
+            
+            if (ngayGiaoHangBatDau.GetHashCode() != 0 && ngayGiaoHangKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.NgayGiaoHang >= ngayGiaoHangBatDau && x.NgayGiaoHang <= ngayGiaoHangKetThuc);
+            }
+
+            // Base 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.ThoiGianTao >= thoiGianTaoBatDau && x.ThoiGianTao <= thoiGianTaoKetThuc);
@@ -146,19 +174,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                         }
                         break;
 
-                    case "NoiNhanHang":
-                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
-                        {
-                            result = result.OrderBy(x => x.NoiNhanHang);
-                        }
-                        else
-                        {
-                            result = result.OrderByDescending(x => x.NoiNhanHang);
-                        }
-                        break;
-
-
-                    case "ThoiGianTao":
+                        case "ThoiGianTao":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
                             result = result.OrderBy(x => x.ThoiGianTao);
@@ -203,7 +219,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             return await PagedList<DonNhapHang>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<DonNhapHang> GetById(int id)
+        public async Task<DonNhapHang> GetById(string id)
         {
             var result = await _context.DanhSachDonNhapHang.Include(x => x.NhanVien).Include(x => x.NhaCungCap).FirstOrDefaultAsync(x => x.MaDonNhapHang == id);
             return result;
@@ -226,7 +242,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
 
             if (!string.IsNullOrEmpty(keyword))
             {
-                result = result.Where(x => x.NoiNhanHang.ToLower().Contains(keyword.ToLower()) || x.MaNhanVien.ToLower().Contains(keyword.ToLower()) || x.MaDonNhapHang.ToString() == keyword || x.MaDonNhapHang.ToString() == keyword);
+                result = result.Where(x => x.MaNhanVien.ToLower().Contains(keyword.ToLower()) || x.MaDonNhapHang.ToString() == keyword || x.MaDonNhapHang.ToString() == keyword);
             }
 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
@@ -300,18 +316,6 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                         }
                         break;
 
-                    case "NoiNhanHang":
-                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
-                        {
-                            result = result.OrderBy(x => x.NoiNhanHang);
-                        }
-                        else
-                        {
-                            result = result.OrderByDescending(x => x.NoiNhanHang);
-                        }
-                        break;
-
-
                     case "ThoiGianTao":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
@@ -374,7 +378,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             return _totalPages;
         }
 
-        public async Task<DonNhapHang> PermanentlyDeleteById(int id)
+        public async Task<DonNhapHang> PermanentlyDeleteById(string id)
         {
             var donNhapHangToDelete = await _context.DanhSachDonNhapHang.FirstOrDefaultAsync(x => x.MaDonNhapHang == id);
             _context.DanhSachDonNhapHang.Remove(donNhapHangToDelete);
@@ -382,7 +386,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             return donNhapHangToDelete;
         }
 
-        public async Task<DonNhapHang> RestoreById(int id)
+        public async Task<DonNhapHang> RestoreById(string id)
         {
             var donNhapHangToRestoreById = await _context.DanhSachDonNhapHang.FirstOrDefaultAsync(x => x.MaDonNhapHang == id);
             donNhapHangToRestoreById.DaXoa = 0;
@@ -392,7 +396,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             return donNhapHangToRestoreById;
         }
 
-        public async Task<DonNhapHang> TemporarilyDeleteById(int id)
+        public async Task<DonNhapHang> TemporarilyDeleteById(string id)
         {
             var donNhapHangToTemporarilyDeleteById = await _context.DanhSachDonNhapHang.FirstOrDefaultAsync(x => x.MaDonNhapHang == id);
             donNhapHangToTemporarilyDeleteById.DaXoa = 1;
@@ -402,7 +406,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             return donNhapHangToTemporarilyDeleteById;
         }
 
-        public async Task<DonNhapHang> UpdateById(int id, DonNhapHangForUpdateDto donNhapHang)
+        public async Task<DonNhapHang> UpdateById(string id, DonNhapHangForUpdateDto donNhapHang)
         {
             var oldRecord = await _context.DanhSachDonNhapHang.AsNoTracking().FirstOrDefaultAsync(x => x.MaDonNhapHang == id);
             var donNhapHangToUpdateById = new DonNhapHang
@@ -411,7 +415,6 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                 MaNhaCungCap = donNhapHang.MaNhaCungCap,
                 MaNhanVien = donNhapHang.MaNhanVien,
                 NgayGiaoHang = donNhapHang.NgayGiaoHang,
-                NoiNhanHang = donNhapHang.NoiNhanHang,
                 TrangThai = donNhapHang.TrangThai,
                 ThoiGianTao = oldRecord.ThoiGianTao,
                 DaXoa = oldRecord.DaXoa

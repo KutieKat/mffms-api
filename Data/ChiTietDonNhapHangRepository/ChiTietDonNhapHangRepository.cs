@@ -22,11 +22,26 @@ namespace MFFMS.API.Data.ChiTietDonNhapHangRepository
             _totalItems = 0;
             _totalPages = 0;
         }
+        private string GenerateId()
+        {
+            int count = _context.DanhSachChiTietDonNhapHang.Count() + 1;
+            string tempId = count.ToString();
+            string currentYear = DateTime.Now.ToString("yy");
+ 
+            while (tempId.Length < 4)
+            {
+                tempId = "0" + tempId;
+            }
+ 
+            tempId = "CTDNH" + currentYear + tempId;
+ 
+            return tempId;
+        }
         public async Task<ChiTietDonNhapHang> Create(ChiTietDonNhapHangForCreateDto chiTietDonNhapHang)
         {
             var newChiTietDonNhapHang = new ChiTietDonNhapHang
             {
-                MaDonNhapHang = chiTietDonNhapHang.MaDonNhapHang,
+                MaDonNhapHang = GenerateId(),
                 MaTSTB = chiTietDonNhapHang.MaTSTB,
                 SoLuong = chiTietDonNhapHang.SoLuong,
                 DVT = chiTietDonNhapHang.DVT,
@@ -206,7 +221,7 @@ namespace MFFMS.API.Data.ChiTietDonNhapHangRepository
                 return await PagedList<ChiTietDonNhapHang>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
             }
 
-        public async Task<ChiTietDonNhapHang> GetById(int maDonNhapHang, int maTSTB)
+        public async Task<ChiTietDonNhapHang> GetById(string maDonNhapHang, string maTSTB)
         {
             var result = await _context.DanhSachChiTietDonNhapHang
                 .Include(x => x.DonNhapHang)
@@ -371,7 +386,7 @@ namespace MFFMS.API.Data.ChiTietDonNhapHangRepository
             return _totalPages;
         }
 
-        public async Task<ChiTietDonNhapHang> PermanentlyDeleteById(int maDonNhapHang, int maTSTB)
+        public async Task<ChiTietDonNhapHang> PermanentlyDeleteById(string maDonNhapHang, string maTSTB)
         {
             var chiTietDonNhapHangToDelete = await _context.DanhSachChiTietDonNhapHang.FirstOrDefaultAsync(x => x.MaDonNhapHang == maDonNhapHang || x.MaTSTB == maTSTB);
 
@@ -381,7 +396,7 @@ namespace MFFMS.API.Data.ChiTietDonNhapHangRepository
             return chiTietDonNhapHangToDelete;
         }
 
-        public async Task<ChiTietDonNhapHang> RestoreById(int maDonNhapHang, int maTSTB)
+        public async Task<ChiTietDonNhapHang> RestoreById(string maDonNhapHang, string maTSTB)
         {
             var chiTietDonNhapHangToRestoreById = await _context.DanhSachChiTietDonNhapHang.FirstOrDefaultAsync(x => x.MaDonNhapHang == maDonNhapHang && x.MaTSTB == maTSTB);
 
@@ -393,7 +408,7 @@ namespace MFFMS.API.Data.ChiTietDonNhapHangRepository
             return chiTietDonNhapHangToRestoreById;
         }
 
-        public async Task<ChiTietDonNhapHang> TemporarilyDeleteById(int maDonNhapHang, int maTSTB)
+        public async Task<ChiTietDonNhapHang> TemporarilyDeleteById(string maDonNhapHang, string maTSTB)
         {
             var chiTietDonNhapHangToTemporarilyDeleteById = await _context.DanhSachChiTietDonNhapHang.FirstOrDefaultAsync(x => x.MaDonNhapHang == maDonNhapHang && x.MaTSTB == maTSTB);
 
@@ -405,7 +420,7 @@ namespace MFFMS.API.Data.ChiTietDonNhapHangRepository
             return chiTietDonNhapHangToTemporarilyDeleteById;
         }
 
-        public async Task<ChiTietDonNhapHang> UpdateById(int maDonNhapHang, int maTSTB, ChiTietDonNhapHangForUpdateDto chiTietDonNhapHang)
+        public async Task<ChiTietDonNhapHang> UpdateById(string maDonNhapHang, string maTSTB, ChiTietDonNhapHangForUpdateDto chiTietDonNhapHang)
         {
             var oldRecord = await _context.DanhSachChiTietDonNhapHang.AsNoTracking().FirstOrDefaultAsync(x => x.MaDonNhapHang == maDonNhapHang && x.MaTSTB == maTSTB);
             var chiTietDonNhapHangToUpdate = new ChiTietDonNhapHang
@@ -419,8 +434,6 @@ namespace MFFMS.API.Data.ChiTietDonNhapHangRepository
                 ThoiGianTao = oldRecord.ThoiGianTao,
                 ThoiGianCapNhat = DateTime.Now
             };
-
-
 
             _context.DanhSachChiTietDonNhapHang.Update(chiTietDonNhapHangToUpdate);
             await _context.SaveChangesAsync();

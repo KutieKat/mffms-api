@@ -7,10 +7,11 @@ namespace MFFMS.API.Models
 {
     public class CaiDat : BaseModel
     {
-        public int MaCaiDat { get; set; }
+        public string MaCaiDat { get; set; }
         public string TenSanBong { get; set; }
         public string DiaChi { get; set; }
         public string SoDienThoai {get;set;}
         public string Fax {get;set;}
+        public string DiaChiTrenPhieu{get;set;}
     }
 }

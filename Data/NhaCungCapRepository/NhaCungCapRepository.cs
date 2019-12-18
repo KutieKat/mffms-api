@@ -26,20 +26,9 @@ namespace MFFMS.API.Data.NhaCungCapRepository
 
         public async Task<NhaCungCap> Create(NhaCungCapForCreateDto nhaCungCap)
         {
-            var danhSachNhaCungCap = await _context.DanhSachNhaCungCap.OrderByDescending(x => x.MaNhaCungCap).FirstOrDefaultAsync();
-            var maNhaCungCap = 1;
-            if (danhSachNhaCungCap == null)
-            {
-                maNhaCungCap = 1;
-            }
-            else
-            {
-                maNhaCungCap = danhSachNhaCungCap.MaNhaCungCap + 1;
-            }
-
             var newNhaCungCap = new NhaCungCap
             {
-                MaNhaCungCap = maNhaCungCap,
+                MaNhaCungCap = GenerateId(),
                 TenNhaCungCap = nhaCungCap.TenNhaCungCap,
                 SoDienThoai = nhaCungCap.SoDienThoai,
                 DiaChi = nhaCungCap.DiaChi,
@@ -59,6 +48,13 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             var keyword = userParams.Keyword;
+
+            var maNhaCungCap = userParams.MaNhaCungCap;
+            var tenNhaCungCap = userParams.TenNhaCungCap;
+            var soDienThoai = userParams.SoDienThoai;
+            var diaChi = userParams.DiaChi;
+            var ghiChu = userParams.GhiChu;
+
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
@@ -66,11 +62,33 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             var trangThai = userParams.TrangThai;
             var daXoa = userParams.DaXoa;
 
-            if (!string.IsNullOrEmpty(keyword))
+            // Nha cung cap
+            if (!string.IsNullOrEmpty(maNhaCungCap))
             {
-                result = result.Where(x => x.TenNhaCungCap.ToLower().Contains(keyword.ToLower()) || x.MaNhaCungCap.ToString() == keyword);
+                result = result.Where(x => x.MaNhaCungCap.ToLower().Contains(maNhaCungCap.ToLower()));
             }
 
+            if (!string.IsNullOrEmpty(tenNhaCungCap))
+            {
+                result = result.Where(x => x.TenNhaCungCap.ToLower().Contains(tenNhaCungCap.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(soDienThoai))
+            {
+                result = result.Where(x => x.SoDienThoai.ToLower().Contains(soDienThoai.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(diaChi))
+            {
+                result = result.Where(x => x.DiaChi.ToLower().Contains(diaChi.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(ghiChu))
+            {
+                result = result.Where(x => x.GhiChu.ToLower().Contains(ghiChu.ToLower()));
+            }
+
+            // Base
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.ThoiGianTao >= thoiGianTaoBatDau && x.ThoiGianTao <= thoiGianTaoKetThuc);
@@ -172,7 +190,18 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             return await PagedList<NhaCungCap>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<NhaCungCap> GetById(int id)
+        public async Task<Object> GetGeneralStatistics(NhaCungCapStatisticsParams userParams)
+        {
+            var result = _context.DanhSachNhaCungCap.AsQueryable();
+            var totalProvider = result.Count();
+
+            return new
+            {
+                Total = totalProvider
+            };
+        }
+
+        public async Task<NhaCungCap> GetById(string id)
         {
             var result = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
             return result;
@@ -291,7 +320,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             return _totalPages;
         }
 
-        public async Task<NhaCungCap> PermanentlyDeleteById(int id)
+        public async Task<NhaCungCap> PermanentlyDeleteById(string id)
         {
             var nhaCungCapToDelete = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
 
@@ -301,7 +330,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             return nhaCungCapToDelete;
         }
 
-        public async Task<NhaCungCap> RestoreById(int id)
+        public async Task<NhaCungCap> RestoreById(string id)
         {
             var nhaCungCapToRestoreById = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
 
@@ -314,7 +343,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             return nhaCungCapToRestoreById;
         }
 
-        public async Task<NhaCungCap> TemporarilyDeleteById(int id)
+        public async Task<NhaCungCap> TemporarilyDeleteById(string id)
         {
             var nhaCungCapTemporarilyDeleteById = await _context.DanhSachNhaCungCap.FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
 
@@ -327,7 +356,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             return nhaCungCapTemporarilyDeleteById;
         }
 
-        public async Task<NhaCungCap> UpdateById(int id, NhaCungCapForUpdateDto nhaCungCap)
+        public async Task<NhaCungCap> UpdateById(string id, NhaCungCapForUpdateDto nhaCungCap)
         {
             var oldRecord = await _context.DanhSachNhaCungCap.AsNoTracking().FirstOrDefaultAsync(x => x.MaNhaCungCap == id);
             var nhaCungCapToUpdate = new NhaCungCap
@@ -371,7 +400,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
             }
         }
 
-        public ValidationResultDto ValidateBeforeUpdate(int id, NhaCungCapForUpdateDto nhaCungCap)
+        public ValidationResultDto ValidateBeforeUpdate(string id, NhaCungCapForUpdateDto nhaCungCap)
         {
             var totalTenNhaCungCap = _context.DanhSachNhaCungCap.Count(x => x.MaNhaCungCap != id && x.TenNhaCungCap.ToLower() == nhaCungCap.TenNhaCungCap.ToLower());
             IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
@@ -394,6 +423,22 @@ namespace MFFMS.API.Data.NhaCungCapRepository
                 };
             }
 
+        }
+
+        private string GenerateId()
+        {
+            int count = _context.DanhSachNhaCungCap.Count() + 1;
+            string tempId = count.ToString();
+            string currentYear = DateTime.Now.ToString("yy");
+
+            while (tempId.Length < 4)
+            {
+                tempId = "0" + tempId;
+            }
+
+            tempId = "NCC" + currentYear + tempId;
+
+            return tempId;
         }
 
     }
