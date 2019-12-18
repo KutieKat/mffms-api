@@ -200,6 +200,42 @@ namespace MFFMS.API.Data.TaiSanThietBiRepository
             return result;
         }
 
+        public async Task<Object> GetGeneralStatistics(TSTBGeneralStatisticsParams userParams)
+        {
+            var result = _context.DanhSachTaiSanThietBi.AsQueryable();
+            var totalTSTB  = 0;     // tổng số TSTB
+            var hoatDongTot = 0;    // tổng số TSTB đang hoạt động tốt
+            var dangSuaChua  = 0;   // tổng số TSTB đang sửa chửa
+            var dangBaoHanh  = 0;   // tổng số TSTB đang bảo hành
+            var daQuaSuDung  = 0;   // tổng số TSTB đã qua sử dụng
+
+            if (userParams != null && userParams.StartingTime.GetHashCode() != 0 && userParams.EndingTime.GetHashCode() != 0)
+            {
+                totalTSTB = result.Count();
+                hoatDongTot = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.TinhTrang == "Hoạt động tốt").Count();
+                dangSuaChua = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.TinhTrang == "Đang sửa chữa").Count();
+                dangBaoHanh = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.TinhTrang == "Đang bảo hành").Count();
+                daQuaSuDung = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime && x.TinhTrang == "Đã qua sử dụng").Count();
+            }
+            else
+            {
+                totalTSTB = result.Count();
+                hoatDongTot = result.Where(x => x.TinhTrang == "Hoạt động tốt").Count();
+                dangSuaChua = result.Where(x => x.TinhTrang == "Đang sửa chữa").Count();
+                dangBaoHanh = result.Where(x => x.TinhTrang == "Đang bảo hành").Count();
+                daQuaSuDung = result.Where(x => x.TinhTrang == "Đã qua sử dụng").Count();
+            }
+
+            return new
+            {
+                Total = totalTSTB,
+                HoatDongTot = hoatDongTot,
+                DangSuaChua = dangSuaChua,
+                DangBaoHanh = dangBaoHanh,
+                DaQuaSuDung = daQuaSuDung,                
+            };
+        }
+
          public object GetStatusStatistics(TaiSanThietBiParams userParams)
         {
             var result = _context.DanhSachTaiSanThietBi.AsQueryable();

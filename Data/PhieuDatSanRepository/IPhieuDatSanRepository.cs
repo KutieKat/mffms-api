@@ -21,5 +21,6 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
         int GetTotalPages();
         int GetTotalItems();
         Object GetStatusStatistics(PhieuDatSanParams userParams);
+        Task<Object> GetGeneralStatistics(PhieuDatSanGeneralStatisticsParams userParams);
     }
 }

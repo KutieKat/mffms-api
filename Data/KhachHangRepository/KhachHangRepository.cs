@@ -242,7 +242,6 @@ namespace MFFMS.API.Data.KhachHangRepository
         public async Task<KhachHang> GetById(string id)
         {
             var result = await _context.DanhSachKhachHang.FirstOrDefaultAsync(x => x.MaKhachHang == id);
-
             return result;
         }
 

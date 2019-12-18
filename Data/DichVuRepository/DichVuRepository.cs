@@ -224,6 +224,34 @@ namespace MFFMS.API.Data.DichVuRepository
             return result;
         }
 
+        public async Task<Object> GetGeneralStatistics(DichVuGeneralStatisticsParams userParams)
+        {
+            var result = _context.DanhSachDichVu.AsQueryable();
+            var totalServices = 0;
+            var cheapestService = 0.0;
+            var mostExpensiveService = 0.0;            
+
+            if (userParams != null && userParams.StartingTime.GetHashCode() != 0 && userParams.EndingTime.GetHashCode() != 0)
+            {
+                totalServices = result.Count();  
+                cheapestService = result.Where(x =>x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Min(x => x.DonGia);
+                mostExpensiveService = result.Where(x =>x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Max(x => x.DonGia);
+            }
+            else
+            {
+                totalServices = result.Count();  
+                cheapestService = result.Min(x => x.DonGia);
+                mostExpensiveService = result.Max(x => x.DonGia);
+            }
+
+            return new
+            {
+                Total = totalServices,
+                Cheapest = cheapestService,
+                MostExpensive = mostExpensiveService,
+            };
+        }
+
         public object GetStatusStatistics(DichVuParams userParams)
         {
             var result = _context.DanhSachDichVu.AsQueryable();
