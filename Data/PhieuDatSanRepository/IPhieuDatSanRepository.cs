@@ -12,12 +12,12 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
     public interface IPhieuDatSanRepository
     {
         Task<PagedList<PhieuDatSan>> GetAll(PhieuDatSanParams userParams);
-        Task<PhieuDatSan> GetById(int id);
+        Task<PhieuDatSan> GetById(string id);
         Task<PhieuDatSan> Create(PhieuDatSanForCreateDto phieuDatSan);
-        Task<PhieuDatSan> UpdateById(int id, PhieuDatSanForUpdateDto phieuDatSan);
-        Task<PhieuDatSan> TemporarilyDeleteById(int id);
-        Task<PhieuDatSan> RestoreById(int id);
-        Task<PhieuDatSan> PermanentlyDeleteById(int id);
+        Task<PhieuDatSan> UpdateById(string id, PhieuDatSanForUpdateDto phieuDatSan);
+        Task<PhieuDatSan> TemporarilyDeleteById(string id);
+        Task<PhieuDatSan> RestoreById(string id);
+        Task<PhieuDatSan> PermanentlyDeleteById(string id);
         int GetTotalPages();
         int GetTotalItems();
         Object GetStatusStatistics(PhieuDatSanParams userParams);

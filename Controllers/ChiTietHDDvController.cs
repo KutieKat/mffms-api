@@ -68,7 +68,7 @@ namespace MFFMS.API.Controllers
         
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int soHDDV, int maDichVu)
+        public async Task<IActionResult> GetById(string soHDDV, string maDichVu)
         {
             try
             {
@@ -158,7 +158,7 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateById(int soHDDV, int maDichVu, ChiTietHDDVForUpdateDto chiTietHDDV)
+        public async Task<IActionResult> UpdateById(string soHDDV, string maDichVu, ChiTietHDDVForUpdateDto chiTietHDDV)
         {
             try
             {
@@ -187,7 +187,7 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> TemporarilyDeleteById(int soHDDV, int maDichVu)
+        public async Task<IActionResult> TemporarilyDeleteById(string soHDDV, string maDichVu)
         {
             try
             {
@@ -217,7 +217,7 @@ namespace MFFMS.API.Controllers
 
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> RestoreById(int soHDDV, int maDichVu)
+        public async Task<IActionResult> RestoreById(string soHDDV, string maDichVu)
         {
             try
             {
@@ -246,7 +246,7 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> PermanentlyDeleteById(int soHDDV, int maDichVu)
+        public async Task<IActionResult> PermanentlyDeleteById(string soHDDV, string maDichVu)
         {
             try
             {

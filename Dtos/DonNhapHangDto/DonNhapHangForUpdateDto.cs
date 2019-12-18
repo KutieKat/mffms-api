@@ -9,12 +9,10 @@ namespace MFFMS.API.Dtos.DonNhapHangDto
     public class DonNhapHangForUpdateDto : BaseDto
     {
         [Required]
-        public int MaNhaCungCap { get; set; }
+        public string MaNhaCungCap { get; set; }
         [Required]
         public string MaNhanVien { get; set; }
         [Required]
         public DateTime NgayGiaoHang { get; set; }
-        [Required]
-        public string NoiNhanHang { get; set; }
     }
 }

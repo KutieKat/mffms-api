@@ -12,12 +12,12 @@ namespace MFFMS.API.Data.ChiTietDonNhapHangRepository
     public interface IChiTietDonNhapHangRepository
     {
         Task<PagedList<ChiTietDonNhapHang>> GetAll(ChiTietDonNhapHangParams userParams);
-        Task<ChiTietDonNhapHang> GetById(int maDonNhapHang, int maTSTB);
+        Task<ChiTietDonNhapHang> GetById(string maDonNhapHang, string maTSTB);
         Task<ChiTietDonNhapHang> Create(ChiTietDonNhapHangForCreateDto chiTietDonNhapHang);
-        Task<ChiTietDonNhapHang> UpdateById(int maDonNhapHang, int maTSTB, ChiTietDonNhapHangForUpdateDto chiTietDonNhapHang);
-        Task<ChiTietDonNhapHang> TemporarilyDeleteById(int maDonNhapHang, int maTSTB);
-        Task<ChiTietDonNhapHang> RestoreById(int maDonNhapHang, int maTSTB);
-        Task<ChiTietDonNhapHang> PermanentlyDeleteById(int maDonNhapHang, int maTSTB);
+        Task<ChiTietDonNhapHang> UpdateById(string maDonNhapHang, string maTSTB, ChiTietDonNhapHangForUpdateDto chiTietDonNhapHang);
+        Task<ChiTietDonNhapHang> TemporarilyDeleteById(string maDonNhapHang, string maTSTB);
+        Task<ChiTietDonNhapHang> RestoreById(string maDonNhapHang, string maTSTB);
+        Task<ChiTietDonNhapHang> PermanentlyDeleteById(string maDonNhapHang, string maTSTB);
         int GetTotalPages();
         int GetTotalItems();
         Object GetStatusStatistics(ChiTietDonNhapHangParams userParams);

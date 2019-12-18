@@ -25,11 +25,26 @@ namespace MFFMS.API.Data.ChiTietHDDVRepository
 
         }
 
+        private string GenerateId()
+        {
+            int count = _context.DanhSachChiTietHDDV.Count() + 1;
+            string tempId = count.ToString();
+            string currentYear = DateTime.Now.ToString("yy");
+ 
+            while (tempId.Length < 4)
+            {
+                tempId = "0" + tempId;
+            }
+ 
+            tempId = "CTHDDV" + currentYear + tempId;
+ 
+            return tempId;
+        }
         public async Task<ChiTietHDDV> Create(ChiTietHDDVForCreateDto chiTietHDDV)
         {
             var newChiTietHDDV = new ChiTietHDDV
             {
-                SoHDDV = chiTietHDDV.SoHDDV,
+                SoHDDV = GenerateId(),
                 MaDichVu = chiTietHDDV.MaDichVu,
                 SoLuong = chiTietHDDV.SoLuong,
                 DonGia = chiTietHDDV.DonGia,
@@ -178,7 +193,7 @@ namespace MFFMS.API.Data.ChiTietHDDVRepository
             return await PagedList<ChiTietHDDV>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<ChiTietHDDV> GetById(int soHDDV, int maDichVu)
+        public async Task<ChiTietHDDV> GetById(string soHDDV, string maDichVu)
         {
             var result = await _context.DanhSachChiTietHDDV.Include(x => x.DichVu).Include(x => x.HoaDonDichVu).FirstOrDefaultAsync(x => x.SoHDDV == soHDDV && x.MaDichVu == maDichVu);
             return result;
@@ -309,7 +324,7 @@ namespace MFFMS.API.Data.ChiTietHDDVRepository
             return _totalPages;
         }
 
-        public async Task<ChiTietHDDV> PermanentlyDeleteById(int soHDDV, int maDichVu)
+        public async Task<ChiTietHDDV> PermanentlyDeleteById(string soHDDV, string maDichVu)
         {
             var chiTietHDDVToDelete = await _context.DanhSachChiTietHDDV.FirstOrDefaultAsync(x => x.SoHDDV == soHDDV || x.MaDichVu == maDichVu);
 
@@ -318,7 +333,7 @@ namespace MFFMS.API.Data.ChiTietHDDVRepository
 
             return chiTietHDDVToDelete;
         }
-        public async Task<ChiTietHDDV> RestoreById(int soHDDV, int maDichVu)
+        public async Task<ChiTietHDDV> RestoreById(string soHDDV, string maDichVu)
         {
             var chiTietHDDVToRestoreById = await _context.DanhSachChiTietHDDV.FirstOrDefaultAsync(x => x.SoHDDV == soHDDV && x.MaDichVu == maDichVu);
 
@@ -330,7 +345,7 @@ namespace MFFMS.API.Data.ChiTietHDDVRepository
             return chiTietHDDVToRestoreById;
         }
 
-        public async Task<ChiTietHDDV> TemporarilyDeleteById(int soHDDV, int maDichVu)
+        public async Task<ChiTietHDDV> TemporarilyDeleteById(string soHDDV, string maDichVu)
         {
             var chiTietHDDVToTemporarilyDeleteById = await _context.DanhSachChiTietHDDV.FirstOrDefaultAsync(x => x.SoHDDV == soHDDV && x.MaDichVu == maDichVu);
 
@@ -342,7 +357,7 @@ namespace MFFMS.API.Data.ChiTietHDDVRepository
             return chiTietHDDVToTemporarilyDeleteById;
         }
 
-        public async Task<ChiTietHDDV> UpdateById(int soHDDV, int maDichVu, ChiTietHDDVForUpdateDto chiTietHDDV)
+        public async Task<ChiTietHDDV> UpdateById(string soHDDV, string maDichVu, ChiTietHDDVForUpdateDto chiTietHDDV)
         {
             var oldRecord = await _context.DanhSachChiTietHDDV.AsNoTracking().FirstOrDefaultAsync(x => x.SoHDDV == soHDDV && x.MaDichVu == maDichVu);
             var chiTietHDDVToUpdate = new ChiTietHDDV

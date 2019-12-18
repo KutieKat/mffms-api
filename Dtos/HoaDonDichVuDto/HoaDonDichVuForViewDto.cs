@@ -8,7 +8,7 @@ namespace MFFMS.API.Dtos.HoaDonDichVuDto
 {
     public class HoaDonDichVuForViewDto : BaseDto
     {
-        public int SoHDDV { get; set; }
+        public string SoHDDV { get; set; }
         public KhachHang KhachHang { get; set; }
         public DichVu DichVu { get; set; }
         public DateTime NgaySuDung { get; set; }

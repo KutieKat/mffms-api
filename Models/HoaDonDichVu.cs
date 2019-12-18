@@ -9,10 +9,10 @@ namespace MFFMS.API.Models
     public class HoaDonDichVu : BaseModel
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int SoHDDV { get; set; }
+        public string SoHDDV { get; set; }
         public string MaKhachHang { get; set; }
         public KhachHang KhachHang { get; set; }
-        public int MaDichVu { get; set; }
+        public string MaDichVu { get; set; }
         public DichVu DichVu { get; set; }
         public DateTime NgaySuDung { get; set; }
         public DateTime NgayLap { get; set; }

@@ -8,8 +8,8 @@ namespace MFFMS.API.Dtos.TaiSanThietBiDto
 {
     public class TaiSanThietBiForViewDto:BaseDto
     {
-        public int MaTSTB { get; set; }
-        public int MaNhaCungCap { get; set; }
+        public string MaTSTB { get; set; }
+        public string MaNhaCungCap { get; set; }
         public NhaCungCap NhaCungCap { get; set; }
         public string TenTSTB { get; set; }
         public string TinhTrang { get; set; }

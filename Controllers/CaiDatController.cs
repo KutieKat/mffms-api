@@ -59,7 +59,7 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateById(int id, CaiDatForUpdateDto caiDat)
+        public async Task<IActionResult> UpdateById(string id, CaiDatForUpdateDto caiDat)
         {
             try
             {

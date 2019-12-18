@@ -13,12 +13,12 @@ namespace MFFMS.API.Data.NhaCungCapRepository
     public interface INhaCungCapRepository
     {
         Task<PagedList<NhaCungCap>> GetAll(NhaCungCapParams userParams);
-        Task<NhaCungCap> GetById(int id);
+        Task<NhaCungCap> GetById(string id);
         Task<NhaCungCap> Create(NhaCungCapForCreateDto nhaCungCap);
-        Task<NhaCungCap> UpdateById(int id, NhaCungCapForUpdateDto nhaCungCap);
-        Task<NhaCungCap> TemporarilyDeleteById(int id);
-        Task<NhaCungCap> RestoreById(int id);
-        Task<NhaCungCap> PermanentlyDeleteById(int id);
+        Task<NhaCungCap> UpdateById(string id, NhaCungCapForUpdateDto nhaCungCap);
+        Task<NhaCungCap> TemporarilyDeleteById(string id);
+        Task<NhaCungCap> RestoreById(string id);
+        Task<NhaCungCap> PermanentlyDeleteById(string id);
 
         int GetTotalPages();
         int GetTotalItems();
@@ -27,7 +27,7 @@ namespace MFFMS.API.Data.NhaCungCapRepository
         Task<Object> GetGeneralStatistics(NhaCungCapStatisticsParams userParams);
         
         ValidationResultDto ValidateBeforeCreate(NhaCungCapForCreateDto nhaCungCap);
-        ValidationResultDto ValidateBeforeUpdate(int id, NhaCungCapForUpdateDto nhaCungCap);
+        ValidationResultDto ValidateBeforeUpdate(string id, NhaCungCapForUpdateDto nhaCungCap);
 
     }
 }

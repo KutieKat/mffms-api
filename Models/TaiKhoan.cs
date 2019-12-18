@@ -8,7 +8,7 @@ namespace MFFMS.API.Models
 {
     public class TaiKhoan : BaseModel
     {
-        public int MaTaiKhoan { get; set; }
+        public string MaTaiKhoan { get; set; }
         public string TenDangNhap { get; set; }
         public byte[] Hash { get; set; }
         public byte[] Salt { get; set; }

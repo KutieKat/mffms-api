@@ -22,23 +22,27 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
             _totalItems = 0;
             _totalPages = 0;
         }
+        private string GenerateId()
+        {
+            int count = _context.DanhSachPhieuDatSan.Count() + 1;
+            string tempId = count.ToString();
+            string currentYear = DateTime.Now.ToString("yy");
+
+            while (tempId.Length < 4)
+            {
+                tempId = "0" + tempId;
+            }
+
+            tempId = "PDS" + currentYear + tempId;
+
+            return tempId;
+        }
 
         public async Task<PhieuDatSan> Create(PhieuDatSanForCreateDto phieuDatSan)
         {
-            var danhSachPhieuDatSan = await _context.DanhSachPhieuDatSan.OrderByDescending(x => x.MaPhieuDatSan).FirstOrDefaultAsync();
-            var maPhieuDatSan = 1;
-            if (danhSachPhieuDatSan == null)
-            {
-                maPhieuDatSan = 1;
-            }
-            else
-            {
-                maPhieuDatSan = danhSachPhieuDatSan.MaPhieuDatSan + 1;
-            }
-
             var newPhieuDatSan = new PhieuDatSan
             {
-                MaPhieuDatSan = maPhieuDatSan,
+                MaPhieuDatSan = GenerateId(),
                 MaKhachHang = phieuDatSan.MaKhachHang,
                 MaNhanVien = phieuDatSan.MaNhanVien,
                 NgayLap = DateTime.Now,
@@ -59,7 +63,15 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
             var result = _context.DanhSachPhieuDatSan.Include(x => x.KhachHang).Include(x => x.NhanVien).AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
-            var keyword = userParams.Keyword;
+
+            var maPhieuDatSan = userParams.MaPhieuDatSan;
+            var maKhachHang = userParams.MaKhachHang;
+            var maNhanVien = userParams.MaNhanVien;
+            var ngayLapBatDau = userParams.NgayLapBatDau;
+            var ngayLapKetThuc = userParams.NgayLapKetThuc;
+            var tongTienBatDau = userParams.TongTienBatDau;
+            var tongTienKetThuc = userParams.TongTienKetThuc;
+
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
             var thoiGianCapNhatBatDau = userParams.ThoiGianCapNhatBatDau;
@@ -67,11 +79,30 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
             var trangThai = userParams.TrangThai;
             var daXoa = userParams.DaXoa;
 
-            if (!string.IsNullOrEmpty(keyword))
+            // PhieuDatSan 
+            if (!string.IsNullOrEmpty(maPhieuDatSan))
             {
-                result = result.Where(x => x.MaKhachHang.ToLower().Contains(keyword.ToLower()) || x.MaNhanVien.ToLower().Contains(keyword.ToLower())) ;
+                result = result.Where(x => x.MaPhieuDatSan.ToLower().Contains(maPhieuDatSan.ToLower()));
             }
 
+            if (!string.IsNullOrEmpty(maKhachHang))
+            {
+                result = result.Where(x => x.MaKhachHang.ToLower().Contains(maKhachHang.ToLower()));
+            }
+            if (!string.IsNullOrEmpty(maNhanVien))
+            {
+                result = result.Where(x => x.MaNhanVien.ToLower().Contains(maNhanVien.ToLower()));
+            }
+            if (ngayLapBatDau.GetHashCode() != 0 && ngayLapKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.NgayLap >= ngayLapBatDau && x.NgayLap <= ngayLapKetThuc);
+            }
+            if (tongTienBatDau.GetHashCode() != 0 && tongTienKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.TongTien >= tongTienBatDau && x.TongTien <= tongTienKetThuc);
+            }
+
+           // Base 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.ThoiGianTao >= thoiGianTaoBatDau && x.ThoiGianTao <= thoiGianTaoKetThuc);
@@ -93,7 +124,7 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
             }
 
 
-            
+
 
             if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
             {
@@ -188,7 +219,7 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
             return await PagedList<PhieuDatSan>.CreateAsync(result, userParams.PageNumber, userParams.PageSize);
         }
 
-        public async Task<PhieuDatSan> GetById(int id)
+        public async Task<PhieuDatSan> GetById(string id)
         {
             var result = await _context.DanhSachPhieuDatSan.Include(x => x.KhachHang).Include(x => x.NhanVien).FirstOrDefaultAsync(x => x.MaPhieuDatSan == id);
             return result;
@@ -344,7 +375,7 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
             return _totalPages;
         }
 
-        public async Task<PhieuDatSan> PermanentlyDeleteById(int id)
+        public async Task<PhieuDatSan> PermanentlyDeleteById(string id)
         {
             var phieuDatSanToDelete = await _context.DanhSachPhieuDatSan.FirstOrDefaultAsync(x => x.MaPhieuDatSan == id);
             _context.DanhSachPhieuDatSan.Remove(phieuDatSanToDelete);
@@ -352,7 +383,7 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
             return phieuDatSanToDelete;
         }
 
-        public async Task<PhieuDatSan> RestoreById(int id)
+        public async Task<PhieuDatSan> RestoreById(string id)
         {
             var phieuDatSanToRestoreById = await _context.DanhSachPhieuDatSan.FirstOrDefaultAsync(x => x.MaPhieuDatSan == id);
             phieuDatSanToRestoreById.DaXoa = 0;
@@ -362,7 +393,7 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
             return phieuDatSanToRestoreById;
         }
 
-        public async Task<PhieuDatSan> TemporarilyDeleteById(int id)
+        public async Task<PhieuDatSan> TemporarilyDeleteById(string id)
         {
             var phieuDatSanToTemporarilyDeleteById = await _context.DanhSachPhieuDatSan.FirstOrDefaultAsync(x => x.MaPhieuDatSan == id);
             phieuDatSanToTemporarilyDeleteById.DaXoa = 1;
@@ -372,7 +403,7 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
             return phieuDatSanToTemporarilyDeleteById;
         }
 
-        public async Task<PhieuDatSan> UpdateById(int id, PhieuDatSanForUpdateDto phieuDatSan)
+        public async Task<PhieuDatSan> UpdateById(string id, PhieuDatSanForUpdateDto phieuDatSan)
         {
             var oldRecord = await _context.DanhSachPhieuDatSan.AsNoTracking().FirstOrDefaultAsync(x => x.MaPhieuDatSan == id);
             var phieuDatSanToUpdateById = new PhieuDatSan
