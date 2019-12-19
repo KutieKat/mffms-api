@@ -15,7 +15,6 @@ namespace MFFMS.API.Helpers.Params
         public DateTime NgaySinhBatDau { get; set; }
         public DateTime NgaySinhKetThuc {get;set;}
         public string Email { get; set; }
-        public string QueQuan { get; set; }
         public string DiaChi { get; set; }
         public string SoDienThoai { get; set; }
     }

@@ -59,17 +59,53 @@ namespace MFFMS.API.Data
                 MaTaiKhoan = id,
                 Hash = hash,
                 Salt = salt,
+                TenDangNhap = result.TenDangNhap,
+                GioiTinh = result.GioiTinh,
                 HoVaTen = result.HoVaTen,
                 NgaySinh = result.NgaySinh,
                 SoDienThoai = result.SoDienThoai,
                 Email = result.Email,
                 DiaChi = result.DiaChi,
-                QueQuan = result.QueQuan,
                 PhanQuyen = result.PhanQuyen,
                 ThoiGianCapNhat = DateTime.Now,
                 TrangThai = result.TrangThai
             };
 
+            _context.Entry(result).State = EntityState.Detached;
+            _context.DanhSachTaiKhoan.Update(taiKhoanToUpdate);
+
+            await _context.SaveChangesAsync();
+            return taiKhoanToUpdate;
+        }
+
+        public async Task<TaiKhoan> ResetPassword(string id)
+        {
+            var result = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
+
+            if (result == null)
+                return null;
+
+            byte[] hash, salt;
+            TaoHash("123456", out hash, out salt);
+
+            var taiKhoanToUpdate = new TaiKhoan
+            {
+                MaTaiKhoan = id,
+                Hash = hash,
+                Salt = salt,
+                TenDangNhap = result.TenDangNhap,
+                GioiTinh = result.GioiTinh,
+                HoVaTen = result.HoVaTen,
+                NgaySinh = result.NgaySinh,
+                SoDienThoai = result.SoDienThoai,
+                Email = result.Email,
+                DiaChi = result.DiaChi,
+                PhanQuyen = result.PhanQuyen,
+                ThoiGianCapNhat = DateTime.Now,
+                TrangThai = result.TrangThai
+            };
+
+            _context.Entry(result).State = EntityState.Detached;
             _context.DanhSachTaiKhoan.Update(taiKhoanToUpdate);
             await _context.SaveChangesAsync();
             return taiKhoanToUpdate;
@@ -112,7 +148,6 @@ namespace MFFMS.API.Data
             var ngaySinhBatDau = userParams.NgaySinhBatDau;
             var ngaySinhKetThuc = userParams.NgaySinhKetThuc;
             var email = userParams.Email;
-            var queQuan = userParams.QueQuan;
             var diaChi = userParams.DiaChi;
             var soDienThoai = userParams.SoDienThoai;
 
@@ -144,6 +179,11 @@ namespace MFFMS.API.Data
                 result = result.Where(x => x.GioiTinh.ToLower().Contains(gioiTinh.ToLower()));
             }
 
+            if (!string.IsNullOrEmpty(phanQuyen))
+            {
+                result = result.Where(x => x.PhanQuyen.ToLower().Contains(phanQuyen.ToLower()));
+            }
+
             if (ngaySinhBatDau.GetHashCode() != 0 && ngaySinhKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.NgaySinh >= ngaySinhBatDau && x.NgaySinh <= ngaySinhKetThuc);
@@ -152,11 +192,6 @@ namespace MFFMS.API.Data
             if (!string.IsNullOrEmpty(email))
             {
                 result = result.Where(x => x.Email.ToLower().Contains(email.ToLower()));
-            }
-
-            if (!string.IsNullOrEmpty(queQuan))
-            {
-                result = result.Where(x => x.QueQuan.ToLower().Contains(queQuan.ToLower()));
             }
 
             if (!string.IsNullOrEmpty(diaChi))
@@ -436,7 +471,9 @@ namespace MFFMS.API.Data
 
         public async Task<bool> TaiKhoanTonTai(string tenDangNhap)
         {
-            if (await _context.DanhSachTaiKhoan.AnyAsync(x => x.TenDangNhap == tenDangNhap))
+            var result = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.TenDangNhap == tenDangNhap);
+
+            if (result != null)
                 return true;
 
             return false;
@@ -474,16 +511,16 @@ namespace MFFMS.API.Data
 
         public async Task<TaiKhoan> UpdateById(string id, TaiKhoanForUpdateDto taiKhoan)
         { 
-            
             var taiKhoanToUpdate = new TaiKhoan
             {
                 MaTaiKhoan = id,
+                TenDangNhap = taiKhoan.TenDangNhap,
                 HoVaTen = taiKhoan.HoVaTen,
                 NgaySinh = taiKhoan.NgaySinh,
+                GioiTinh = taiKhoan.GioiTinh,
                 SoDienThoai = taiKhoan.SoDienThoai,
                 Email = taiKhoan.Email,
                 DiaChi = taiKhoan.DiaChi,
-                QueQuan = taiKhoan.QueQuan,
                 PhanQuyen = taiKhoan.PhanQuyen,
                 ThoiGianCapNhat = DateTime.Now,
                 TrangThai = taiKhoan.TrangThai

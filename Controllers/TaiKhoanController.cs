@@ -165,6 +165,35 @@ namespace MFFMS.API.Controllers
             }
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> ResetPassword(string id)
+        {
+            try
+            {
+                var result = await _repo.ResetPassword(id);
+
+                return StatusCode(200, new SuccessResponseDto
+                {
+                    Message = "Khôi phục mật khẩu mặc định cho tài khoản thành công!",
+                    Result = new SuccessResponseResultWithSingleDataDto
+                    {
+                        Data = result
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new FailedResponseDto
+                {
+                    Message = "Khôi phục mật khẩu mặc định cho tài khoản thất bại!",
+                    Result = new FailedResponseResultDto
+                    {
+                        Errors = e
+                    }
+                });
+            }
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> PermanentlyDeleteById(string id)
         {
@@ -253,13 +282,14 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register( TaiKhoanForCreateDto taiKhoan)
+        public async Task<IActionResult> Register(TaiKhoanForCreateDto taiKhoan)
         {
             try
             {
                 taiKhoan.TenDangNhap = taiKhoan.TenDangNhap.ToLower();
+                var exists = await _repo.TaiKhoanTonTai(taiKhoan.TenDangNhap);
 
-                if (await _repo.TaiKhoanTonTai(taiKhoan.TenDangNhap))
+                if (exists == true)
                 {
                     return BadRequest();
                 }
@@ -267,7 +297,13 @@ namespace MFFMS.API.Controllers
                 var taiKhoanMoi = new TaiKhoan
                 {
                     TenDangNhap = taiKhoan.TenDangNhap,
+                    HoVaTen = taiKhoan.HoVaTen,
+                    GioiTinh = taiKhoan.GioiTinh,
                     ThoiGianTao = DateTime.Now,
+                    DiaChi = taiKhoan.DiaChi,
+                    NgaySinh = taiKhoan.NgaySinh,
+                    Email = taiKhoan.Email,
+                    SoDienThoai = taiKhoan.SoDienThoai,
                     PhanQuyen = taiKhoan.PhanQuyen
                 };
 
@@ -278,7 +314,7 @@ namespace MFFMS.API.Controllers
                     Message = "Tạo tài khoản mới thành công!",
                     Result = new SuccessResponseResultWithSingleDataDto
                     {
-                        Data = taiKhoanDuocTao
+                        Data = taiKhoanMoi
                     }
                 });
             }
@@ -331,7 +367,8 @@ namespace MFFMS.API.Controllers
                     {
                         Data = new
                         {
-                            token = tokenHandler.WriteToken(token)
+                            token = tokenHandler.WriteToken(token),
+                            user = taiKhoanDuocDangNhap
                         }
                     }
                 });
