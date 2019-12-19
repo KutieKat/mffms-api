@@ -613,7 +613,8 @@ namespace MFFMS.API.Data.ChiTieuPhieuDatSanRepository
 
         public ValidationResultDto ValidateBeforeCreate(ChiTietPhieuDatSanForCreateDto chiTietPhieuDatSan)
         {
-            var total = _context.DanhSachChiTietPhieuDatSan.Count(x => x.MaSanBong == chiTietPhieuDatSan.MaSanBong && x.ThoiGianBatDau == chiTietPhieuDatSan.ThoiGianBatDau);
+            
+            var total = _context.DanhSachChiTietPhieuDatSan.Count(x => x.MaSanBong == chiTietPhieuDatSan.MaSanBong && x.ThoiGianBatDau <= chiTietPhieuDatSan.ThoiGianBatDau && x.ThoiGianKetThuc >= chiTietPhieuDatSan.ThoiGianBatDau);
             IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
             if(total >= 1)
             {
@@ -648,7 +649,7 @@ namespace MFFMS.API.Data.ChiTieuPhieuDatSanRepository
                     && chiTietPhieuDatSan.ToString().Contains("ThanhTien");
 
                 var isOkayToCreate = true;
-                var total = _context.DanhSachChiTietPhieuDatSan.Count(x => x.MaSanBong == chiTietPhieuDatSan.MaSanBong && x.ThoiGianBatDau == chiTietPhieuDatSan.ThoiGianBatDau);
+                var total = _context.DanhSachChiTietPhieuDatSan.Count(x => x.MaSanBong == chiTietPhieuDatSan.MaSanBong && x.ThoiGianBatDau <= chiTietPhieuDatSan.ThoiGianBatDau && x.ThoiGianKetThuc >= chiTietPhieuDatSan.ThoiGianBatDau);
                 if(total >= 1)
                 {
                     isOkayToCreate = false;
@@ -683,7 +684,7 @@ namespace MFFMS.API.Data.ChiTieuPhieuDatSanRepository
 
         public ValidationResultDto ValidateBeforeUpdate(int id, ChiTietPhieuDatSanForUpdateDto chiTietPhieuDatSan)
         {
-            var total = _context.DanhSachChiTietPhieuDatSan.Count(x => x.MaChiTietPDS != id && x.MaSanBong == chiTietPhieuDatSan.MaSanBong && x.ThoiGianBatDau == chiTietPhieuDatSan.ThoiGianBatDau);
+            var total = _context.DanhSachChiTietPhieuDatSan.Count(x => x.MaChiTietPDS != id && x.MaSanBong == chiTietPhieuDatSan.MaSanBong && x.ThoiGianBatDau <= chiTietPhieuDatSan.ThoiGianBatDau && x.ThoiGianKetThuc >= chiTietPhieuDatSan.ThoiGianBatDau);
             IDictionary<string, string[]> Errors = new Dictionary<string, string[]>();
             if(total > 0)
             {
