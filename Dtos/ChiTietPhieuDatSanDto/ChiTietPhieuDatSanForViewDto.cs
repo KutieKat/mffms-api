@@ -15,7 +15,7 @@ namespace MFFMS.API.Dtos.ChiTietPhieuDatSanDto
         public double ThoiGianBatDau { get; set; }
         public double ThoiGianKetThuc { get; set; }
         public DateTime NgayDat { get; set; }
-        public decimal TienCoc { get; set; }
-        public decimal ThanhTien { get; set; }
+        public double TienCoc { get; set; }
+        public double ThanhTien { get; set; }
     }
 }

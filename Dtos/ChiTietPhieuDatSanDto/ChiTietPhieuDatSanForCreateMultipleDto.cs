@@ -9,7 +9,7 @@ namespace MFFMS.API.Dtos.ChiTietPhieuDatSanDto
     public class ChiTietPhieuDatSanForCreateMultipleDto : BaseDto
     {
         [Required]
-        public int MaPhieuDatSan { get; set; }
+        public string MaPhieuDatSan { get; set; }
         [Required]
         public string MaSanBong { get; set; }
         [Required]
@@ -19,9 +19,9 @@ namespace MFFMS.API.Dtos.ChiTietPhieuDatSanDto
         [Required]
         public DateTime NgayDat { get; set; }
         [Required]
-        public decimal TienCoc { get; set; }
+        public double TienCoc { get; set; }
         [Required]
-        public decimal ThanhTien { get; set; }
+        public double ThanhTien { get; set; }
 
         public override string ToString()
         {

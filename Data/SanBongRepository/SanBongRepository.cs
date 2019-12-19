@@ -522,21 +522,7 @@ namespace MFFMS.API.Data.SanBongRepository
             }
 
         }
+       
 
-        private string GenerateId()
-        {
-            int count = _context.DanhSachSanBong.Count() + 1;
-            string tempId = count.ToString();
-            string currentYear = DateTime.Now.ToString("yy");
-
-            while (tempId.Length < 4)
-            {
-                tempId = "0" + tempId;
-            }
-
-            tempId = "SB" + currentYear + tempId;
-
-            return tempId;
-        }
     }
 }

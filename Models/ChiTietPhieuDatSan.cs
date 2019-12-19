@@ -9,7 +9,7 @@ namespace MFFMS.API.Models
     public class ChiTietPhieuDatSan : BaseModel
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public string MaChiTietPDS { get; set; }
+        public int MaChiTietPDS { get; set; }
         public string MaPhieuDatSan { get; set; }
         public PhieuDatSan PhieuDatSan { get; set; }
         public string MaSanBong { get; set; }

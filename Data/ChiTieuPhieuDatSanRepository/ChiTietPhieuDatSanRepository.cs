@@ -27,21 +27,32 @@ namespace MFFMS.API.Data.ChiTieuPhieuDatSanRepository
         public async Task<ChiTietPhieuDatSan> Create(ChiTietPhieuDatSanForCreateDto chiTietPhieuDatSan)
         {
             var phieuDatSan = await _context.DanhSachPhieuDatSan.FirstOrDefaultAsync(x => x.MaPhieuDatSan == chiTietPhieuDatSan.MaPhieuDatSan);
-            var daThannToan = phieuDatSan.ChiTietPhieuDatSan.Sum(x => x.TienCoc) + chiTietPhieuDatSan.TienCoc;
+            double daThanhToan = 0;
 
-            if(daThannToan == 0)
+            var danhSachChiTietPhieuDatSan_PhieuDatSan =  _context.DanhSachChiTietPhieuDatSan.Where(x => x.MaPhieuDatSan == phieuDatSan.MaPhieuDatSan);
+
+            foreach(var item in danhSachChiTietPhieuDatSan_PhieuDatSan)
+            {
+                daThanhToan =daThanhToan + item.TienCoc;
+            }
+
+            daThanhToan = daThanhToan + chiTietPhieuDatSan.TienCoc;
+            if(daThanhToan == 0)
             {
                 phieuDatSan.TrangThai = 0;
             }
-            else if(daThannToan < phieuDatSan.TongTien)
+            else if(daThanhToan < phieuDatSan.TongTien)
             {
                 phieuDatSan.TrangThai = 1;
             }
-            else
+            else if(daThanhToan >= phieuDatSan.TongTien)
             {
                 phieuDatSan.TrangThai = 2;
             }
 
+            _context.DanhSachPhieuDatSan.Update(phieuDatSan);
+            await _context.SaveChangesAsync();
+            
 
             var danhSachChiTietPhieuDatSan = await _context.DanhSachChiTietPhieuDatSan.OrderByDescending(x => x.MaChiTietPDS).FirstOrDefaultAsync();
             var maChiTietPhieuDatSan = 1;
@@ -93,6 +104,33 @@ namespace MFFMS.API.Data.ChiTieuPhieuDatSanRepository
             for(int i = 0; i < danhSachChiTietPhieuDatSan.Count; i++)
             {
                 var chiTietPDS = danhSachChiTietPhieuDatSan.ElementAt(i);
+
+                var phieuDatSan = await _context.DanhSachPhieuDatSan.FirstOrDefaultAsync(x => x.MaPhieuDatSan == chiTietPDS.MaPhieuDatSan);
+                double daThanhToan = 0;
+
+                var danhSachChiTietPhieuDatSan_PhieuDatSan = _context.DanhSachChiTietPhieuDatSan.Where(x => x.MaPhieuDatSan == phieuDatSan.MaPhieuDatSan);
+                foreach(var item in danhSachChiTietPhieuDatSan_PhieuDatSan)
+                {
+                    daThanhToan = daThanhToan + item.TienCoc;
+                }
+
+                daThanhToan = daThanhToan + chiTietPDS.TienCoc;
+
+                if (daThanhToan == 0)
+                {
+                    phieuDatSan.TrangThai = 0;
+                }
+                else if (daThanhToan < phieuDatSan.TongTien)
+                {
+                    phieuDatSan.TrangThai = 1;
+                }
+                else if (daThanhToan >= phieuDatSan.TongTien)
+                {
+                    phieuDatSan.TrangThai = 2;
+                }
+
+                _context.DanhSachPhieuDatSan.Update(phieuDatSan);
+
                 var newChiTietPhieuDatSan = new ChiTietPhieuDatSan
                 {
                     MaChiTietPDS = maChiTietPDS,
@@ -110,12 +148,12 @@ namespace MFFMS.API.Data.ChiTieuPhieuDatSanRepository
                 maChiTietPDS = maChiTietPDS + 1;
                 temp.Add(newChiTietPhieuDatSan);
                 await _context.DanhSachChiTietPhieuDatSan.AddAsync(newChiTietPhieuDatSan);
+
+
                 await _context.SaveChangesAsync();
 
-                
-
             }
-
+            
             return temp;
 
         }
@@ -524,19 +562,34 @@ namespace MFFMS.API.Data.ChiTieuPhieuDatSanRepository
         public async Task<ChiTietPhieuDatSan> UpdateById(int id, ChiTietPhieuDatSanForUpdateDto chiTietPhieuDatSan)
         {
             var phieuDatSan = await _context.DanhSachPhieuDatSan.FirstOrDefaultAsync(x => x.MaPhieuDatSan == chiTietPhieuDatSan.MaPhieuDatSan);
-            var daThannToan = phieuDatSan.ChiTietPhieuDatSan.Sum(x => x.TienCoc) + chiTietPhieuDatSan.TienCoc;
-            if (daThannToan == 0)
+            double daThanhToan = 0;
+            var danhSachChiTietPhieuDatSan = _context.DanhSachChiTietPhieuDatSan
+                .Where(x => x.MaPhieuDatSan == phieuDatSan.MaPhieuDatSan && x.MaChiTietPDS != id);
+
+            foreach(var item in danhSachChiTietPhieuDatSan)
+            {
+                daThanhToan = daThanhToan + item.TienCoc;
+            }
+
+            daThanhToan = daThanhToan + chiTietPhieuDatSan.TienCoc;
+
+            if (daThanhToan == 0)
             {
                 phieuDatSan.TrangThai = 0;
             }
-            else if (daThannToan < phieuDatSan.TongTien)
+            else if (daThanhToan < phieuDatSan.TongTien)
             {
                 phieuDatSan.TrangThai = 1;
             }
-            else
+            else if (daThanhToan >= phieuDatSan.TongTien)
             {
                 phieuDatSan.TrangThai = 2;
             }
+
+            _context.DanhSachPhieuDatSan.Update(phieuDatSan);
+            await _context.SaveChangesAsync();
+
+
             var oldRecord = await _context.DanhSachChiTietPhieuDatSan.AsNoTracking().FirstOrDefaultAsync(x => x.MaChiTietPDS == id);
             var chiTietPhieuDatSanToUpdateById = new ChiTietPhieuDatSan
             {
@@ -553,7 +606,7 @@ namespace MFFMS.API.Data.ChiTieuPhieuDatSanRepository
             };
 
             _context.DanhSachChiTietPhieuDatSan.Update(chiTietPhieuDatSanToUpdateById);
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return chiTietPhieuDatSanToUpdateById;
 
         }
