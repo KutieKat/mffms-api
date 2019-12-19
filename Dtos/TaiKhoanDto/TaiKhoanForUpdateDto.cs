@@ -10,11 +10,11 @@ namespace MFFMS.API.Dtos.TaiKhoanDto
     {
         [Required]
         public string PhanQuyen { get; set; }
+        public string TenDangNhap { get; set; }
         public string HoVaTen { get; set; }
         public string GioiTinh { get; set; }
         public DateTime NgaySinh { get; set; }
         public string Email { get; set; }
-        public string QueQuan { get; set; }
         public string DiaChi { get; set; }
         public string SoDienThoai { get; set; }
 
