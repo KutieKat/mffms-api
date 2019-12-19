@@ -26,5 +26,6 @@ namespace MFFMS.API.Data
         Task<TaiKhoan> PermanentlyDeleteById(string id);
         Task<TaiKhoan> ChangePassword(string id, TaiKhoanForChangePasswordDto taiKhoan);
         Task<TaiKhoan> ResetPassword(string id);
+        Task<TaiKhoan> ValidateHash(string tenDangNhap, byte[] hash);
     }
 }

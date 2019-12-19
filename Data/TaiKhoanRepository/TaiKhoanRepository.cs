@@ -510,12 +510,16 @@ namespace MFFMS.API.Data
         }
 
         public async Task<TaiKhoan> UpdateById(string id, TaiKhoanForUpdateDto taiKhoan)
-        { 
+        {
+            var taiKhoanCu = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.MaTaiKhoan == id);
+
             var taiKhoanToUpdate = new TaiKhoan
             {
                 MaTaiKhoan = id,
                 TenDangNhap = taiKhoan.TenDangNhap,
                 HoVaTen = taiKhoan.HoVaTen,
+                Hash = taiKhoanCu.Hash,
+                Salt = taiKhoanCu.Salt,
                 NgaySinh = taiKhoan.NgaySinh,
                 GioiTinh = taiKhoan.GioiTinh,
                 SoDienThoai = taiKhoan.SoDienThoai,
@@ -526,9 +530,16 @@ namespace MFFMS.API.Data
                 TrangThai = taiKhoan.TrangThai
             };
 
+            _context.Entry(taiKhoanCu).State = EntityState.Detached;
             _context.DanhSachTaiKhoan.Update(taiKhoanToUpdate);
             await _context.SaveChangesAsync();
             return taiKhoanToUpdate;
+        }
+
+        public async Task<TaiKhoan> ValidateHash(string tenDangNhap, byte[] hash)
+        {
+            var result = await _context.DanhSachTaiKhoan.FirstOrDefaultAsync(x => x.TenDangNhap == tenDangNhap && x.Hash == hash);
+            return result;
         }
 
         private bool KiemTraHash(string matKhau, byte[] hash, byte[] salt)
