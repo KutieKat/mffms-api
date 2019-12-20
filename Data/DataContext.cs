@@ -43,6 +43,22 @@ namespace MFFMS.API.Data
             modelBuilder.Entity<CaiDat>().HasKey(x => x.MaCaiDat);
 
             // Requirements
+            modelBuilder.Entity<KhachHang>().Property(x => x.MaKhachHang).HasMaxLength(200);
+            modelBuilder.Entity<NhanVien>().Property(x => x.MaNhanVien).HasMaxLength(200);
+            modelBuilder.Entity<SanBong>().Property(x => x.MaSanBong).HasMaxLength(200);
+            modelBuilder.Entity<PhieuDatSan>().Property(x => x.MaPhieuDatSan).HasMaxLength(200);
+            modelBuilder.Entity<ChiTietPhieuDatSan>().Property(x => x.MaChiTietPDS).HasMaxLength(200);
+            modelBuilder.Entity<DichVu>().Property(x => x.MaDichVu).HasMaxLength(200);
+            modelBuilder.Entity<HoaDonDichVu>().Property(x => x.SoHDDV).HasMaxLength(200);
+            modelBuilder.Entity<ChiTietHDDV>().Property(x => x.SoHDDV).HasMaxLength(200);
+            modelBuilder.Entity<ChiTietHDDV>().Property(x => x.MaDichVu).HasMaxLength(200);
+            modelBuilder.Entity<NhaCungCap>().Property(x => x.MaNhaCungCap).HasMaxLength(200);
+            modelBuilder.Entity<TaiSanThietBi>().Property(x => x.MaTSTB).HasMaxLength(200);
+            modelBuilder.Entity<DonNhapHang>().Property(x => x.MaDonNhapHang).HasMaxLength(200);
+            modelBuilder.Entity<ChiTietDonNhapHang>().Property(x => x.MaDonNhapHang).HasMaxLength(200);
+            modelBuilder.Entity<ChiTietDonNhapHang>().Property(x => x.MaTSTB).HasMaxLength(200);
+
+
             modelBuilder.Entity<NhanVien>().HasIndex(x => x.SoDienThoai).IsUnique();
             modelBuilder.Entity<NhanVien>().Property(x => x.SoDienThoai).IsRequired();
             modelBuilder.Entity<NhanVien>().HasIndex(x => x.SoCMND).IsUnique();
@@ -63,14 +79,12 @@ namespace MFFMS.API.Data
             modelBuilder.Entity<NhaCungCap>().HasIndex(x => x.SoDienThoai).IsUnique();
             modelBuilder.Entity<NhaCungCap>().Property(x => x.SoDienThoai).IsRequired();
 
-            modelBuilder.Entity<TaiSanThietBi>().HasIndex(x => x.TenTSTB).IsUnique();
+            modelBuilder.Entity<TaiSanThietBi>().HasIndex(x => x.TenTSTB).IsUnique();   
             modelBuilder.Entity<TaiSanThietBi>().Property(x => x.TenTSTB).IsRequired();
 
-            modelBuilder.Entity<ChiTietPhieuDatSan>().HasIndex(x => x.ThoiGianBatDau).IsUnique();
             modelBuilder.Entity<ChiTietPhieuDatSan>().Property(x => x.ThoiGianBatDau).IsRequired();
-            modelBuilder.Entity<ChiTietPhieuDatSan>().HasIndex(x => x.ThoiGianKetThuc).IsUnique();
             modelBuilder.Entity<ChiTietPhieuDatSan>().Property(x => x.ThoiGianKetThuc).IsRequired();
-
+            modelBuilder.Entity<ChiTietPhieuDatSan>().HasIndex(x => new { x.MaSanBong, x.ThoiGianBatDau }).IsUnique();
             //Relationships
             modelBuilder.Entity<HoaDonDichVu>()
                 .HasOne(x => x.KhachHang)

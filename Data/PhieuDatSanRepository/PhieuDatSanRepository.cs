@@ -49,7 +49,7 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
                 TongTien = phieuDatSan.TongTien,
                 ThoiGianCapNhat = DateTime.Now,
                 ThoiGianTao = DateTime.Now,
-                TrangThai = 1,
+                TrangThai = 0,
                 DaXoa = 0
             };
 
@@ -57,6 +57,9 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
             await _context.SaveChangesAsync();
             return newPhieuDatSan;
         }
+
+       
+        
 
         public async Task<PagedList<PhieuDatSan>> GetAll(PhieuDatSanParams userParams)
         {
@@ -430,6 +433,26 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
 
         public async Task<PhieuDatSan> UpdateById(string id, PhieuDatSanForUpdateDto phieuDatSan)
         {
+            var danhSachChiTietPhieuDatSan = _context.DanhSachChiTietPhieuDatSan.Where(x => x.MaPhieuDatSan == id);
+            double daThanhToan = 0;
+            foreach(var item in danhSachChiTietPhieuDatSan)
+            {
+                daThanhToan = daThanhToan + item.TienCoc;
+            }
+
+            if (daThanhToan == 0)
+            {
+                phieuDatSan.TrangThai = 0;
+            }
+            else if (daThanhToan < phieuDatSan.TongTien)
+            {
+                phieuDatSan.TrangThai = 1;
+            }
+            else if(daThanhToan >= phieuDatSan.TongTien)
+            {
+                phieuDatSan.TrangThai = 2;
+            }
+
             var oldRecord = await _context.DanhSachPhieuDatSan.AsNoTracking().FirstOrDefaultAsync(x => x.MaPhieuDatSan == id);
             var phieuDatSanToUpdateById = new PhieuDatSan
             {
@@ -442,6 +465,8 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
                 ThoiGianTao = oldRecord.ThoiGianTao,
                 DaXoa = oldRecord.DaXoa
             };
+
+            
 
             _context.DanhSachPhieuDatSan.Update(phieuDatSanToUpdateById);
             await _context.SaveChangesAsync();
