@@ -13,6 +13,7 @@ namespace MFFMS.API.Dtos.DonNhapHangDto
         [Required]
         public string MaNhanVien { get; set; }
         public DateTime NgayGiaoHang { get; set; }
+        public DateTime NgayLap { get; set; }
         public string GhiChu { get; set; }
         public double ThanhTien { get; set; }
         public double DaThanhToan { get; set; }

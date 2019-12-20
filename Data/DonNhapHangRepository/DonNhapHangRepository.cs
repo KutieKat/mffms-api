@@ -61,6 +61,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                 MaNhaCungCap = donNhapHang.MaNhaCungCap,
                 MaNhanVien = donNhapHang.MaNhanVien,
                 NgayGiaoHang = donNhapHang.NgayGiaoHang,
+                NgayLap = donNhapHang.NgayLap,
                 GhiChu = donNhapHang.GhiChu,
                 ThanhTien = donNhapHang.ThanhTien,
                 DaThanhToan = donNhapHang.DaThanhToan,
@@ -87,6 +88,8 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             var maNhanVien = userParams.MaNhanVien;
             var ngayGiaoHangBatDau = userParams.NgayGiaoHangBatDau;
             var ngayGiaoHangKetThuc = userParams.NgayGiaoHangKetThuc;
+            var ngayLapBatDau = userParams.NgayLapBatDau;
+            var ngayLapKetThuc = userParams.NgayLapKetThuc;
             var ghiChu = userParams.GhiChu;
             var thanhTienBatDau = userParams.ThanhTienBatDau;
             var thanhTienKetThuc = userParams.ThanhTienKetThuc;
@@ -130,6 +133,11 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             if (ngayGiaoHangBatDau.GetHashCode() != 0 && ngayGiaoHangKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.NgayGiaoHang >= ngayGiaoHangBatDau && x.NgayGiaoHang <= ngayGiaoHangKetThuc);
+            }
+
+            if (ngayLapBatDau.GetHashCode() != 0 && ngayLapKetThuc.GetHashCode() != 0)
+            {
+                result = result.Where(x => x.NgayLap >= ngayLapBatDau && x.NgayLap <= ngayLapKetThuc);
             }
 
             if (thanhTienBatDau > 0 && thanhTienKetThuc > 0)
@@ -213,6 +221,17 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                         else
                         {
                             result = result.OrderByDescending(x => x.NgayGiaoHang);
+                        }
+                        break;
+
+                    case "NgayLap":
+                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = result.OrderBy(x => x.NgayLap);
+                        }
+                        else
+                        {
+                            result = result.OrderByDescending(x => x.NgayLap);
                         }
                         break;
 
@@ -483,6 +502,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                 MaNhaCungCap = donNhapHang.MaNhaCungCap,
                 MaNhanVien = donNhapHang.MaNhanVien,
                 NgayGiaoHang = donNhapHang.NgayGiaoHang,
+                NgayLap = donNhapHang.NgayLap,
                 GhiChu = donNhapHang.GhiChu,
                 ThanhTien = donNhapHang.ThanhTien,
                 DaThanhToan = donNhapHang.DaThanhToan,

@@ -58,9 +58,6 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
             return newPhieuDatSan;
         }
 
-       
-        
-
         public async Task<PagedList<PhieuDatSan>> GetAll(PhieuDatSanParams userParams)
         {
             var result = _context.DanhSachPhieuDatSan.Include(x => x.KhachHang).Include(x => x.NhanVien).AsQueryable();
