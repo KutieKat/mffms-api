@@ -693,21 +693,18 @@ namespace MFFMS.API.Data.NhanVienRepository
 
             return new
             {
-                generalEmployee = new
-                {
-                    TotalQuantity = totalQuantity,
-                    TotalAllSalary = totalAllSalary,
-                    TotalManageQuantity = totalManageQuantity,
-                    TotalManageSalary = totalManageSalary,
-                    AvgManageSalary = avgManageSalary,
-                    MinManageSalary = minManageSalary,
-                    MaxManageSalary = maxManageSalary,
-                    TotalServiceQuantity = totalServiceQuantity,
-                    TotalServiceSalary = totalServiceSalary,
-                    AvgServiceSalary = avgServiceSalary, 
-                    MinServiceSalary = minServiceSalary,
-                    MaxServiceSalary = maxServiceSalary,
-                }
+                TotalQuantity = totalQuantity,
+                TotalAllSalary = totalAllSalary,
+                TotalManageQuantity = totalManageQuantity,
+                TotalManageSalary = totalManageSalary,
+                AvgManageSalary = avgManageSalary,
+                MinManageSalary = minManageSalary,
+                MaxManageSalary = maxManageSalary,
+                TotalServiceQuantity = totalServiceQuantity,
+                TotalServiceSalary = totalServiceSalary,
+                AvgServiceSalary = avgServiceSalary, 
+                MinServiceSalary = minServiceSalary,
+                MaxServiceSalary = maxServiceSalary,
             };
         }
 
