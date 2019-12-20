@@ -38,6 +38,7 @@ using MFFMS.API.Data.DonNhapHangRepository;
 using MFFMS.API.Data.ChiTietDonNhapHangRepository;
 using MFFMS.API.Data.PhieuDatSanRepository;
 using MFFMS.API.Data.ChiTieuPhieuDatSanRepository;
+using MFFMS.API.Data.ThongKeRepository;
 
 namespace MFFMS.API
 {
@@ -75,6 +76,7 @@ namespace MFFMS.API
             services.AddScoped<IChiTietDonNhapHangRepository, ChiTietDonNhapHangRepository>();
             services.AddScoped<IPhieuDatSanRepository, PhieuDatSanRepository>();
             services.AddScoped<IChiTietPhieuDatSanRepository, ChiTietPhieuDatSanRepository>();
+            services.AddScoped<IThongKeRepository, ThongKeRepository>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
