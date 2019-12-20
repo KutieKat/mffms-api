@@ -78,7 +78,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
 
         public async Task<PagedList<DonNhapHang>> GetAll(DonNhapHangParams userParams)
         {
-            var result = _context.DanhSachDonNhapHang.Include(x=>x.NhaCungCap).Include(x=>x.NhanVien).AsQueryable();
+            var result = _context.DanhSachDonNhapHang.Include(x => x.ChiTietDonNhapHang).Include(x=>x.NhaCungCap).Include(x=>x.NhanVien).AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             
@@ -274,7 +274,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
 
         public async Task<DonNhapHang> GetById(string id)
         {
-            var result = await _context.DanhSachDonNhapHang.Include(x => x.NhanVien).Include(x => x.NhaCungCap).FirstOrDefaultAsync(x => x.MaDonNhapHang == id);
+            var result = await _context.DanhSachDonNhapHang.Include(x => x.ChiTietDonNhapHang).Include(x => x.NhanVien).Include(x => x.NhaCungCap).FirstOrDefaultAsync(x => x.MaDonNhapHang == id);
             return result;
         }
 
