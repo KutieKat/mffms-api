@@ -10,7 +10,7 @@ namespace MFFMS.API.Helpers.Params
     {
         public string SoHDDV { get; set; }
         public string MaKhachHang { get; set; }
-        public string MaDichVu { get; set; }
+        public string MaNhanVien { get; set; }
         public DateTime NgaySuDungBatDau { get; set; }
         public DateTime NgaySuDungKetThuc {get;set;}
         public DateTime NgayLapBatDau { get; set; }
@@ -18,6 +18,7 @@ namespace MFFMS.API.Helpers.Params
         public string GhiChu { get; set; }
         public double ThanhTienBatDau {get;set;}
         public double ThanhTienKetThuc {get;set;}
-        public string DaThanhToan{get;set;}
+        public double DaThanhToanBatDau{get;set;}
+        public double DaThanhToanKetThuc { get; set; }
     }
 }

@@ -14,5 +14,6 @@ namespace MFFMS.API.Models
         public int SoLuong { get; set; }
         public double DonGia { get; set; }
         public string DVT { get; set; }
+        public double ThanhTien { get; set; }
     }
 }

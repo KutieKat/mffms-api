@@ -10,7 +10,11 @@ namespace MFFMS.API.Helpers.Params
         public string MaDonNhapHang { get; set; }
         public string MaNhaCungCap { get; set; }
         public string MaNhanVien { get; set; }
-        public string NoiNhanHang { get; set; }
+        public string GhiChu { get; set; }
+        public double ThanhTienBatDau { get; set; }
+        public double ThanhTienKetThuc { get; set; }
+        public double DaThanhToanBatDau { get; set; }
+        public double DaThanhToanKetThuc { get; set; }
         public DateTime NgayGiaoHangBatDau { get; set; }
         public DateTime NgayGiaoHangKetThuc { get; set; }
     }

@@ -46,6 +46,9 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                 MaNhaCungCap = donNhapHang.MaNhaCungCap,
                 MaNhanVien = donNhapHang.MaNhanVien,
                 NgayGiaoHang = donNhapHang.NgayGiaoHang,
+                GhiChu = donNhapHang.GhiChu,
+                ThanhTien = donNhapHang.ThanhTien,
+                DaThanhToan = donNhapHang.DaThanhToan,
                 ThoiGianCapNhat = DateTime.Now,
                 ThoiGianTao = DateTime.Now,
                 TrangThai = 1,
@@ -68,6 +71,11 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             var maNhanVien = userParams.MaNhanVien;
             var ngayGiaoHangBatDau = userParams.NgayGiaoHangBatDau;
             var ngayGiaoHangKetThuc = userParams.NgayGiaoHangKetThuc;
+            var ghiChu = userParams.GhiChu;
+            var thanhTienBatDau = userParams.ThanhTienBatDau;
+            var thanhTienKetThuc = userParams.ThanhTienKetThuc;
+            var daThanhToanBatDau = userParams.DaThanhToanBatDau;
+            var daThanhToanKetThuc = userParams.DaThanhToanKetThuc;
 
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
@@ -91,15 +99,19 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             {
                 result = result.Where(x => x.MaNhanVien.ToLower().Contains(maNhanVien.ToLower()));
             }
-            if (!string.IsNullOrEmpty(maNhanVien))
+
+            if (!string.IsNullOrEmpty(ghiChu))
             {
-                result = result.Where(x => x.MaNhanVien.ToLower().Contains(maNhanVien.ToLower()));
+                result = result.Where(x => x.MaNhanVien.ToLower().Contains(ghiChu.ToLower()));
             }
             
             if (ngayGiaoHangBatDau.GetHashCode() != 0 && ngayGiaoHangKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.NgayGiaoHang >= ngayGiaoHangBatDau && x.NgayGiaoHang <= ngayGiaoHangKetThuc);
             }
+
+            result = result.Where(x => x.ThanhTien >= thanhTienBatDau && x.ThanhTien <= thanhTienKetThuc);
+            result = result.Where(x => x.DaThanhToan >= daThanhToanBatDau && x.DaThanhToan <= daThanhToanKetThuc);
 
             // Base 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)
@@ -415,6 +427,9 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                 MaNhaCungCap = donNhapHang.MaNhaCungCap,
                 MaNhanVien = donNhapHang.MaNhanVien,
                 NgayGiaoHang = donNhapHang.NgayGiaoHang,
+                GhiChu = donNhapHang.GhiChu,
+                ThanhTien = donNhapHang.ThanhTien,
+                DaThanhToan = donNhapHang.DaThanhToan,
                 TrangThai = donNhapHang.TrangThai,
                 ThoiGianTao = oldRecord.ThoiGianTao,
                 DaXoa = oldRecord.DaXoa

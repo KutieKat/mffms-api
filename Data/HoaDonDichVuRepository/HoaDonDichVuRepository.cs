@@ -51,7 +51,6 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
                 DaThanhToan = hoaDonDichVu.DaThanhToan,
                 GhiChu = hoaDonDichVu.GhiChu,
                 MaKhachHang = hoaDonDichVu.MaKhachHang,
-                MaDichVu = hoaDonDichVu.MaDichVu,
                 ThoiGianTao = DateTime.Now,
                 ThoiGianCapNhat = DateTime.Now,
                 TrangThai = 1
@@ -63,13 +62,13 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
 
         public async Task<PagedList<HoaDonDichVu>> GetAll(HoaDonDichVuParams userParams)
         {
-            var result = _context.DanhSachHoaDonDichVu.Include(x => x.KhachHang).Include(x => x.DichVu).AsQueryable();
+            var result = _context.DanhSachHoaDonDichVu.Include(x => x.KhachHang).Include(x => x.NhanVien).AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             
             var soHDDV = userParams.SoHDDV;
             var maKhachHang = userParams.MaKhachHang;
-            var maDichVu = userParams.MaDichVu;
+            var maNhanVien = userParams.MaNhanVien;
             var ngaySuDungBatDau = userParams.NgaySuDungBatDau;
             var ngaySuDungKetThuc = userParams.NgaySuDungKetThuc;
             var ngayLapBatDau = userParams.NgayLapBatDau;
@@ -77,7 +76,8 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             var ghiChu = userParams.GhiChu;
             var thanhTienBatDau = userParams.ThanhTienBatDau;
             var thanhTienKetThuc = userParams.ThanhTienKetThuc;
-            var daThanhToan = userParams.DaThanhToan;
+            var daThanhToanBatDau = userParams.DaThanhToanBatDau;
+            var daThanhToanKetThuc = userParams.DaThanhToanKetThuc;
 
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
@@ -97,19 +97,18 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
                 result = result.Where(x => x.MaKhachHang.ToLower().Contains(maKhachHang.ToLower()));
             }
 
-            if (!string.IsNullOrEmpty(maDichVu))
+            if (!string.IsNullOrEmpty(maNhanVien))
             {
-                result = result.Where(x => x.MaDichVu.ToLower().Contains(maDichVu.ToLower()));
+                result = result.Where(x => x.MaNhanVien.ToLower().Contains(maNhanVien.ToLower()));
             }
 
             if (!string.IsNullOrEmpty(ghiChu))
             {
                 result = result.Where(x => x.GhiChu.ToLower().Contains(ghiChu.ToLower()));
             }
-            if (!string.IsNullOrEmpty(daThanhToan))
-            {
-                result = result.Where(x => x.DaThanhToan.ToLower().Contains(daThanhToan.ToLower()));
-            }
+
+            result = result.Where(x => x.ThanhTien >= thanhTienBatDau && x.ThanhTien <= thanhTienKetThuc);
+            result = result.Where(x => x.DaThanhToan >= daThanhToanBatDau && x.DaThanhToan <= daThanhToanKetThuc);
 
             // Base
             if (ngayLapBatDau.GetHashCode() != 0 && ngayLapKetThuc.GetHashCode() != 0)
@@ -174,16 +173,17 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
                         }
                         break;
 
-                    case "MaDichVu":
+                    case "MaNhanVien":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.MaDichVu);
+                            result = result.OrderBy(x => x.MaNhanVien);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.MaDichVu);
+                            result = result.OrderByDescending(x => x.MaNhanVien);
                         }
                         break;
+
                     case "NgaySuDung":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
@@ -252,7 +252,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
 
         public async Task<HoaDonDichVu> GetById(string id)
         {
-            var result = await _context.DanhSachHoaDonDichVu.Include(x => x.DichVu).Include(x => x.KhachHang).FirstOrDefaultAsync(x => x.SoHDDV == id);
+            var result = await _context.DanhSachHoaDonDichVu.Include(x => x.NhanVien).Include(x => x.KhachHang).FirstOrDefaultAsync(x => x.SoHDDV == id);
             return result;
         }
 
@@ -271,7 +271,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
 
             if (!string.IsNullOrEmpty(keyword))
             {
-                result = result.Where(x => x.MaKhachHang.ToLower().Contains(keyword.ToLower()) || x.MaDichVu.ToString().ToLower().Contains(keyword.ToLower()) || x.SoHDDV.ToString() == keyword);
+                result = result.Where(x => x.MaKhachHang.ToLower().Contains(keyword.ToLower()) || x.MaNhanVien.ToString().ToLower().Contains(keyword.ToLower()) || x.SoHDDV.ToString() == keyword);
             }
 
 
@@ -314,11 +314,11 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
                     case "MaDichVu":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
-                            result = result.OrderBy(x => x.MaDichVu);
+                            result = result.OrderBy(x => x.MaNhanVien);
                         }
                         else
                         {
-                            result = result.OrderByDescending(x => x.MaDichVu);
+                            result = result.OrderByDescending(x => x.MaNhanVien);
                         }
                         break;
                     case "NgaySuDung":
@@ -444,7 +444,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             {
                 SoHDDV = id,
                 MaKhachHang = hoaDonDichVu.MaKhachHang,
-                MaDichVu = hoaDonDichVu.MaDichVu,
+                //MaDichVu = hoaDonDichVu.MaDichVu,
                 NgayLap = hoaDonDichVu.NgayLap,
                 NgaySuDung = hoaDonDichVu.NgaySuDung,
                 ThanhTien = hoaDonDichVu.ThanhTien,

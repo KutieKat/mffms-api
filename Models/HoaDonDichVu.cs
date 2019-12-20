@@ -12,13 +12,13 @@ namespace MFFMS.API.Models
         public string SoHDDV { get; set; }
         public string MaKhachHang { get; set; }
         public KhachHang KhachHang { get; set; }
-        public string MaDichVu { get; set; }
-        public DichVu DichVu { get; set; }
+        public string MaNhanVien { get; set; }
+        public NhanVien NhanVien { get; set; }
         public DateTime NgaySuDung { get; set; }
         public DateTime NgayLap { get; set; }
         public string GhiChu { get; set; }
         public double ThanhTien {get;set;}
-        public string DaThanhToan{get;set;}
+        public double DaThanhToan{get;set;}
         public ICollection<ChiTietHDDV> ChiTietHDDV { get; set; }
 
     }

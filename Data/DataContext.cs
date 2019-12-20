@@ -91,7 +91,7 @@ namespace MFFMS.API.Data
                 .WithMany(x => x.HoaDonDichVu)
                 .IsRequired();
             modelBuilder.Entity<HoaDonDichVu>()
-                .HasOne(x => x.DichVu)
+                .HasOne(x => x.NhanVien)
                 .WithMany(x => x.HoaDonDichVu)
                 .IsRequired();
 

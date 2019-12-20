@@ -18,5 +18,6 @@ namespace MFFMS.API.Dtos.ChiTietDonNhapHangDto
         public double DonGia { get; set; }
         [Required]
         public string DVT { get; set; }
+        public double ThanhTien { get; set; }
     }
 }
