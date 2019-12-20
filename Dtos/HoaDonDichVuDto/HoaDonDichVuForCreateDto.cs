@@ -8,7 +8,9 @@ namespace MFFMS.API.Dtos.HoaDonDichVuDto
 {
     public class HoaDonDichVuForCreateDto : BaseDto
     {
+        [Required]
         public string MaKhachHang { get; set; }
+        [Required]
         public string MaNhanVien { get; set; }
         public DateTime NgaySuDung { get; set; }
         public DateTime NgayLap { get; set; }

@@ -110,8 +110,15 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                 result = result.Where(x => x.NgayGiaoHang >= ngayGiaoHangBatDau && x.NgayGiaoHang <= ngayGiaoHangKetThuc);
             }
 
-            result = result.Where(x => x.ThanhTien >= thanhTienBatDau && x.ThanhTien <= thanhTienKetThuc);
-            result = result.Where(x => x.DaThanhToan >= daThanhToanBatDau && x.DaThanhToan <= daThanhToanKetThuc);
+            if (thanhTienBatDau > 0 && thanhTienKetThuc > 0)
+            {
+                result = result.Where(x => x.ThanhTien >= thanhTienBatDau && x.ThanhTien <= thanhTienKetThuc);
+            }
+
+            if (daThanhToanBatDau > 0 && daThanhToanKetThuc > 0)
+            {
+                result = result.Where(x => x.DaThanhToan >= daThanhToanBatDau && x.DaThanhToan <= daThanhToanKetThuc);
+            }
 
             // Base 
             if (thoiGianTaoBatDau.GetHashCode() != 0 && thoiGianTaoKetThuc.GetHashCode() != 0)

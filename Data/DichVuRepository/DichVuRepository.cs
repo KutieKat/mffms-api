@@ -89,7 +89,7 @@ namespace MFFMS.API.Data.DichVuRepository
                 result = result.Where(x => x.TenDichVu.ToLower().Contains(tenDichVu.ToLower()));
             }
 
-            if (donGiaBatDau.GetHashCode() !=0 && donGiaKetThuc.GetHashCode() != 0)
+            if (donGiaBatDau > 0 && donGiaKetThuc > 0)
             {
                 result = result.Where(x => x.DonGia >= donGiaBatDau && x.DonGia <= donGiaKetThuc);
             }

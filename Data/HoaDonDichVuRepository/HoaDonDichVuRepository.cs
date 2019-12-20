@@ -51,6 +51,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
                 DaThanhToan = hoaDonDichVu.DaThanhToan,
                 GhiChu = hoaDonDichVu.GhiChu,
                 MaKhachHang = hoaDonDichVu.MaKhachHang,
+                MaNhanVien = hoaDonDichVu.MaNhanVien,
                 ThoiGianTao = DateTime.Now,
                 ThoiGianCapNhat = DateTime.Now,
                 TrangThai = 1
@@ -107,8 +108,15 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
                 result = result.Where(x => x.GhiChu.ToLower().Contains(ghiChu.ToLower()));
             }
 
-            result = result.Where(x => x.ThanhTien >= thanhTienBatDau && x.ThanhTien <= thanhTienKetThuc);
-            result = result.Where(x => x.DaThanhToan >= daThanhToanBatDau && x.DaThanhToan <= daThanhToanKetThuc);
+            if (thanhTienBatDau > 0 && thanhTienKetThuc > 0)
+            {
+                result = result.Where(x => x.ThanhTien >= thanhTienBatDau && x.ThanhTien <= thanhTienKetThuc);
+            }
+
+            if (daThanhToanBatDau > 0 && daThanhToanKetThuc > 0)
+            {
+                result = result.Where(x => x.DaThanhToan >= daThanhToanBatDau && x.DaThanhToan <= daThanhToanKetThuc);
+            }
 
             // Base
             if (ngayLapBatDau.GetHashCode() != 0 && ngayLapKetThuc.GetHashCode() != 0)
@@ -444,7 +452,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             {
                 SoHDDV = id,
                 MaKhachHang = hoaDonDichVu.MaKhachHang,
-                //MaDichVu = hoaDonDichVu.MaDichVu,
+                MaNhanVien = hoaDonDichVu.MaNhanVien,
                 NgayLap = hoaDonDichVu.NgayLap,
                 NgaySuDung = hoaDonDichVu.NgaySuDung,
                 ThanhTien = hoaDonDichVu.ThanhTien,

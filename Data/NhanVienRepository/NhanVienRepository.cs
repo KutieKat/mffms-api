@@ -113,7 +113,10 @@ namespace MFFMS.API.Data.NhanVienRepository
                 result = result.Where(x => x.SoCMND.ToLower().Contains(soCMND.ToLower()));
             }
 
-            result = result.Where(x => x.Luong >= luongBatDau && x.Luong <= luongKetThuc);
+            if (luongBatDau > 0 && luongKetThuc > 0)
+            {
+                result = result.Where(x => x.Luong >= luongBatDau && x.Luong <= luongKetThuc);
+            }
 
             if (!string.IsNullOrEmpty(ghiChu))
             {
