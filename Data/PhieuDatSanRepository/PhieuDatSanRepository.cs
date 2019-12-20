@@ -60,7 +60,7 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
 
         public async Task<PagedList<PhieuDatSan>> GetAll(PhieuDatSanParams userParams)
         {
-            var result = _context.DanhSachPhieuDatSan.Include(x => x.KhachHang).Include(x => x.NhanVien).AsQueryable();
+            var result = _context.DanhSachPhieuDatSan.Include(x => x.ChiTietPhieuDatSan).Include(x => x.KhachHang).Include(x => x.NhanVien).AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
 
@@ -218,35 +218,159 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
 
         public async Task<PhieuDatSan> GetById(string id)
         {
-            var result = await _context.DanhSachPhieuDatSan.Include(x => x.KhachHang).Include(x => x.NhanVien).FirstOrDefaultAsync(x => x.MaPhieuDatSan == id);
+            var result = await _context.DanhSachPhieuDatSan.Include(x => x.ChiTietPhieuDatSan).Include(x => x.KhachHang).Include(x => x.NhanVien).FirstOrDefaultAsync(x => x.MaPhieuDatSan == id);
             return result;
         }
 
         public async Task<Object> GetGeneralStatistics(PhieuDatSanGeneralStatisticsParams userParams)
         {
             var result = _context.DanhSachPhieuDatSan.AsQueryable();
-            var totalTickets = 0; // tong so phioeu dat san 
-           // var mostBookedCustomer = await _context.DanhSachPhieuDatSan.Include(x=>x.KhachHang).Max();
-                       
+            var totalPhieuDatSan = 0;
+            KhachHang DatSanNhieuNhat = new KhachHang();
+            NhanVien TiepNhanDatSanNhieuNhat = new NhanVien();
+            SanBong DuocDatNhieuNhat = new SanBong();
+            ICollection<KhachHang> danhSachKhachHang = await _context.DanhSachKhachHang.OrderBy(x => x.ThoiGianTao).ToListAsync();
+            ICollection<NhanVien> danhSachNhanVien = await _context.DanhSachNhanVien.OrderBy(x => x.ThoiGianTao).ToListAsync();
+            ICollection<SanBong> danhSachSanBong = await _context.DanhSachSanBong.OrderBy(x => x.ThoiGianTao).ToListAsync();
+            var demKhachHang = new List<int>();
+            var demNhanVien = new List<int>();
+            var demSanBong = new List<int>();
 
             if (userParams != null && userParams.StartingTime.GetHashCode() != 0 && userParams.EndingTime.GetHashCode() != 0)
             {
-                totalTickets = result.Count();  
-                //cheapestService = result.Where(x =>x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Min(x => x.DonGia);
-                // mostExpensiveService = result.Where(x =>x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Max(x => x.DonGia);
+                totalPhieuDatSan = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Count();
+                var danhSachPhieuDatSan = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime);
+
+                //khách hàng
+                foreach (var khachHang in danhSachKhachHang)
+                {
+                    var demKH = 0;
+                    foreach (var phieuDatSan in danhSachPhieuDatSan)
+                    {
+                        if (phieuDatSan.MaKhachHang == khachHang.MaKhachHang)
+                        {
+                            demKH = demKH + 1;
+                        }
+                    }
+
+                    demKhachHang.Add(demKH);
+
+                }
+
+
+                int max = demKhachHang.Max();
+                var index = demKhachHang.IndexOf(max);
+                DatSanNhieuNhat = danhSachKhachHang.ElementAt(index);
+
+                //Nhân viên
+
+                foreach (var nhanVien in danhSachNhanVien)
+                {
+                    var demNV = 0;
+                    foreach (var phieuDatSan in danhSachPhieuDatSan)
+                    {
+                        if (phieuDatSan.MaNhanVien == nhanVien.MaNhanVien)
+                        {
+                            demNV = demNV + 1;
+                        }
+                    }
+
+                    demNhanVien.Add(demNV);
+                }
+
+                int maxNV = demNhanVien.Max();
+                var indexNV = demKhachHang.IndexOf(maxNV);
+                TiepNhanDatSanNhieuNhat = danhSachNhanVien.ElementAt(indexNV);
+
+                var danhSachChiTietPDS = _context.DanhSachChiTietPhieuDatSan.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime);
+                foreach (var sanBong in danhSachSanBong)
+                {
+                    var demSB = 0;
+                    foreach (var chiTietPhieuDatSan in danhSachChiTietPDS)
+                    {
+                        if (chiTietPhieuDatSan.MaSanBong == sanBong.MaSanBong)
+                        {
+                            demSB = demSB + 1;
+                        }
+                    }
+
+                    demSanBong.Add(demSB);
+                }
+
+                int maxSB = demSanBong.Max();
+                var indexSB = demSanBong.IndexOf(maxSB);
+                DuocDatNhieuNhat = danhSachSanBong.ElementAt(indexSB);
             }
             else
             {
-                // totalServices = result.Count();  
-                //cheapestService = result.Min(x => x.DonGia);
-                // mostExpensiveService = result.Max(x => x.DonGia);
+                totalPhieuDatSan = result.Count();
+                var danhSachPhieuDatSan = result.OrderBy(x => x.ThoiGianTao);
+                var danhSachChiTietPDS = _context.DanhSachChiTietPhieuDatSan.OrderBy(x => x.ThoiGianTao);
+                foreach (var khachHang in danhSachKhachHang)
+                {
+                    var demKH = 0;
+                    foreach (var phieuDatSan in danhSachPhieuDatSan)
+                    {
+                        if (phieuDatSan.MaKhachHang == khachHang.MaKhachHang)
+                        {
+                            demKH = demKH + 1;
+                        }
+                    }
+
+                    demKhachHang.Add(demKH);
+
+                }
+
+
+
+                int max = demKhachHang.Max();
+                var index = demKhachHang.IndexOf(max);
+                DatSanNhieuNhat = danhSachKhachHang.ElementAt(index);
+
+
+                foreach (var nhanVien in danhSachNhanVien)
+                {
+                    var demNV = 0;
+                    foreach (var phieuDatSan in danhSachPhieuDatSan)
+                    {
+                        if (phieuDatSan.MaNhanVien == nhanVien.MaNhanVien)
+                        {
+                            demNV = demNV + 1;
+                        }
+                    }
+
+                    demNhanVien.Add(demNV);
+                }
+
+                int maxNV = demNhanVien.Max();
+                var indexNV = demNhanVien.IndexOf(maxNV);
+                TiepNhanDatSanNhieuNhat = danhSachNhanVien.ElementAt(indexNV);
+
+                foreach (var sanBong in danhSachSanBong)
+                {
+                    var demSB = 0;
+                    foreach (var chiTietPhieuDatSan in danhSachChiTietPDS)
+                    {
+                        if (chiTietPhieuDatSan.MaSanBong == sanBong.MaSanBong)
+                        {
+                            demSB = demSB + 1;
+                        }
+                    }
+
+                    demSanBong.Add(demSB);
+                }
+
+                int maxSB = demSanBong.Max();
+                var indexSB = demSanBong.IndexOf(maxSB);
+                DuocDatNhieuNhat = danhSachSanBong.ElementAt(indexSB);
             }
 
             return new
             {
-                Total = totalTickets,
-                //Cheapest = cheapestService,
-                //MostExpensive = mostExpensiveService,
+                totalPhieuDatSan,
+                DatSanNhieuNhat,
+                TiepNhanDatSanNhieuNhat,
+                DuocDatNhieuNhat
             };
         }
 
