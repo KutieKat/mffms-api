@@ -21,5 +21,6 @@ namespace MFFMS.API.Data.DonNhapHangRepository
         int GetTotalPages();
         int GetTotalItems();
         Object GetStatusStatistics(DonNhapHangParams userParams);
+        Task<Object> GetGeneralStatistics(DonNhapHangGeneralStatisticsParams userParams);
     }
 }

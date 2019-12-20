@@ -516,5 +516,33 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             await _context.SaveChangesAsync();
             return donNhapHangToUpdateById;
         }
+
+        public async Task<object> GetGeneralStatistics(DonNhapHangGeneralStatisticsParams userParams)
+        {
+            var result = _context.DanhSachDonNhapHang.AsQueryable();
+            var total = 0.0;
+            var cheapest = 0.0;
+            var mostExpensive = 0.0;
+
+            if (userParams != null && userParams.StartingTime.GetHashCode() != 0 && userParams.EndingTime.GetHashCode() != 0)
+            {
+                total = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Count();
+                cheapest = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Min(x => x.ThanhTien);
+                mostExpensive = result.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Max(x => x.ThanhTien);
+            }
+            else
+            {
+                total = result.Count();
+                cheapest = result.Min(x => x.ThanhTien);
+                mostExpensive = result.Max(x => x.ThanhTien);
+            }
+
+            return new
+            {
+                Total = total,
+                Cheapest = cheapest,
+                MostExpensive = mostExpensive
+            };
+        }
     }
 }
