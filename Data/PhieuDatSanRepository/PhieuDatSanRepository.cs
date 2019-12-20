@@ -123,9 +123,6 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
                 result = result.Where(x => x.DaXoa == daXoa);
             }
 
-
-
-
             if (!string.IsNullOrEmpty(sortField) && !string.IsNullOrEmpty(sortOrder))
             {
                 switch (sortField)
@@ -223,6 +220,34 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
         {
             var result = await _context.DanhSachPhieuDatSan.Include(x => x.KhachHang).Include(x => x.NhanVien).FirstOrDefaultAsync(x => x.MaPhieuDatSan == id);
             return result;
+        }
+
+        public async Task<Object> GetGeneralStatistics(PhieuDatSanGeneralStatisticsParams userParams)
+        {
+            var result = _context.DanhSachPhieuDatSan.AsQueryable();
+            var totalTickets = 0; // tong so phioeu dat san 
+           // var mostBookedCustomer = await _context.DanhSachPhieuDatSan.Include(x=>x.KhachHang).Max();
+                       
+
+            if (userParams != null && userParams.StartingTime.GetHashCode() != 0 && userParams.EndingTime.GetHashCode() != 0)
+            {
+                totalTickets = result.Count();  
+                //cheapestService = result.Where(x =>x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Min(x => x.DonGia);
+                // mostExpensiveService = result.Where(x =>x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Max(x => x.DonGia);
+            }
+            else
+            {
+                // totalServices = result.Count();  
+                //cheapestService = result.Min(x => x.DonGia);
+                // mostExpensiveService = result.Max(x => x.DonGia);
+            }
+
+            return new
+            {
+                Total = totalTickets,
+                //Cheapest = cheapestService,
+                //MostExpensive = mostExpensiveService,
+            };
         }
 
         public object GetStatusStatistics(PhieuDatSanParams userParams)
