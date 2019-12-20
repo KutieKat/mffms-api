@@ -40,6 +40,114 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             return tempId;
         }
 
+        public async Task<Object> GetGeneralStatistics(HoaDonDichVuStatisticsParams userParams)
+        {
+            var totalHoaDonDV = 0;
+            KhachHang khachHangCoHoaDonNhieuNhat = new KhachHang();
+            DichVu dichVuCoHoaDonNhieuNhat = new DichVu();
+
+            var danhSachKhachHang = _context.DanhSachKhachHang.OrderBy(x => x.ThoiGianTao).ToList();
+            var danhSachDichVu = _context.DanhSachDichVu.OrderBy(x => x.ThoiGianTao).ToList();
+
+            var demKhachHang = new List<int>();
+            var demDichVu = new List<int>();
+
+
+            if (userParams != null && userParams.StartingTime.GetHashCode() != 0 && userParams.EndingTime.GetHashCode() != 0)
+            {
+                totalHoaDonDV = _context.DanhSachHoaDonDichVu.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime).Count();
+                var danhSachHoaDonDichVu = _context.DanhSachHoaDonDichVu.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime);
+                var danhSachChiTietHDDV = _context.DanhSachChiTietHDDV.Where(x => x.ThoiGianTao >= userParams.StartingTime && x.ThoiGianTao <= userParams.EndingTime);
+                foreach (var khachHang in danhSachKhachHang)
+                {
+                    int demKH = 0;
+                    foreach (var hoaDonDichVu in danhSachHoaDonDichVu)
+                    {
+                        if (hoaDonDichVu.MaKhachHang == khachHang.MaKhachHang)
+                        {
+                            demKH = demKH + 1;
+                        }
+                    }
+
+                    demKhachHang.Add(demKH);
+                }
+
+                int maxKH = demKhachHang.Max();
+                int indexKH = demKhachHang.IndexOf(maxKH);
+                khachHangCoHoaDonNhieuNhat = danhSachKhachHang.ElementAt(indexKH);
+
+
+                foreach (var dichVu in danhSachDichVu)
+                {
+                    int demDV = 0;
+                    foreach (var chiTietHDDV in danhSachChiTietHDDV)
+                    {
+                        if (chiTietHDDV.MaDichVu == dichVu.MaDichVu)
+                        {
+                            demDV = demDV + 1;
+                        }
+                    }
+
+                    demDichVu.Add(demDV);
+                }
+
+                int maxDV = demDichVu.Max();
+                int indexDV = demDichVu.IndexOf(maxDV);
+                dichVuCoHoaDonNhieuNhat = danhSachDichVu.ElementAt(indexDV);
+            }
+
+            else
+            {
+                totalHoaDonDV = _context.DanhSachHoaDonDichVu.Count();
+                var danhSachHoaDonDichVu = _context.DanhSachHoaDonDichVu.OrderBy(x => x.ThoiGianTao);
+                var danhSachChiTietHDDV = _context.DanhSachChiTietHDDV.OrderBy(x => x.ThoiGianTao);
+
+                foreach (var khachHang in danhSachKhachHang)
+                {
+                    int demKH = 0;
+                    foreach (var hoaDonDichVu in danhSachHoaDonDichVu)
+                    {
+                        if (hoaDonDichVu.MaKhachHang == khachHang.MaKhachHang)
+                        {
+                            demKH = demKH + 1;
+                        }
+                    }
+
+                    demKhachHang.Add(demKH);
+                }
+
+                int maxKH = demKhachHang.Max();
+                int indexKH = demKhachHang.IndexOf(maxKH);
+                khachHangCoHoaDonNhieuNhat = danhSachKhachHang.ElementAt(indexKH);
+
+
+                foreach (var dichVu in danhSachDichVu)
+                {
+                    int demDV = 0;
+                    foreach (var chiTietHDDV in danhSachChiTietHDDV)
+                    {
+                        if (chiTietHDDV.MaDichVu == dichVu.MaDichVu)
+                        {
+                            demDV = demDV + 1;
+                        }
+                    }
+
+                    demDichVu.Add(demDV);
+                }
+
+                int maxDV = demDichVu.Max();
+                int indexDV = demDichVu.IndexOf(maxDV);
+                dichVuCoHoaDonNhieuNhat = danhSachDichVu.ElementAt(indexDV);
+            }
+
+            return new
+            {
+                totalHoaDonDV,
+                khachHangCoHoaDonNhieuNhat,
+                dichVuCoHoaDonNhieuNhat
+            };
+        }
+
         public async Task<HoaDonDichVu> Create(HoaDonDichVuForCreateDto hoaDonDichVu)
         {
             var tinhTrang = "";

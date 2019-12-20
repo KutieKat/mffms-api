@@ -23,5 +23,6 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
         int GetTotalItems();
         //Task<Object> GetGeneralStatisticsParams(HoaDonDichVuStatisticsParams userParams);
         Object GetStatusStatistics(HoaDonDichVuParams userParams);
+        Task<Object> GetGeneralStatistics(HoaDonDichVuStatisticsParams userParams);
     }
 }
