@@ -40,6 +40,21 @@ namespace MFFMS.API.Data.DonNhapHangRepository
 
         public async Task<DonNhapHang> Create(DonNhapHangForCreateDto donNhapHang)
         {
+            var tinhTrang = "";
+
+            if (donNhapHang.DaThanhToan == 0)
+            {
+                tinhTrang = "Chưa thanh toán";
+            }
+            else if (donNhapHang.DaThanhToan != donNhapHang.ThanhTien && donNhapHang.DaThanhToan > 0)
+            {
+                tinhTrang = "Đã thanh toán một phần";
+            }
+            else
+            {
+                tinhTrang = "Đã thanh toán";
+            }
+
             var newDonNhapHang = new DonNhapHang
             {
                 MaDonNhapHang = GenerateId(),
@@ -49,6 +64,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                 GhiChu = donNhapHang.GhiChu,
                 ThanhTien = donNhapHang.ThanhTien,
                 DaThanhToan = donNhapHang.DaThanhToan,
+                TinhTrang = tinhTrang,
                 ThoiGianCapNhat = DateTime.Now,
                 ThoiGianTao = DateTime.Now,
                 TrangThai = 1,
@@ -76,6 +92,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             var thanhTienKetThuc = userParams.ThanhTienKetThuc;
             var daThanhToanBatDau = userParams.DaThanhToanBatDau;
             var daThanhToanKetThuc = userParams.DaThanhToanKetThuc;
+            var tinhTrang = userParams.TinhTrang;
 
             var thoiGianTaoBatDau = userParams.ThoiGianTaoBatDau;
             var thoiGianTaoKetThuc = userParams.ThoiGianTaoKetThuc;
@@ -104,7 +121,12 @@ namespace MFFMS.API.Data.DonNhapHangRepository
             {
                 result = result.Where(x => x.MaNhanVien.ToLower().Contains(ghiChu.ToLower()));
             }
-            
+
+            if (!string.IsNullOrEmpty(tinhTrang))
+            {
+                result = result.Where(x => x.TinhTrang.ToLower().Contains(tinhTrang.ToLower()));
+            }
+
             if (ngayGiaoHangBatDau.GetHashCode() != 0 && ngayGiaoHangKetThuc.GetHashCode() != 0)
             {
                 result = result.Where(x => x.NgayGiaoHang >= ngayGiaoHangBatDau && x.NgayGiaoHang <= ngayGiaoHangKetThuc);
@@ -171,6 +193,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                             result = result.OrderByDescending(x => x.MaNhaCungCap);
                         }
                         break;
+
                     case "MaNhanVien":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
@@ -193,7 +216,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                         }
                         break;
 
-                        case "ThoiGianTao":
+                    case "ThoiGianTao":
                         if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
                         {
                             result = result.OrderBy(x => x.ThoiGianTao);
@@ -212,6 +235,17 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                         else
                         {
                             result = result.OrderByDescending(x => x.ThoiGianCapNhat);
+                        }
+                        break;
+
+                    case "TinhTrang":
+                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = result.OrderBy(x => x.TinhTrang);
+                        }
+                        else
+                        {
+                            result = result.OrderByDescending(x => x.TinhTrang);
                         }
                         break;
 
@@ -428,6 +462,21 @@ namespace MFFMS.API.Data.DonNhapHangRepository
         public async Task<DonNhapHang> UpdateById(string id, DonNhapHangForUpdateDto donNhapHang)
         {
             var oldRecord = await _context.DanhSachDonNhapHang.AsNoTracking().FirstOrDefaultAsync(x => x.MaDonNhapHang == id);
+            var tinhTrang = "";
+
+            if (donNhapHang.DaThanhToan == 0)
+            {
+                tinhTrang = "Chưa thanh toán";
+            }
+            else if (donNhapHang.DaThanhToan != donNhapHang.ThanhTien && donNhapHang.DaThanhToan > 0)
+            {
+                tinhTrang = "Đã thanh toán một phần";
+            }
+            else
+            {
+                tinhTrang = "Đã thanh toán";
+            }
+
             var donNhapHangToUpdateById = new DonNhapHang
             {
                 MaDonNhapHang = id,
@@ -437,6 +486,7 @@ namespace MFFMS.API.Data.DonNhapHangRepository
                 GhiChu = donNhapHang.GhiChu,
                 ThanhTien = donNhapHang.ThanhTien,
                 DaThanhToan = donNhapHang.DaThanhToan,
+                TinhTrang = tinhTrang,
                 TrangThai = donNhapHang.TrangThai,
                 ThoiGianTao = oldRecord.ThoiGianTao,
                 DaXoa = oldRecord.DaXoa

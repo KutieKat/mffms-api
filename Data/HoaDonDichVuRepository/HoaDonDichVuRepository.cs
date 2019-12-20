@@ -42,6 +42,21 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
 
         public async Task<HoaDonDichVu> Create(HoaDonDichVuForCreateDto hoaDonDichVu)
         {
+            var tinhTrang = "";
+
+            if (hoaDonDichVu.DaThanhToan == 0)
+            {
+                tinhTrang = "Chưa thanh toán";
+            }
+            else if (hoaDonDichVu.DaThanhToan != hoaDonDichVu.ThanhTien && hoaDonDichVu.DaThanhToan > 0)
+            {
+                tinhTrang = "Đã thanh toán một phần";
+            }
+            else
+            {
+                tinhTrang = "Đã thanh toán";
+            }
+
             var newHoaDonDichVu = new HoaDonDichVu
             {
                 SoHDDV = GenerateId(),
@@ -49,6 +64,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
                 NgaySuDung = hoaDonDichVu.NgaySuDung,
                 ThanhTien = hoaDonDichVu.ThanhTien,
                 DaThanhToan = hoaDonDichVu.DaThanhToan,
+                TinhTrang = tinhTrang,
                 GhiChu = hoaDonDichVu.GhiChu,
                 MaKhachHang = hoaDonDichVu.MaKhachHang,
                 MaNhanVien = hoaDonDichVu.MaNhanVien,
@@ -75,6 +91,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             var ngayLapBatDau = userParams.NgayLapBatDau;
             var ngayLapKetThuc = userParams.NgayLapKetThuc;
             var ghiChu = userParams.GhiChu;
+            var tinhTrang = userParams.TinhTrang;
             var thanhTienBatDau = userParams.ThanhTienBatDau;
             var thanhTienKetThuc = userParams.ThanhTienKetThuc;
             var daThanhToanBatDau = userParams.DaThanhToanBatDau;
@@ -106,6 +123,11 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
             if (!string.IsNullOrEmpty(ghiChu))
             {
                 result = result.Where(x => x.GhiChu.ToLower().Contains(ghiChu.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(tinhTrang))
+            {
+                result = result.Where(x => x.TinhTrang.ToLower().Contains(tinhTrang.ToLower()));
             }
 
             if (thanhTienBatDau > 0 && thanhTienKetThuc > 0)
@@ -232,6 +254,17 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
                         else
                         {
                             result = result.OrderByDescending(x => x.ThoiGianCapNhat);
+                        }
+                        break;
+
+                    case "TinhTrang":
+                        if (string.Equals(sortOrder, "ASC", StringComparison.OrdinalIgnoreCase))
+                        {
+                            result = result.OrderBy(x => x.TinhTrang);
+                        }
+                        else
+                        {
+                            result = result.OrderByDescending(x => x.TinhTrang);
                         }
                         break;
 
@@ -448,6 +481,21 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
         public async Task<HoaDonDichVu> UpdateById(string id, HoaDonDichVuForUpdateDto hoaDonDichVu)
         {
             var oldRecord = await _context.DanhSachHoaDonDichVu.AsNoTracking().FirstOrDefaultAsync(x => x.SoHDDV == id);
+            var tinhTrang = "";
+
+            if (hoaDonDichVu.DaThanhToan == 0)
+            {
+                tinhTrang = "Chưa thanh toán";
+            }
+            else if (hoaDonDichVu.DaThanhToan != hoaDonDichVu.ThanhTien && hoaDonDichVu.DaThanhToan > 0)
+            {
+                tinhTrang = "Đã thanh toán một phần";
+            }
+            else
+            {
+                tinhTrang = "Đã thanh toán";
+            }
+
             var hoaDonDichVuToUpdate = new HoaDonDichVu
             {
                 SoHDDV = id,
@@ -457,6 +505,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
                 NgaySuDung = hoaDonDichVu.NgaySuDung,
                 ThanhTien = hoaDonDichVu.ThanhTien,
                 DaThanhToan = hoaDonDichVu.DaThanhToan,
+                TinhTrang = tinhTrang,
                 TrangThai = hoaDonDichVu.TrangThai,
                 ThoiGianTao = oldRecord.ThoiGianTao,
                 ThoiGianCapNhat = DateTime.Now

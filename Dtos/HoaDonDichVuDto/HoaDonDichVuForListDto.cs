@@ -16,6 +16,6 @@ namespace MFFMS.API.Dtos.HoaDonDichVuDto
         public double ThanhTien{get;set;}
         public string DaThanhToan{get;set;}
         public string GhiChu { get; set; }
-
+        public string TinhTrang { get; set; }
     }
 }

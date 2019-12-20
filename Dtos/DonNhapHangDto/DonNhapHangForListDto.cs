@@ -15,6 +15,6 @@ namespace MFFMS.API.Dtos.DonNhapHangDto
         public string GhiChu { get; set; }
         public double ThanhTien { get; set; }
         public double DaThanhToan { get; set; }
-
+        public string TinhTrang { get; set; }
     }
 }

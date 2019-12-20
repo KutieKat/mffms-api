@@ -20,5 +20,6 @@ namespace MFFMS.API.Helpers.Params
         public double ThanhTienKetThuc {get;set;}
         public double DaThanhToanBatDau{get;set;}
         public double DaThanhToanKetThuc { get; set; }
+        public string TinhTrang { get; set; }
     }
 }
