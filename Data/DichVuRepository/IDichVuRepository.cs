@@ -22,6 +22,7 @@ namespace MFFMS.API.Data.DichVuRepository
         int GetTotalPages();
         int GetTotalItems();
         Object GetStatusStatistics(DichVuParams userParams);
+        Task<Object> GetGeneralStatistics(DichVuGeneralStatisticsParams userParams);
         ValidationResultDto ValidateBeforeCreate(DichVuForCreateDto dichVu);
         ValidationResultDto ValidateBeforeUpdate(string id, DichVuForUpdateDto dichVu);
     }

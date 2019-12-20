@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using MFFMS.API.Data.DichVuRepository;
-using MFFMS.API.Dtos.DichVuDto;
+using MFFMS.API.Data.ChiTieuPhieuDatSanRepository;
+using MFFMS.API.Dtos.ChiTietPhieuDatSanDto;
 using MFFMS.API.Dtos.ResponseDto;
 using MFFMS.API.Helpers;
 using MFFMS.API.Helpers.Params;
@@ -15,26 +15,27 @@ namespace MFFMS.API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class DichVuController : ControllerBase
+    public class ChiTietPhieuDatSanController : ControllerBase
     {
-        private readonly IDichVuRepository _repo;
+        private readonly IChiTietPhieuDatSanRepository _repo;
         private readonly IMapper _mapper;
         private readonly string _entityName;
-
-        public DichVuController(IDichVuRepository repo, IMapper mapper)
+        public ChiTietPhieuDatSanController (IChiTietPhieuDatSanRepository repo, IMapper mapper)
         {
             _repo = repo;
             _mapper = mapper;
-            _entityName = "dịch vụ";
+            _entityName = "chi tiết phiếu đặt sân";
         }
 
+        
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] DichVuParams userParams)
+        public async Task<IActionResult> GetAll([FromQuery] ChiTietPhieuDatSanParams userParams)
         {
+
             try
             {
                 var result = await _repo.GetAll(userParams);
-                var resultToReturn = _mapper.Map<IEnumerable<DichVuForListDto>>(result);
+                var resultToReturn = _mapper.Map<IEnumerable<ChiTietPhieuDatSanForListDto>>(result);
 
                 Response.AddPagination(result.CurrentPage, result.PageSize, result.TotalCount, result.TotalPages);
 
@@ -65,14 +66,14 @@ namespace MFFMS.API.Controllers
             }
         }
 
-
+        
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<IActionResult> GetById(int id)
         {
             try
             {
                 var result = await _repo.GetById(id);
-                var resultToReturn = _mapper.Map<DichVuForViewDto>(result);
+                var resultToReturn = _mapper.Map<ChiTietPhieuDatSanForViewDto>(result);
 
                 return StatusCode(200, new SuccessResponseDto
                 {
@@ -96,45 +97,17 @@ namespace MFFMS.API.Controllers
             }
         }
 
-         [HttpGet]
-        public async Task<IActionResult> GetGeneralStatistics([FromQuery] DichVuGeneralStatisticsParams userParams)
-        {
-            try
-            {
-                var result = await _repo.GetGeneralStatistics(userParams);
-
-                return StatusCode(200, new SuccessResponseDto
-                {
-                    Message = "Lấy dữ liệu thống kê tổng quan về " + _entityName + " thành công!",
-                    Result = new SuccessResponseResultWithSingleDataDto
-                    {
-                        Data = result
-                    }
-                });
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, new FailedResponseDto
-                {
-                    Message = "Lấy dữ liệu thống kê tổng quan về " + _entityName + " thất bại!",
-                    Result = new FailedResponseResultDto
-                    {
-                        Errors = e
-                    }
-                });
-            }
-        }
-
+        
         [HttpPost]
-        public async Task<IActionResult> Create(DichVuForCreateDto dichVu)
+        public async Task<IActionResult> Create(ChiTietPhieuDatSanForCreateDto chiTietPhieuDatSan)
         {
             try
             {
-                var validationResult = _repo.ValidateBeforeCreate(dichVu);
+                var validationResult = _repo.ValidateBeforeCreate(chiTietPhieuDatSan);
 
                 if (validationResult.IsValid)
                 {
-                    var result = await _repo.Create(dichVu);
+                    var result = await _repo.Create(chiTietPhieuDatSan);
 
                     return StatusCode(201, new SuccessResponseDto
                     {
@@ -170,16 +143,62 @@ namespace MFFMS.API.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateById(string id, DichVuForUpdateDto dichVu)
+        [HttpPost]
+        public async Task<IActionResult> CreateMultiple(ICollection<ChiTietPhieuDatSanForCreateMultipleDto> danhSachChiTietPhieuDatSan)
         {
             try
             {
-                var validationResult = _repo.ValidateBeforeUpdate(id, dichVu);
+                var validationResult = _repo.ValidateBeforeCreateMultiple(danhSachChiTietPhieuDatSan);
 
                 if (validationResult.IsValid)
                 {
-                    var result = await _repo.UpdateById(id, dichVu);
+                    var result = await _repo.CreateMultiple(danhSachChiTietPhieuDatSan);
+
+                    return StatusCode(201, new SuccessResponseDto
+                    {
+                        Message = "Nhập dữ liệu cho " + _entityName + " thành công!",
+                        Result = new SuccessResponseResultWithSingleDataDto
+                        {
+                            Data = result
+                        }
+                    });
+                }
+                else
+                {
+                    return StatusCode(500, new FailedResponseDto
+                    {
+                        Message = "Nhập dữ liệu cho " + _entityName + " thất bại!",
+                        Result = new FailedResponseResultDto
+                        {
+                            Errors = validationResult.Errors
+                        }
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new FailedResponseDto
+                {
+                    Message = "Nhập dữ liệu cho " + _entityName + " thất bại!",
+                    Result = new FailedResponseResultDto
+                    {
+                        Errors = e
+                    }
+                });
+            }
+        }
+
+        
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateById(int id, ChiTietPhieuDatSanForUpdateDto chiTietPhieuDatSan)
+        {
+            try
+            {
+                var validationResult = _repo.ValidateBeforeUpdate(id, chiTietPhieuDatSan);
+
+                if (validationResult.IsValid)
+                {
+                    var result = await _repo.UpdateById(id, chiTietPhieuDatSan);
 
                     return StatusCode(200, new SuccessResponseDto
                     {
@@ -216,7 +235,7 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> TemporarilyDeleteById(string id)
+        public async Task<IActionResult> TemporarilyDeleteById(int id)
         {
             try
             {
@@ -244,7 +263,7 @@ namespace MFFMS.API.Controllers
             }
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> RestoreById(string id)
+        public async Task<IActionResult> RestoreById(int id)
         {
             try
             {
@@ -273,7 +292,7 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> PermanentlyDeleteById(string id)
+        public async Task<IActionResult> PermanentlyDeleteById(int id)
         {
             try
             {

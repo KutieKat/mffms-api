@@ -46,6 +46,7 @@ namespace MFFMS.API.Data.ChiTietDonNhapHangRepository
                 SoLuong = chiTietDonNhapHang.SoLuong,
                 DVT = chiTietDonNhapHang.DVT,
                 DonGia = chiTietDonNhapHang.DonGia,
+                ThanhTien = chiTietDonNhapHang.ThanhTien,
                 ThoiGianCapNhat = DateTime.Now,
                 ThoiGianTao = DateTime.Now,
                 TrangThai = 1
@@ -69,6 +70,7 @@ namespace MFFMS.API.Data.ChiTietDonNhapHangRepository
                     SoLuong = chiTietDonNhapHang.SoLuong,
                     DVT = chiTietDonNhapHang.DVT,
                     DonGia = chiTietDonNhapHang.DonGia,
+                    ThanhTien = chiTietDonNhapHang.ThanhTien,
                     ThoiGianCapNhat = DateTime.Now,
                     ThoiGianTao = DateTime.Now,
                     TrangThai = 1
@@ -430,6 +432,7 @@ namespace MFFMS.API.Data.ChiTietDonNhapHangRepository
                 SoLuong = chiTietDonNhapHang.SoLuong,
                 DonGia = chiTietDonNhapHang.DonGia,
                 DVT = chiTietDonNhapHang.DVT,
+                ThanhTien = chiTietDonNhapHang.ThanhTien,
                 TrangThai = chiTietDonNhapHang.TrangThai,
                 ThoiGianTao = oldRecord.ThoiGianTao,
                 ThoiGianCapNhat = DateTime.Now

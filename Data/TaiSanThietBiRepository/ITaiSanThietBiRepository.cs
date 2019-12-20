@@ -22,6 +22,7 @@ namespace MFFMS.API.Data.TaiSanThietBiRepository
         int GetTotalPages();
         int GetTotalItems();
         Object GetStatusStatistics(TaiSanThietBiParams userParams);
+        Task<Object> GetGeneralStatistics(TSTBGeneralStatisticsParams userParams);
         ValidationResultDto ValidateBeforeCreate(TaiSanThietBiForCreateDto nhaCungCap);
         ValidationResultDto ValidateBeforeUpdate(string id, TaiSanThietBiForUpdateDto nhaCungCap);
 

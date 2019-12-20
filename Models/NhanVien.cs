@@ -22,5 +22,6 @@ namespace MFFMS.API.Models
 
         public ICollection<PhieuDatSan> PhieuDatSan { get; set; }
         public ICollection<DonNhapHang> DonNhapHang { get; set; }
+        public ICollection<HoaDonDichVu> HoaDonDichVu { get; set; }
     }
 }

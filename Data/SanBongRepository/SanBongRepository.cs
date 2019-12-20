@@ -23,6 +23,7 @@ namespace MFFMS.API.Data.SanBongRepository
             _totalItems = 0;
             _totalPages = 0;
         }
+        
         private string GenerateId()
         {
             int count = _context.DanhSachSanBong.Count() + 1;
@@ -38,6 +39,7 @@ namespace MFFMS.API.Data.SanBongRepository
 
             return tempId;
         }
+        
         public async Task<SanBong> Create(SanBongForCreateDto sanBong)
         {
             var newSanBong = new SanBong
@@ -520,5 +522,7 @@ namespace MFFMS.API.Data.SanBongRepository
             }
 
         }
+       
+
     }
 }

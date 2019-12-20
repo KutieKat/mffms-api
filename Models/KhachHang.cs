@@ -8,7 +8,7 @@ namespace MFFMS.API.Models
 {
     public class KhachHang : BaseModel
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]     
         public string MaKhachHang { get; set; }
         public string TenKhachHang { get; set; }
         public string GioiTinh { get; set; }

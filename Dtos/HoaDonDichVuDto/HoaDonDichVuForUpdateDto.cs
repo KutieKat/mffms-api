@@ -8,17 +8,14 @@ namespace MFFMS.API.Dtos.HoaDonDichVuDto
 {
     public class HoaDonDichVuForUpdateDto : BaseDto
     {
+        [Required]
         public string MaKhachHang { get; set; }
         [Required]
-        public string MaDichVu { get; set; }
-        [Required]
+        public string MaNhanVien { get; set; }
         public DateTime NgaySuDung { get; set; }
-        [Required]
         public DateTime NgayLap { get; set; }
-        [Required]
         public double ThanhTien {get;set;}
-        [Required]
-        public string DaThanhToan{get;set;}
+        public double DaThanhToan{get;set;}
         public string GhiChu { get; set; }
     }
 }

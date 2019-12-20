@@ -113,7 +113,10 @@ namespace MFFMS.API.Data.NhanVienRepository
                 result = result.Where(x => x.SoCMND.ToLower().Contains(soCMND.ToLower()));
             }
 
-            result = result.Where(x => x.Luong >= luongBatDau && x.Luong <= luongKetThuc);
+            if (luongBatDau > 0 && luongKetThuc > 0)
+            {
+                result = result.Where(x => x.Luong >= luongBatDau && x.Luong <= luongKetThuc);
+            }
 
             if (!string.IsNullOrEmpty(ghiChu))
             {
@@ -693,21 +696,18 @@ namespace MFFMS.API.Data.NhanVienRepository
 
             return new
             {
-                generalEmployee = new
-                {
-                    TotalQuantity = totalQuantity,
-                    TotalAllSalary = totalAllSalary,
-                    TotalManageQuantity = totalManageQuantity,
-                    TotalManageSalary = totalManageSalary,
-                    AvgManageSalary = avgManageSalary,
-                    MinManageSalary = minManageSalary,
-                    MaxManageSalary = maxManageSalary,
-                    TotalServiceQuantity = totalServiceQuantity,
-                    TotalServiceSalary = totalServiceSalary,
-                    AvgServiceSalary = avgServiceSalary, 
-                    MinServiceSalary = minServiceSalary,
-                    MaxServiceSalary = maxServiceSalary,
-                }
+                TotalQuantity = totalQuantity,
+                TotalAllSalary = totalAllSalary,
+                TotalManageQuantity = totalManageQuantity,
+                TotalManageSalary = totalManageSalary,
+                AvgManageSalary = avgManageSalary,
+                MinManageSalary = minManageSalary,
+                MaxManageSalary = maxManageSalary,
+                TotalServiceQuantity = totalServiceQuantity,
+                TotalServiceSalary = totalServiceSalary,
+                AvgServiceSalary = avgServiceSalary, 
+                MinServiceSalary = minServiceSalary,
+                MaxServiceSalary = maxServiceSalary,
             };
         }
 
