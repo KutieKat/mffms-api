@@ -165,6 +165,35 @@ namespace MFFMS.API.Controllers
             }
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> ResetPassword(string id)
+        {
+            try
+            {
+                var result = await _repo.ResetPassword(id);
+
+                return StatusCode(200, new SuccessResponseDto
+                {
+                    Message = "Khôi phục mật khẩu mặc định cho tài khoản thành công!",
+                    Result = new SuccessResponseResultWithSingleDataDto
+                    {
+                        Data = result
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new FailedResponseDto
+                {
+                    Message = "Khôi phục mật khẩu mặc định cho tài khoản thất bại!",
+                    Result = new FailedResponseResultDto
+                    {
+                        Errors = e
+                    }
+                });
+            }
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> PermanentlyDeleteById(string id)
         {
@@ -253,13 +282,14 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register( TaiKhoanForCreateDto taiKhoan)
+        public async Task<IActionResult> Register(TaiKhoanForCreateDto taiKhoan)
         {
             try
             {
                 taiKhoan.TenDangNhap = taiKhoan.TenDangNhap.ToLower();
+                var exists = await _repo.TaiKhoanTonTai(taiKhoan.TenDangNhap);
 
-                if (await _repo.TaiKhoanTonTai(taiKhoan.TenDangNhap))
+                if (exists == true)
                 {
                     return BadRequest();
                 }
@@ -267,7 +297,13 @@ namespace MFFMS.API.Controllers
                 var taiKhoanMoi = new TaiKhoan
                 {
                     TenDangNhap = taiKhoan.TenDangNhap,
+                    HoVaTen = taiKhoan.HoVaTen,
+                    GioiTinh = taiKhoan.GioiTinh,
                     ThoiGianTao = DateTime.Now,
+                    DiaChi = taiKhoan.DiaChi,
+                    NgaySinh = taiKhoan.NgaySinh,
+                    Email = taiKhoan.Email,
+                    SoDienThoai = taiKhoan.SoDienThoai,
                     PhanQuyen = taiKhoan.PhanQuyen
                 };
 
@@ -278,7 +314,7 @@ namespace MFFMS.API.Controllers
                     Message = "Tạo tài khoản mới thành công!",
                     Result = new SuccessResponseResultWithSingleDataDto
                     {
-                        Data = taiKhoanDuocTao
+                        Data = taiKhoanMoi
                     }
                 });
             }
@@ -296,6 +332,45 @@ namespace MFFMS.API.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> ValidateHash([FromBody] ValidateHashDto objectToValidate)
+        {
+            try
+            {
+                var result = await _repo.ValidateHash(objectToValidate.TenDangNhap, objectToValidate.Hash);
+
+                if (result == null)
+                {
+                    return StatusCode(500, new FailedResponseDto
+                    {
+                        Message = "Tài khoản không tồn tại!"
+                    });
+                }
+                else
+                {
+                    return StatusCode(200, new SuccessResponseDto
+                    {
+                        Message = "Tài khoản tồn tại!",
+                        Result = new SuccessResponseResultWithSingleDataDto
+                        {
+                            Data = result
+                        }
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new FailedResponseDto
+                {
+                    Message = "Tài khoản không tồn tại!",
+                    Result = new FailedResponseResultDto
+                    {
+                        Errors = e
+                    }
+                });
+            }
+        }
+
+        [HttpPost]
         public async Task<IActionResult> Login([FromBody] TaiKhoanForLoginDto taiKhoan)
         {
             try
@@ -303,36 +378,38 @@ namespace MFFMS.API.Controllers
                 var taiKhoanDuocDangNhap = await _repo.DangNhap(taiKhoan.TenDangNhap.ToLower(), taiKhoan.MatKhau);
 
                 if (taiKhoanDuocDangNhap == null)
-                    return Unauthorized();
-
-                var claims = new[]
                 {
-                    new Claim(ClaimTypes.NameIdentifier, taiKhoanDuocDangNhap.MaTaiKhoan.ToString()),
-                    new Claim(ClaimTypes.Name, taiKhoanDuocDangNhap.TenDangNhap),
-                    new Claim(ClaimTypes.Role, taiKhoanDuocDangNhap.PhanQuyen)
-                };
+                    return StatusCode(500, new FailedResponseDto
+                    {
+                        Message = "Đăng nhập vào hệ thống thất bại!"
+                    });
+                }
 
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value));
-                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(claims),
-                    Expires = DateTime.Now.AddDays(1),
-                    SigningCredentials = creds
-                };
+                //var claims = new[]
+                //{
+                //    new Claim(ClaimTypes.NameIdentifier, taiKhoanDuocDangNhap.MaTaiKhoan.ToString()),
+                //    new Claim(ClaimTypes.Name, taiKhoanDuocDangNhap.TenDangNhap),
+                //    new Claim(ClaimTypes.Role, taiKhoanDuocDangNhap.PhanQuyen)
+                //};
 
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var token = tokenHandler.CreateToken(tokenDescriptor);
+                //var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value));
+                //var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+                //var tokenDescriptor = new SecurityTokenDescriptor
+                //{
+                //    Subject = new ClaimsIdentity(claims),
+                //    Expires = DateTime.Now.AddDays(1),
+                //    SigningCredentials = creds
+                //};
+
+                //var tokenHandler = new JwtSecurityTokenHandler();
+                //var token = tokenHandler.CreateToken(tokenDescriptor);
 
                 return StatusCode(200, new SuccessResponseDto
                 {
                     Message = "Đăng nhập vào hệ thống thành công!",
                     Result = new SuccessResponseResultWithSingleDataDto
                     {
-                        Data = new
-                        {
-                            token = tokenHandler.WriteToken(token)
-                        }
+                        Data = taiKhoanDuocDangNhap
                     }
                 });
             }
