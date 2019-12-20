@@ -79,7 +79,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
 
         public async Task<PagedList<HoaDonDichVu>> GetAll(HoaDonDichVuParams userParams)
         {
-            var result = _context.DanhSachHoaDonDichVu.Include(x => x.KhachHang).Include(x => x.NhanVien).AsQueryable();
+            var result = _context.DanhSachHoaDonDichVu.Include(x => x.ChiTietHDDV).Include(x => x.KhachHang).Include(x => x.NhanVien).AsQueryable();
             var sortField = userParams.SortField;
             var sortOrder = userParams.SortOrder;
             
@@ -293,7 +293,7 @@ namespace MFFMS.API.Data.HoaDonDichVuRepository
 
         public async Task<HoaDonDichVu> GetById(string id)
         {
-            var result = await _context.DanhSachHoaDonDichVu.Include(x => x.NhanVien).Include(x => x.KhachHang).FirstOrDefaultAsync(x => x.SoHDDV == id);
+            var result = await _context.DanhSachHoaDonDichVu.Include(x => x.ChiTietHDDV).Include(x => x.NhanVien).Include(x => x.KhachHang).FirstOrDefaultAsync(x => x.SoHDDV == id);
             return result;
         }
 

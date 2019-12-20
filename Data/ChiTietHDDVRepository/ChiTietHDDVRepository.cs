@@ -25,26 +25,12 @@ namespace MFFMS.API.Data.ChiTietHDDVRepository
 
         }
 
-        private string GenerateId()
-        {
-            int count = _context.DanhSachChiTietHDDV.Count() + 1;
-            string tempId = count.ToString();
-            string currentYear = DateTime.Now.ToString("yy");
- 
-            while (tempId.Length < 4)
-            {
-                tempId = "0" + tempId;
-            }
- 
-            tempId = "CTHDDV" + currentYear + tempId;
- 
-            return tempId;
-        }
+       
         public async Task<ChiTietHDDV> Create(ChiTietHDDVForCreateDto chiTietHDDV)
         {
             var newChiTietHDDV = new ChiTietHDDV
             {
-                SoHDDV = GenerateId(),
+                SoHDDV = chiTietHDDV.SoHDDV,
                 MaDichVu = chiTietHDDV.MaDichVu,
                 SoLuong = chiTietHDDV.SoLuong,
                 DonGia = chiTietHDDV.DonGia,
