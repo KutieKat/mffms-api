@@ -14,5 +14,6 @@ namespace MFFMS.API.Dtos.PhieuDatSanDto
         public string MaNhanVien { get; set; }
         [Required]
         public double TongTien { get; set; }
+        public DateTime NgayLap { get; set; }
     }
 }
