@@ -78,8 +78,6 @@ namespace MFFMS.API.Data.ChiTieuPhieuDatSanRepository
                 DaXoa = 0
             };
 
-            
-
             await _context.DanhSachChiTietPhieuDatSan.AddAsync(newChiTietPhieuDatSan);
 
             
