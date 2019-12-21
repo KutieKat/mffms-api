@@ -45,7 +45,7 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
                 MaPhieuDatSan = GenerateId(),
                 MaKhachHang = phieuDatSan.MaKhachHang,
                 MaNhanVien = phieuDatSan.MaNhanVien,
-                NgayLap = DateTime.Now,
+                NgayLap = phieuDatSan.NgayLap,
                 TongTien = phieuDatSan.TongTien,
                 ThoiGianCapNhat = DateTime.Now,
                 ThoiGianTao = DateTime.Now,
