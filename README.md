@@ -44,4 +44,4 @@
 * [Dương Thạnh Tín](https://github.com/DuongThanhTin) (16521241 - PMCL2016.3)
 
 ## Giấy phép
-* [MIT](https://github.com/KutieKat/mffms-web/blob/master/LICENSE)
+* [MIT](https://github.com/KutieKat/mffms-api/blob/master/LICENSE)
