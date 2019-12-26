@@ -580,7 +580,7 @@ namespace MFFMS.API.Data.PhieuDatSanRepository
                 MaPhieuDatSan = id,
                 MaKhachHang = phieuDatSan.MaKhachHang,
                 MaNhanVien = phieuDatSan.MaNhanVien,
-                NgayLap = oldRecord.NgayLap,
+                NgayLap = phieuDatSan.NgayLap,
                 TongTien = phieuDatSan.TongTien,
                 TrangThai = phieuDatSan.TrangThai,
                 ThoiGianTao = oldRecord.ThoiGianTao,
