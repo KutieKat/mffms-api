@@ -32,7 +32,7 @@ namespace MFFMS.API.Data.CaiDatRepository
             var oldRecord = await _context.DanhSachCaiDat.AsNoTracking().FirstOrDefaultAsync();
             var caiDatToUpdate = new CaiDat
             {
-                MaCaiDat = GenerateId(),
+                MaCaiDat = oldRecord.MaCaiDat,
                 TenSanBong = caiDat.TenSanBong,
                 DiaChi = caiDat.DiaChi,
                 SoDienThoai = caiDat.SoDienThoai,
