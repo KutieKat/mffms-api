@@ -38,10 +38,14 @@
 * [Swashbuckle.AspNetCore](https://www.nuget.org/packages/swashbuckle.aspnetcore/)
 
 ## Đội ngũ phát triển
-* [Nguyễn Tiến Dũng](https://github.com/KutieKat) (16520259 - PMCL2016.1)
-* [Nguyễn Việt Tiến](https://github.com/viettiennguyen029) (16521233 - PMCL2016.3)
-* [Hồ Nguyễn Nhật Tiến](https://github.com/nhattienho1998) (16521218 - PMCL2016.3)
-* [Dương Thạnh Tín](https://github.com/DuongThanhTin) (16521241 - PMCL2016.3)
+<table>
+  <tr>
+    <td align="center"><img src="https://avatars2.githubusercontent.com/u/37391128?s=460&v=4" alt="Nguyễn Tiến Dũng"/><br /><b><a href="https://github.com/KutieKat">Nguyễn Tiến Dũng</a><br/>(Trưởng nhóm)</b><br/>16520259<br/>PMCL2016.1<br /><span title="Coding">💻</span> <span title="Documenting">📖</span> <span title="Testing">✔️</span></td>
+    <td align="center"><img src="https://avatars3.githubusercontent.com/u/38419585?s=460&v=4" alt="Nguyễn Việt Tiến"/><br /><b><a href="https://github.com/viettiennguyen029">Nguyễn Việt Tiến</a><br/>(Nhóm phó)</b><br/>16521233<br/>PMCL2016.3<br /><span title="Coding">💻</span> <span title="Documenting">📖</span> <span title="Testing">✔️</span></td>
+    <td align="center"><img src="https://avatars1.githubusercontent.com/u/29588339?s=460&v=4" alt="Hồ Nguyễn Nhật Tiến" /><br /><b><a href="https://github.com/nhattienho1998">Hồ Nguyễn Nhật Tiến</a><br/>(Thành viên)</b><br/>16521218<br/>PMCL2016.3<br /><span title="Coding">💻</span> <span title="Documenting">📖</span> <span title="Testing">✔️</span></td>
+    <td align="center"><img src="https://avatars3.githubusercontent.com/u/38368965?s=460&v=4" alt="Dương Thạnh Tín"/><br /><b><a href="https://github.com/DuongThanhTin">Dương Thạnh Tín</a><br/>(Thành viên)</b><br/>16521241<br/>PMCL2016.3<br /><span title="Documenting">📖</span> <span title="Testing">✔️</span></td>
+  </tr>
+</table>
 
 ## Giấy phép
 * [MIT](https://github.com/KutieKat/mffms-api/blob/master/LICENSE)
