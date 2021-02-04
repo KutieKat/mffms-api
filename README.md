@@ -37,9 +37,5 @@
 * [MySql.Data.EntityFrameworkCore](https://www.nuget.org/packages/MySql.Data.EntityFrameworkCore)
 * [Swashbuckle.AspNetCore](https://www.nuget.org/packages/swashbuckle.aspnetcore/)
 
-## Đội ngũ phát triển
-* [Nguyễn Tiến Dũng](https://github.com/KutieKat) (MSSV: 16520259 - Lớp: PMCL2016.1)
-* [Nguyễn Việt Tiến](https://github.com/viettiennguyen029) (MSSV: 16521233 - Lớp: PMCL2016.3)
-
 ## Giấy phép
 * [MIT](https://github.com/KutieKat/mffms-api/blob/master/LICENSE)
